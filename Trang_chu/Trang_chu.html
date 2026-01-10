@@ -3,11 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ</title>
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+
+
+    <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+    <title>THƯ VIỆN GTQTD</title>
     <link rel="stylesheet" href="/Trang_chu/Trang_chu.css">
 </head>
 <body>
-    <h1>Hello World!</h1>
+    <header>
+        <nav class="navbar">
+            <!-- Logo + menu trái -->
+            <div class="nav-left">
+                <a href="/Trang_chu/Trang_chu.html" class="logo">
+                    <img src="/Assets/Images/logo.png" alt="Logo GTQTD">
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/Trang_chu/Trang_chu.html">GTQTD</a></li>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+            <!-- Nút bên phải -->
+            <div class="nav-right">
+                <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                <a href="#"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class ="search-area">
+            <div class="search-bg"></div>
+            <div class="search-content">
+                <p style = "font-size: 65px;">Khám phá những tựa sách <br> mà bạn yêu thích</p>
+                <p>Có +100.000 đầu sách đang chờ bạn khám phá</p>
+                <div class="search-box">
+                    <input type="text" placeholder="Nhập tên sách, tác giả...">
+                    <button>Tìm kiếm</button>
+                </div>
+            </div>
+        </div>
+        <div class = "content-area">
+            <p class = "introduce">Xem thư viện có gì</p>
+        </div>
+    </main>
+    
     <script type="module" src="/Trang_chu/Trang_chu.js"></script>
+    <footer>
+
+    </footer>
 </body>
+
 </html>
