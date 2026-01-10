@@ -1,0 +1,174 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: #f4f6f5;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Ben Trai */
+.left {
+    width: 60%;
+    background: url("/Assets/Images/bookshelf.jpg") left/cover no-repeat;
+    position: relative;
+}
+
+.logo{
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 240px;
+    height: 80px;
+    background:  url("/Assets/Images/logo.png") left/contain no-repeat;
+}
+
+.overlay {
+    background: rgba(18, 83, 43, 0.9);
+    color: #fff;
+    height: 100%;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.overlay h1 {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.overlay p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.stats span {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 14px;
+    border-radius: 20px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+/* Ben phai */
+.right {
+    width: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form {
+    width: 360px;
+}
+
+.login-form h2 {
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.tendangnhap-box {
+    position: relative;
+}
+
+.tendangnhap-box .input-icon {
+    position: absolute;
+    left: 12px;
+    top: 35%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.tendangnhap-box input {
+    padding-left: 38px;
+}
+ 
+.password-box {
+    position: relative;
+}
+
+.password-box input {
+    padding-left: 38px;
+}
+
+.password-box .input-icon {
+    position: absolute;
+    left: 12px;
+    top: 35%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.password-box .eye {
+    position: absolute;
+    right: 12px;
+    top: 35%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+}
+
+.password-box input {
+    padding-right: 38px;
+}
+
+.remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #1f7a43;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #166437;
+}
