@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('role', data.role);
 
       // nối đến trang chủ
-      if (data.role === 'ADMIN ') {
+      if (data.role === 'ADMIN') {
         window.location.href = '/Trang_chu_admin/Trang_chu_admin.html';
       } else {
         window.location.href = '/Trang_chu/Trang_chu.html';
