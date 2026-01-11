@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // lưu session
       localStorage.setItem('accountId', data.accountId);
+      localStorage.setItem('username', username);
       localStorage.setItem('role', data.role);
 
       // nối đến trang chủ

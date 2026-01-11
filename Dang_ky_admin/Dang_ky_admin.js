@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setDisabled(true);
 
     try {
-      const res = await fetch('/api/accounts/create/admin', {
+      const res = await fetch('http://localhost:8080/api/accounts/create/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })

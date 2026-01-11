@@ -27,7 +27,18 @@
             <!-- Nút bên phải -->
             <div class="nav-right">
                 <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
-                <a href="/Dang_nhap/Dang_nhap.html"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
+                <a href="/Dang_nhap/Dang_nhap.html" class="login-link"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
+                <div class="user-menu" style="display:none;">
+                    <button class="btn-user">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="username-text"></span>
+                    </button>
+
+                    <div class="dropdown">
+                    <a href="/User_profile/User_profile.html">Profile</a>
+                    <a href="/Dang_nhap/Dang_nhap.html">Đăng xuất</a>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
