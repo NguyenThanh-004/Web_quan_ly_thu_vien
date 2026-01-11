@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ Admin - Thư viện GTQTD</title>
+    <link rel="stylesheet" href="Trang_chu_admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-book-open logo-icon"></i>
+            <span class="logo-text">GTQTD</span>
+        </div>
+
+        <ul class="menu">
+            <li class="active">
+                <i class="fa-solid fa-house"></i> Trang chủ
+            </li>
+            <li>
+                <i class="fa-solid fa-book"></i> Sách
+            </li>
+            <li>
+                <i class="fa-solid fa-user"></i> Độc giả
+            </li>
+            <li>
+                <i class="fa-solid fa-file-invoice"></i> Phiếu mượn
+            </li>
+            <li>
+                <i class="fa-solid fa-pen-nib"></i> Tác giả
+            </li>
+            <li>
+                <i class="fa-solid fa-building"></i> Nhà xuất bản
+            </li>
+            <li>
+                <i class="fa-solid fa-id-card"></i> Thẻ thư viện
+            </li>
+            <li>
+                <i class="fa-solid fa-layer-group"></i> Thể loại
+            </li>
+            <li>
+                <i class="fa-solid fa-tags"></i> Lĩnh vực
+            </li>
+        </ul>
+
+        <div id="logout_function" class="logout">
+            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <div class="header">
+            <input type="text" placeholder="Tìm kiếm sách, tác giả ...">
+
+            <div class="user">
+                <span>Giáp</span>
+                <div class="avatar">
+                    <i class="fa-solid fa-circle-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông số -->
+        <div class="stats">
+
+            <div class="card">
+                <p>
+                    <i class="fa-solid fa-book-open"></i>
+                    Số sách mượn
+                </p>
+                <h2>12,450</h2>
+                <span class="green">
+                    <i class="fa-solid fa-arrow-up"></i> 12 this week
+                </span>
+            </div>
+
+            <div class="card">
+                <p>
+                    <i class="fa-solid fa-hand-holding"></i>
+                    Số phiếu đang mượn
+                </p>
+                <h2>342</h2>
+                <span class="green">
+                    <i class="fa-solid fa-arrow-up"></i> 5 today
+                </span>
+            </div>
+
+            <div class="card warning">
+                <p>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Số phiếu quá hạn
+                </p>
+                <h2>14</h2>
+                <span class="red">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    Action needed
+                </span>
+            </div>
+
+            <div class="card">
+                <p>
+                    <i class="fa-solid fa-user-plus"></i>
+                    Thành viên mới
+                </p>
+                <h2>28</h2>
+                <span class="green">
+                    <i class="fa-solid fa-arrow-up"></i> 3 this month
+                </span>
+            </div>
+
+        </div>
+
+        <!-- Truy cập nhanh -->
+        <h3 class="section-title">Truy cập nhanh</h3>
+
+        <div class="quick">
+
+        <div class="quick-card quick-box">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Đăng ký độc giả</span>
+        </div>
+
+        <div id="register-admin" class="quick-card quick-box" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Đăng ký admin">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Đăng ký admin</span>
+        </div>
+
+        <div class="quick-card quick-box">
+            <i class="fa-solid fa-file-circle-plus"></i>
+            <span>Phiếu mượn</span>
+        </div>
+
+        <div class="quick-card quick-box">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Báo cáo</span>
+        </div>
+
+        </div>
+        
+    </div>
+
+    </main>
+</div>
+<script type="module" src="/Trang_chu_admin/Trang_chu_admin.js"></script>
+</body>
+</html>

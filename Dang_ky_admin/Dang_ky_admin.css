@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Overlay nền mờ */
+.overlay {
+    width: 100vw;
+    height: 100vh;
+    background: #f7f9f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal */
+.form-container {
+    width: 900px;
+    background: #f9fbf9;
+    border-radius: 16px;
+    padding: 30px 40px 40px;
+    position: relative;
+}
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Title */
+.modal h2 {
+    margin-bottom: 20px;
+    font-size: 26px;
+}
+
+/* Khung form */
+.form-box {
+    border: 2px solid #2ecc71;
+    border-radius: 14px;
+    padding: 30px 40px;
+}
+
+/* Form group */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+/* Input */
+.form-group input {
+    width: 70%;
+    height: 42px;
+    border-radius: 10px;
+    border: none;
+    background: #e0e0e0;
+    padding: 0 15px;
+    font-size: 14px;
+    outline: none;
+}
+
+/* Button */
+.btn-submit {
+    display: block;
+    margin: 30px auto 0;
+    background: #256f3d;
+    color: #fff;
+    border: none;
+    padding: 12px 45px;
+    font-size: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background: #1f5f34;
+}
