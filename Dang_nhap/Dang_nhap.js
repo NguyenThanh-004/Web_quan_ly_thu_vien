@@ -60,14 +60,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const data = await res.json();
-
+      console.log('LOGIN RESPONSE:', data);
+      console.log('ROLE TYPE:', typeof data.role);
+      console.log('ROLE VALUE:', `"${data.role}"`);
       // lưu session
       localStorage.setItem('accountId', data.accountId);
       localStorage.setItem('username', username);
       localStorage.setItem('role', data.role);
 
       // nối đến trang chủ
-      window.location.href = '/Trang_chu/Trang_chu.html';
+      if (data.role === 'ADMIN ') {
+        window.location.href = '/Trang_chu_admin/Trang_chu_admin.html';
+      } else {
+        window.location.href = '/Trang_chu/Trang_chu.html';
+      }
     } catch (err) {
       subtitle.textContent = err.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
       subtitle.style.color = 'red';

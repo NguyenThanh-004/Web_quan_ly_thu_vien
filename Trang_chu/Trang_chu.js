@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // === CHECK LOGIN NGAY KHI LOAD ===
   const username = localStorage.getItem('username');
   console.log('Logged in user:', username);
+  console.log('User role:', localStorage.getItem('role'));
   const loginLink = document.querySelector('.login-link');
   const userMenu = document.querySelector('.user-menu');
   const usernameText = document.querySelector('.username-text');
