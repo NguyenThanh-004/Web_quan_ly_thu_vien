@@ -3,9 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+
+
+    <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+    <link rel="stylesheet" href="/User_profile/User_profile.css">
+    <title>Profile</title>
 </head>
 <body>
-    <h1>Trang thông tin người dùng</h1>
+    <header>
+        <nav class="navbar">
+            <!-- Logo + menu trái -->
+            <div class="nav-left">
+                <a href="/Trang_chu/Trang_chu.html" class="logo">
+                    <img src="/Assets/Images/logo.png" alt="Logo GTQTD">
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/Trang_chu/Trang_chu.html">GTQTD</a></li>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+            <!-- Nút bên phải -->
+            <div class="nav-right">
+                <a href="#"><button class="btn-giosach"><i class="fas fa-history"></i></button></a>
+                <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                <a href="/Dang_nhap/Dang_nhap.html" class="login-link"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
+                <div class="user-menu" style="display:none;">
+                    <button class="btn-user">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="username-text"></span>
+                    </button>
+
+                    <div class="dropdown">
+                    <a href="/User_profile/User_profile.html">Profile</a>
+                    <a href="/Dang_nhap/Dang_nhap.html" class="btn-logout">Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="profile-page">
+        <h1 class="page-title">Trang cá nhân</h1>
+        <div class="profile-layout">
+            <!-- Cột trái -->
+            <aside class="profile-card">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class ="user-info">
+                    <h2 class="user-name" id="profileName">Nguyen Van A</h2>
+                    <p class="user-id"  id="profileId">ID: LIB-2023-889</p>
+                    <a href="/Dang_nhap/Dang_nhap.html" class="logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                </div>
+            </aside>
+            <!-- Cột phải -->
+            <section class="profile-content">
+                <!-- Trạng thái + tiền ký quỹ -->
+                <div class="status-row">
+                    <div class="status-box">
+                        <span class="label">Trạng thái</span>
+                        <span class="value active" id="profileStatus">
+                            <i class="fas fa-circle"></i> Active
+                        </span>
+                    </div>
+                    <div class="status-box">
+                        <span class="label">Tiền quỹ</span>
+                        <span class="value money" id="profileMoney">50.000 VND</span>
+                    </div>
+                </div>
+                <!-- Thông tin độc giả -->
+                <div class="info-card">
+                    <h3><i class="fas fa-user"></i> Thông tin độc giả</h3>
+                    <div class="info-grid">
+                        <div>
+                            <label>Họ và tên</label>
+                            <p id="infoName">Nguyen Van A</p>
+                        </div>
+                        <div>
+                            <label>Ngày sinh</label>
+                            <p id="infoBirth">15/08/1995</p>
+                        </div>
+                        <div>
+                            <label>Email</label>
+                            <p id="infoEmail">nguyenvana@example.com</p>
+                        </div>
+
+                        <div>
+                            <label>Số điện thoại</label>
+                            <p id="infoPhone">090 123 4567</p>
+                        </div>
+                        <div class="full">
+                            <label>Địa chỉ</label>
+                            <p id="infoAddress">123 Library Street, Ben Nghe Ward, District 1, Ho Chi Minh City</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Thông tin thẻ thư viện -->
+                <div class="info-card">
+                    <h3><i class="fas fa-id-card"></i> Thông tin thẻ thư viện</h3>
+                    <div class="info-grid">
+                        <div>
+                            <label>Mã thẻ thư viện</label>
+                            <p id="cardId">LIB-2023-889</p>
+                        </div>
+                        <div>
+                            <label>Trạng thái</label>
+                            <p id="cardStatus">Bình thường</p>
+                        </div>
+                        <div>
+                            <label>Ngày cấp</label>
+                            <p id="cardIssueDate">06/01/2026</p>
+                        </div>
+                        <div>
+                            <label>Ngày hết hạn</label>
+                            <p id="cardExpiryDate">20/05/2027</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Cột 1 -->
+            <div class="footer-col social">
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-square"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <!-- Cột 2 -->
+            <div class="footer-col">
+                <h4>Thư viện</h4>
+                <ul>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 3 -->
+            <div class="footer-col">
+                <h4>Chính sách</h4>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Chính sách độc giả</a></li>
+                    <li><a href="#">Điều khoản</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 4 -->
+            <div class="footer-col">
+                <h4>Bản quyền</h4>
+                <ul>
+                    <li><a href="#">Hỗ trợ</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    <script type="module" src="/User_profile/User_profile.js"></script>
 </body>
 </html>

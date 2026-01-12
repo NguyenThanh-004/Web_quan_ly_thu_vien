@@ -55,7 +55,7 @@ header {
     gap: 12px;
 }
 
-.btn-giosach,
+.btn-giosach, .btn-lichsumuon,
 .btn-dangnhap {
     padding: 12px 12px;
     border-radius: 6px;
@@ -65,6 +65,12 @@ header {
 }
 
 .btn-giosach {
+    background-color: #e5e7eb;
+    font-size: 18px;
+    color: #000000;
+}
+
+.btn-lichsumuon {
     background-color: #e5e7eb;
     font-size: 18px;
     color: #000000;
@@ -215,8 +221,94 @@ header {
     margin: 70px 80px;
     font-size: 50px;
     font-weight: bold;
-    
 }
+
+
+
+/* ===== FOOTER ===== */
+.footer {
+    background-color: #ffffff;
+    border-top: 1px solid #e5e5e5;
+    padding: 40px 0;
+    margin-top: 80px;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.footer-col h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #000;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 8px;
+}
+
+.footer-col ul li a {
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+}
+
+.footer-col ul li a:hover {
+    color: #000;
+}
+
+/* Social icons */
+.social-icons {
+    display: flex;
+    gap: 16px;
+}
+
+.social-icons a {
+    color: #000;
+    font-size: 18px;
+}
+
+.social-icons a:hover {
+    opacity: 0.7;
+}
+
+
+/* #staff-list {
+    height: 800px;
+} */
+
+/* View More */
+/* .view-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 40px 0;
+}
+
+.view-more-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.3s;
+    font-weight: 600;
+}
+
+.view-more-btn:hover {
+    color: var(--primary);
+} */
 
 @media (max-width: 768px) {
     .navbar {
@@ -255,3 +347,25 @@ header {
     }
 }
 
+/* .card {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.card-img-top {
+    height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
+}
+
+.book-title {
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.book-author {
+    font-size: 13px;
+    color: var(--muted);
+} */

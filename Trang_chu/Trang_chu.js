@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const username = localStorage.getItem('username');
   console.log('Logged in user:', username);
   console.log('User role:', localStorage.getItem('role'));
+  console.log('Auth token:', localStorage.getItem('token'));
   const loginLink = document.querySelector('.login-link');
   const userMenu = document.querySelector('.user-menu');
   const usernameText = document.querySelector('.username-text');
@@ -37,3 +38,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+

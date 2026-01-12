@@ -65,8 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('ROLE VALUE:', `"${data.role}"`);
       // lưu session
       localStorage.setItem('accountId', data.accountId);
-      localStorage.setItem('username', username);
+      localStorage.setItem('username', data.username);
       localStorage.setItem('role', data.role);
+      localStorage.setItem('token', data.token);
 
       // nối đến trang chủ
       if (data.role === 'ADMIN') {
