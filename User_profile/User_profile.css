@@ -1,6 +1,7 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
+    background-color: #F8F9FB;
 }
 
 a {
@@ -60,6 +61,8 @@ header {
     padding: 12px 12px;
     border-radius: 6px;
     border: none;
+    margin-left: 5px;
+    margin-right: 5px;
     cursor: pointer;
     font-weight: bold;
 }
@@ -287,7 +290,6 @@ header {
     background-color: #ffffff;
     border-top: 1px solid #e5e5e5;
     padding: 40px 0;
-    margin-top: 80px;
 }
 
 .footer-container {

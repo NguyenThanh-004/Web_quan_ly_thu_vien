@@ -172,3 +172,29 @@ button {
 button:hover {
     background: #166437;
 }
+
+.guest-btn {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px;
+    background: #f4f6f5;
+    color: #1f7a43;
+    border: 1px dashed #1f7a43;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    transition: all 0.25s ease;
+}
+
+.guest-btn:hover {
+    background: #e9f3ee;
+    border-color: #166437;
+    color: #166437;
+}
+

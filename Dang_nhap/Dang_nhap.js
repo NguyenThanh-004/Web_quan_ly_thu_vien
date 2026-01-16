@@ -84,3 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+const guestBtn = document.querySelector('.guest-btn');
+
+guestBtn.addEventListener('click', () => {
+    window.location.href = '/Trang_chu/Trang_chu.html';
+});

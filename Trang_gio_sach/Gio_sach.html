@@ -8,8 +8,8 @@
 
 
     <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
-    <title>THƯ VIỆN GTQTD</title>
-    <link rel="stylesheet" href="/Trang_chu/Trang_chu.css">
+    <title>Giỏ sách</title>
+    <link rel="stylesheet" href="/Trang_gio_sach/Gio_sach.css">
 </head>
 <body>
     <header>
@@ -45,33 +45,70 @@
             </div>
         </nav>
     </header>
-    <main>
-        <div class ="search-area">
-            <div class="search-bg"></div>
-            <div class="search-content">
-                <p style = "font-size: 65px;">Khám phá những tựa sách <br>mà bạn yêu thích</p>
-                <p>Có +100.000 đầu sách đang chờ bạn khám phá</p>
-                <div class="search-box">
-                    <input type="text" placeholder="Nhập tên sách, tác giả...">
-                    <button>Tìm kiếm</button>
+    <main class="cart-page">
+        <div class="cart-container">
+
+            <!-- Cột trái -->
+            <div class="cart-left">
+            <div class="cart-header">
+                <h2>Giỏ sách</h2>
+                <span class="cart-sub">Sách trong giỏ</span>
+                <button class="clear-cart">✕ Xóa hết</button>
+            </div>
+
+            <!-- Item -->
+            <div class="cart-item">
+                <img src="/Assets/Images/sample1.jpg" alt="Book">
+
+                <div class="cart-info">
+                <h4>The Great Gatsby</h4>
+                <p class="author">F. Scott Fitzgerald</p>
+                <p class="meta">Mã bản sao: TGG-1</p>
+                <p class="status new">Tình trạng: Mới</p>
+                </div>
+
+                <div class="cart-actions">
+                <input type="checkbox">
+                <button class="remove-item">
+                    <i class="fas fa-trash"></i>
+                </button>
                 </div>
             </div>
-        </div>
-        <div class = "content-area">
-            <p class = "introduce">Xem thư viện có gì</p>
-        </div>
-        <div class="book-section">
-            <div class="book-grid" id="bookGrid">
-                <!-- JS render sách ở đây -->
-            </div>
 
-            <div class="load-more">
-                <button id="btnLoadMore">
-                    Xem thêm <i class="fas fa-chevron-down"></i>
+            <!-- Item -->
+            <div class="cart-item">
+                <img src="/Assets/Images/sample2.jpg" alt="Book">
+
+                <div class="cart-info">
+                <h4>Sapiens: A Brief History</h4>
+                <p class="author">Yuval Noah Harari</p>
+                <p class="meta">Mã bản sao: SABH-1</p>
+                <p class="status old">Tình trạng: Cũ</p>
+                </div>
+
+                <div class="cart-actions">
+                <input type="checkbox">
+                <button class="remove-item">
+                    <i class="fas fa-trash"></i>
                 </button>
+                </div>
+            </div>
             </div>
 
-        </div>        
+            <!-- Cột phải -->
+            <div class="cart-right">
+            <div class="summary-box">
+                <p class="note">
+                📌 Sách sẽ được lưu trong 24h sau khi bấm chọn Mượn sách
+                </p>
+
+                <button class="btn-borrow">Mượn sách</button>
+                <a href="/Trang_chu/Trang_chu.html" class="continue">
+                Tiếp tục tìm sách
+                </a>
+            </div>
+            </div>
+        </div>
     </main>
     <footer class="footer">
         <div class="footer-container">
@@ -112,10 +149,6 @@
             </div>
         </div>
     </footer>
-    <button id="btnScrollTop" class="scroll-top">
-        <i class="fas fa-chevron-up"></i>
-    </button>
-    <script src="/Trang_chu/Trang_chu.js"></script>
+    <script src="/Trang_gio_sach/Gio_sach.js"></script>
 </body>
-
 </html>

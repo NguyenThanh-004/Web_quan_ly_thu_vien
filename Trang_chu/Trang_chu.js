@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = '/Dang_nhap/Dang_nhap.html';
   });
 
+
   // Click ngoài → đóng dropdown
   document.addEventListener('click', (e) => {
     if (!userMenu.contains(e.target)) {
@@ -113,3 +114,5 @@ btnScrollTop.addEventListener('click', () => {
     behavior: 'smooth'
   });
 });
+
+
