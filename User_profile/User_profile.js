@@ -1,11 +1,11 @@
 import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 document.addEventListener('DOMContentLoaded', async () => {
-  const username = localStorage.getItem('username');
-  const accountId = localStorage.getItem('accountId');
-  const token = localStorage.getItem('token');
+  const username = sessionStorage.getItem('username');
+  const accountId = sessionStorage.getItem('accountId');
+  const token = sessionStorage.getItem('token');
   console.log('Logged in user:', username);
-  console.log('User role:', localStorage.getItem('role'));
-  console.log('Auth token:', localStorage.getItem('token'));
+  console.log('User role:', sessionStorage.getItem('role'));
+  console.log('Auth token:', sessionStorage.getItem('token'));
   const loginLink = document.querySelector('.login-link');
   const userMenu = document.querySelector('.user-menu');
   const usernameText = document.querySelector('.username-text');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   logoutBtn.addEventListener('click', () => {
-    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = '/Dang_nhap/Dang_nhap.html';
   });
 

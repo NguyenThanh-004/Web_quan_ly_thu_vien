@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!logoutBtn) return;
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    localStorage.removeItem('accountId');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('accountId');
     window.location.href = '../Dang_nhap/Dang_nhap.html';
   };
 
@@ -144,7 +144,7 @@ let totalPages = 1;
 // ================= HELPER =================
 function buildHeaders() {
   const headers = {};
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (token) headers['Authorization'] = `Bearer ${token}`;
   return headers;
 }
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const usernameEl = document.querySelector('.username-text');
   if (usernameEl) {
     usernameEl.textContent =
-      localStorage.getItem('username') || 'Khách';
+      sessionStorage.getItem('username') || 'Khách';
   }
 
   fetchTheLoai(0, pageSize);

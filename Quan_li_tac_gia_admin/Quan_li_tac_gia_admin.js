@@ -10,10 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const navigate = () => {
     // clear local auth data then redirect to login
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    localStorage.removeItem('accountId');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('accountId');
     window.location.href = '../Dang_nhap/Dang_nhap.html';
   };
 
@@ -160,7 +160,7 @@ function setStatus(msg) {
 function buildHeaders(isJson = true) {
   const headers = {};
   if (isJson) headers['Content-Type'] = 'application/json';
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (token) headers['Authorization'] = `Bearer ${token}`;
   return headers;
 }
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // hiển thị username nếu có token
   const usernameEl = document.querySelector('.username-text');
-  const storedUser = localStorage.getItem('username');
+  const storedUser = sessionStorage.getItem('username');
   if (usernameEl) {
     usernameEl.textContent = storedUser ? storedUser : 'Khách';
   }

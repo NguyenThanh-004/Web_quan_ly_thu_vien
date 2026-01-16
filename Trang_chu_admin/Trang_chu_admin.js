@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const navigate = () => {
     // clear stored auth and redirect to login
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    localStorage.removeItem('accountId');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('accountId');
     window.location.href = '/Dang_nhap/Dang_nhap.html';
   };
 
@@ -154,6 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // show username in header if present
 document.addEventListener('DOMContentLoaded', () => {
   const usernameEl = document.querySelector('.username-text');
-  const storedUser = localStorage.getItem('username');
+  const storedUser = sessionStorage.getItem('username');
   if (usernameEl) usernameEl.textContent = storedUser ? storedUser : 'Khách';
 });
