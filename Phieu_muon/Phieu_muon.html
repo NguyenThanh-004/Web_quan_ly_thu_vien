@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+    <title>PHIẾU MƯỢN - GTQTD</title>
+    <link rel="stylesheet" href="/Trang_chu/Trang_chu.css">
+    <link rel="stylesheet" href="Phieu_muon.css">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-left">
+                <a href="/Trang_chu/Trang_chu.html" class="logo">
+                    <img src="/Assets/Images/logo.png" alt="Logo GTQTD">
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/Trang_chu/Trang_chu.html">GTQTD</a></li>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <a href="#"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
+                <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                <div class="user-menu">
+                    <button class="btn-user">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="username-text">Giáp</span>
+                    </button>
+                    <div class="dropdown">
+                        <a href="/User_profile/User_profile.html">Profile</a>
+                        <a href="/Dang_nhap/Dang_nhap.html" class="btn-logout">Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="loan-container">
+        <div class="loan-header">
+            <h1 class="loan-title">Phiếu mượn</h1>
+            <div class="filter-box">
+                <button class="btn-filter">Tất cả <i class="fas fa-chevron-down"></i></button>
+            </div>
+        </div>
+
+        <div id="loan-list" class="loan-list">
+            <div class="loan-card">
+                <div class="loan-card-header">
+                    <i class="far fa-file-alt"></i> PHIẾU MƯỢN
+                </div>
+                <div class="loan-card-body">
+                    <div class="info-group">
+                        <div class="info-item">
+                            <label>MÃ PHIẾU MƯỢN</label>
+                            <p>BS-8492</p>
+                        </div>
+                        <div class="info-item">
+                            <label>MÃ THẺ THƯ VIỆN</label>
+                            <p>LC-445582</p>
+                        </div>
+                        <div class="info-item">
+                            <label>NGÀY MƯỢN</label>
+                            <p>6/1/2026</p>
+                        </div>
+                    </div>
+                    <div class="status-group">
+                        <label>TRẠNG THÁI</label>
+                        <p class="status-text">Chờ</p>
+                    </div>
+                    <div class="action-group">
+                        <button class="btn-detail-loan"><i class="fas fa-book"></i> Chi tiết mượn trả</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col social">
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-square"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Thư viện</h4>
+                <ul>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Chính sách</h4>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Chính sách độc giả</a></li>
+                    <li><a href="#">Điều khoản</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Bản quyền</h4>
+                <ul>
+                    <li><a href="#">Hỗ trợ</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="Phieu_muon.js"></script>
+</body>
+
+</html>

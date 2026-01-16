@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+    <title>GIỎ SÁCH - GTQTD</title>
+    <link rel="stylesheet" href="/Trang_chu/Trang_chu.css">
+    <link rel="stylesheet" href="Gio_sach.css">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-left">
+                <a href="/Trang_chu/Trang_chu.html" class="logo">
+                    <img src="/Assets/Images/logo.png" alt="Logo GTQTD">
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/Trang_chu/Trang_chu.html">GTQTD</a></li>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <a href="#"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
+                <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                <div class="user-menu">
+                    <button class="btn-user">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="username-text">Giáp</span>
+                    </button>
+                    <div class="dropdown">
+                        <a href="/User_profile/User_profile.html">Profile</a>
+                        <a href="/Dang_nhap/Dang_nhap.html" class="btn-logout">Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="cart-container">
+        <h1 class="cart-page-title">Giỏ sách</h1>
+
+        <div class="cart-content-wrapper">
+            <div class="cart-items-column">
+                <div class="cart-header-actions">
+                    <h2>Sách trong giỏ</h2>
+                    <button class="btn-clear-all" id="api-clear-cart"><i class="far fa-trash-alt"></i> Xóa hết</button>
+                </div>
+
+                <div id="cart-items-list">
+                    <div class="cart-item">
+                        <div class="item-cover">
+                            <img src="https://via.placeholder.com/100x150" alt="Book">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-top">
+                                <h3 class="item-title">The Great Gatsby</h3>
+                                <div class="item-controls">
+                                    <input type="checkbox" class="item-checkbox">
+                                    <button class="btn-remove-item"><i class="far fa-trash-alt"></i></button>
+                                </div>
+                            </div>
+                            <p class="item-author">Của <span>F. Scott Fitzgerald</span></p>
+                            <div class="item-tags">
+                                <span class="tag-status available">Available</span>
+                                <span class="tag-genre">Viễn tưởng</span>
+                            </div>
+                            <p class="item-id">Mã sách: TGG1</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="cart-summary-column">
+                <div class="summary-card">
+                    <div class="summary-notice">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Sách sẽ được lưu lại trong 24h sau khi bạn chọn Mượn sách</p>
+                    </div>
+                    <button class="btn-confirm-borrow" id="api-submit-borrow">Mượn sách</button>
+                    <a href="/Trang_chu/Trang_chu.html" class="link-continue">Tiếp tục tìm sách</a>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col social">
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-square"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Thư viện</h4>
+                <ul>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Chính sách</h4>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Chính sách độc giả</a></li>
+                    <li><a href="#">Điều khoản</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Bản quyền</h4>
+                <ul>
+                    <li><a href="#">Hỗ trợ</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="Gio_sach.js"></script>
+</body>
+
+</html>
