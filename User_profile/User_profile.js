@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('Auth token:', sessionStorage.getItem('token'));
   const loginLink = document.querySelector('.login-link');
   const userMenu = document.querySelector('.user-menu');
+  const libraryActions = document.querySelector('.library-actions');
   const usernameText = document.querySelector('.username-text');
   const btnUser = document.querySelector('.btn-user');
   const logoutBtn = document.querySelector('.btn-logout');
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ===== ĐÃ ĐĂNG NHẬP =====
   loginLink.style.display = 'none';
   userMenu.style.display = 'block';
+  libraryActions.style.display = 'block';
   usernameText.textContent = username;
 
   // Toggle dropdown

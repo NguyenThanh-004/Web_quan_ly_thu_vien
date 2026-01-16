@@ -52,7 +52,7 @@ header {
 
 .nav-right {
     display: flex;
-    gap: 12px;
+    gap: 20px;
 }
 
 .btn-giosach, .btn-lichsumuon,
@@ -60,6 +60,8 @@ header {
     padding: 12px 12px;
     border-radius: 6px;
     border: none;
+    margin-left: 5px;
+    margin-right: 5px;
     cursor: pointer;
     font-weight: bold;
 }
@@ -85,6 +87,8 @@ header {
 .user-menu {
   position: relative;
 }
+
+
 
 .btn-user {
   display: flex;
@@ -285,54 +289,153 @@ header {
 }
 
 
-/* #staff-list {
-    height: 800px;
-} */
-
-/* View More */
-/* .view-more-wrap {
-    display: flex;
-    justify-content: center;
-    margin: 40px 0;
+.book-section {
+    padding: 40px 80px;
 }
 
-.view-more-btn {
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    font-size: 14px;
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
+}
+
+.book-card {
+    text-align: left;
     cursor: pointer;
-    transition: color 0.3s;
+}
+
+.book-card img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.book-card h4 {
+    margin: 10px 0 4px;
+    font-size: 15px;
     font-weight: 600;
 }
 
-.view-more-btn:hover {
-    color: var(--primary);
-} */
+.book-card p {
+    font-size: 13px;
+    color: #666;
+}
 
+.load-more {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.load-more button {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.scroll-top {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 70px;
+    height: 70px;
+    border-radius: 6px;
+    border: none;
+    background-color: #237245; 
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 999;
+}
+
+.scroll-top:hover {
+    transform: translateY(-3px);
+    background-color: #256628;
+}
+
+
+/* ===== Laptop nhỏ / Tablet ngang ===== */
+@media (max-width: 1200px) {
+
+    .book-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .book-card img {
+        height: 340px;
+    }
+}
+
+/* ===== Tablet ===== */
+@media (max-width: 992px) {
+
+    .book-section {
+        padding: 40px 40px;
+    }
+
+    .book-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .book-card img {
+        height: 300px;
+    }
+
+    .introduce {
+        margin: 50px 40px;
+        font-size: 38px;
+        text-align: center;
+    }
+}
+
+/* ===== Mobile ===== */
 @media (max-width: 768px) {
+
+    /* NAVBAR */
     .navbar {
         padding: 10px 16px;
     }
 
     .nav-links {
-        display: none; 
+        display: none;
     }
 
-    .logo img {
-        height: 32px;
+    .nav-right {
+        gap: 10px;
     }
 
+    .btn-giosach,
+    .btn-lichsumuon,
+    .btn-dangnhap,
+    .btn-user {
+        padding: 8px 10px;
+        font-size: 16px;
+    }
+
+    .username-text {
+        display: none;
+    }
+
+    /* SEARCH */
     .search-area {
         height: 360px;
     }
 
-    .search-content h1 {
-        font-size: 26px;
+    .search-content p:first-child {
+        font-size: 36px;
+        line-height: 1.2;
     }
 
     .search-content p {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .search-box {
@@ -342,30 +445,70 @@ header {
 
     .search-box input,
     .search-box button {
-        border-radius: 6px;
         width: 100%;
+        border-radius: 6px;
+    }
+
+    /* BOOK */
+    .book-section {
+        padding: 30px 20px;
+    }
+
+    .book-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .book-card img {
+        height: 260px;
+    }
+
+    /* INTRO */
+    .introduce {
+        margin: 40px 20px;
+        font-size: 32px;
+    }
+
+    /* FOOTER */
+    .footer-container {
+        flex-direction: column;
+        gap: 24px;
+        padding: 0 20px;
+        text-align: center;
+    }
+
+    .social-icons {
+        justify-content: center;
+    }
+
+    /* SCROLL TOP */
+    .scroll-top {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+        right: 20px;
+        bottom: 20px;
     }
 }
 
-/* .card {
-    border: none;
-    background: transparent;
-    box-shadow: none;
+/* ===== Mobile nhỏ ===== */
+@media (max-width: 480px) {
+
+    .book-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .book-card img {
+        height: 240px;
+    }
+
+    .introduce {
+        font-size: 26px;
+    }
+
+    .search-content p:first-child {
+        font-size: 28px;
+    }
 }
 
-.card-img-top {
-    height: 220px;
-    object-fit: cover;
-    border-radius: 6px;
-    box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
-}
 
-.book-title {
-    margin-top: 10px;
-    font-weight: 600;
-}
-
-.book-author {
-    font-size: 13px;
-    color: var(--muted);
-} */

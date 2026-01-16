@@ -26,8 +26,10 @@
             </div>
             <!-- Nút bên phải -->
             <div class="nav-right">
-                <a href="#"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
-                <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                <div class="library-actions" style="display: none;">
+                    <a href="#"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
+                    <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                </div>
                 <a href="/Dang_nhap/Dang_nhap.html" class="login-link"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
                 <div class="user-menu" style="display:none;">
                     <button class="btn-user">
@@ -58,11 +60,18 @@
         <div class = "content-area">
             <p class = "introduce">Xem thư viện có gì</p>
         </div>
-        <!-- <div class="row" id="staff-list"></div>
+        <div class="book-section">
+            <div class="book-grid" id="bookGrid">
+                <!-- JS render sách ở đây -->
+            </div>
 
-        <div class="view-more-wrap">
-            <button class="view-more-btn">Xem thêm ▾</button>
-        </div> -->
+            <div class="load-more">
+                <button id="btnLoadMore">
+                    Xem thêm <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+
+        </div>        
     </main>
     <footer class="footer">
         <div class="footer-container">
@@ -103,8 +112,9 @@
             </div>
         </div>
     </footer>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="api.js"></script> -->
+    <button id="btnScrollTop" class="scroll-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
     <script src="/Trang_chu/Trang_chu.js"></script>
 </body>
 
