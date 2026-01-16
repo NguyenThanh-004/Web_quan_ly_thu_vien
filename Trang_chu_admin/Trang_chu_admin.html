@@ -2,9 +2,13 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+
     <title>Trang chủ Admin - Thư viện GTQTD</title>
+
     <link rel="stylesheet" href="Trang_chu_admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../Assets/Images/logo.png">
+
 </head>
 <body>
     <div class="layout">
@@ -29,19 +33,19 @@
             <li>
                 <i class="fa-solid fa-file-invoice"></i> Phiếu mượn
             </li>
-            <li>
+            <li id="menu-tac-gia" role="button" data-href="../Quan_li_tac_gia_admin/Quan_li_tac_gia_admin.html">
                 <i class="fa-solid fa-pen-nib"></i> Tác giả
             </li>
-            <li>
+            <li id="menu-nha-xuat-ban" role="button" data-href="../Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.html">
                 <i class="fa-solid fa-building"></i> Nhà xuất bản
             </li>
             <li>
                 <i class="fa-solid fa-id-card"></i> Thẻ thư viện
             </li>
-            <li>
+            <li id="menu-the-loai" role="button" data-href="../Quan_li_the_loai_admin/Quan_li_the_loai_admin.html">
                 <i class="fa-solid fa-layer-group"></i> Thể loại
             </li>
-            <li>
+            <li id="menu-linh-vuc" role="button" data-href="../Quan_li_linh_vuc_admin/Quan_li_linh_vuc_admin.html">
                 <i class="fa-solid fa-tags"></i> Lĩnh vực
             </li>
         </ul>
@@ -56,13 +60,16 @@
 
         <!-- HEADER -->
         <div class="header">
+            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
             <input type="text" placeholder="Tìm kiếm sách, tác giả ...">
 
-            <div class="user">
-                <span>Giáp</span>
+            <div class="user">              
                 <div class="avatar">
                     <i class="fa-solid fa-circle-user"></i>
                 </div>
+                <span class="username-text"></span>
             </div>
         </div>
 
@@ -138,7 +145,7 @@
 
         <div class="quick-card quick-box">
             <i class="fa-solid fa-chart-column"></i>
-            <span>Báo cáo</span>
+            <span>Thêm sách</span>
         </div>
 
         </div>
@@ -147,6 +154,10 @@
 
     </main>
 </div>
-<script type="module" src="/Trang_chu_admin/Trang_chu_admin.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="../Assets/JS/Config/api.config.js"></script>
+    <script src="Trang_chu_admin.js"></script>
+
 </body>
 </html>
