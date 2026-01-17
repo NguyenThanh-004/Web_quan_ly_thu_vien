@@ -111,9 +111,14 @@ async function searchBooks(reset = false) {
             currentPage = 0;
             bookGrid.innerHTML = "";
         }
-
+        const token = sessionStorage.getItem("token");
         const response = await fetch(
-            `http://localhost:8080/api/sach/search?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=${pageSize}`
+            `http://localhost:8080/api/sach/search?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=${pageSize}`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
         );
 
         if (!response.ok) {
@@ -181,12 +186,17 @@ function renderBooks(books) {
             <h4>${book.tenSach}</h4>
             <p>${authors}</p>
         `;
-
+        card.addEventListener("click", () => {
+            goToDetail(book.sachId);
+        });
         bookGrid.appendChild(card);
     });
 }
 
-
+function goToDetail(sachId) {
+    window.location.href =
+        `/Trang_chi_tiet_sach/Trang_chi_tiet_sach.html?sachId=${sachId}`;
+}
 
 btnLoadMore.addEventListener("click", () => {
     searchBooks(false);

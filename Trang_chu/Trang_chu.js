@@ -86,8 +86,18 @@ function renderBooks(books) {
       <p>${authors}</p>
     `;
 
+    bookCard.addEventListener('click', () => {
+      goToDetail(book.sachId);
+    });
+
     bookGrid.appendChild(bookCard);
   });
+}
+
+
+function goToDetail(sachId) {
+    window.location.href =
+        `/Trang_chi_tiet_sach/Trang_chi_tiet_sach.html?sachId=${sachId}`;
 }
 
 // Load lần đầu
