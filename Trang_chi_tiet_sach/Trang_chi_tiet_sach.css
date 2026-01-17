@@ -1,0 +1,261 @@
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 32px;
+    background-color: #fdfdfd;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links a {
+    font-weight: bold;
+    color: #111318;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.nav-right {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-giosach,
+.btn-lichsumuon,
+.btn-dangnhap {
+    padding: 12px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-giosach {
+    background-color: #e5e7eb;
+    font-size: 18px;
+    color: #000000;
+}
+
+.btn-lichsumuon {
+    background-color: #e5e7eb;
+    font-size: 18px;
+    color: #000000;
+}
+
+.btn-dangnhap {
+    background-color: #e5e7eb;
+    font-size: 18px;
+    color: #000000;
+}
+
+.user-menu {
+    position: relative;
+}
+
+.btn-user {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: absolute;
+    right: 0;
+    top: 120%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-width: 140px;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-user {
+    display: flex;
+    align-items: center; /* 👈 canh icon + text */
+    padding: 12px 12px; /* 👈 giống nút đăng nhập */
+    border-radius: 6px;
+    font-size: 18px;
+    gap: 6px;
+}
+
+.username-text {
+    font-weight: 600;
+}
+
+.dropdown a {
+    padding: 10px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dropdown a:hover {
+    background: #f5f5f5;
+}
+
+.user-menu.show .dropdown {
+    display: flex;
+}
+
+.book-page-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 32px;
+}
+
+/* Thông tin sách */
+.book-info-section {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.book-cover img {
+    width: 100%;
+    border-radius: 4px;
+}
+
+/* Thông tin phải */
+.book-info h1 {
+    font-size: 28px;
+    margin-bottom: 4px;
+}
+
+.book-meta {
+    color: #2563eb;
+    margin-bottom: 20px;
+}
+
+/* Grid thông tin */
+.book-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.book-info-grid span {
+    font-size: 12px;
+    color: #888;
+}
+
+.book-info-grid p {
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Section */
+.copy-section {
+    margin-bottom: 80px;
+}
+
+.section-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+/* Grid 2 cột */
+.copy-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 40px;
+}
+
+/* Card */
+.copy-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Nội dung trong card */
+.copy-info {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 40px;
+}
+
+.copy-field span {
+    font-size: 11px;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+}
+
+.copy-field p {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Trạng thái */
+.status.available {
+    color: #16a34a;
+}
+
+.status.borrowed {
+    color: #9ca3af;
+}
+
+/* Nút + */
+.btn-copy-add {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: #f3f4f6;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Xem thêm */
+.view-more {
+    margin-top: 40px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .copy-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .copy-info {
+        gap: 20px;
+    }
+}

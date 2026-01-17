@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+
+
+    <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+    <title>THƯ VIỆN GTQTD</title>
+    <link rel="stylesheet" href="/Trang_chu/Trang_chu.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <!-- Logo + menu trái -->
+            <div class="nav-left">
+                <a href="/Trang_chu/Trang_chu.html" class="logo">
+                    <img src="/Assets/Images/logo.png" alt="Logo GTQTD">
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/Trang_chu/Trang_chu.html">GTQTD</a></li>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+            <!-- Nút bên phải -->
+            <div class="nav-right">
+                <div class="library-actions" style="display: none;">
+                    <a href="#"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
+                    <a href="/Trang_gio_sach/Gio_sach.html"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                </div>
+                <a href="/Dang_nhap/Dang_nhap.html" class="login-link"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
+                <div class="user-menu" style="display:none;">
+                    <button class="btn-user">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="username-text"></span>
+                    </button>
+
+                    <div class="dropdown">
+                    <a href="/User_profile/User_profile.html">Profile</a>
+                    <a href="/Dang_nhap/Dang_nhap.html" class="btn-logout">Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="main-content">
+        <section class="book-section">
+            <div class="search-bar">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Nhập từ khóa tìm kiếm..."
+                >
+                <button id="btnSearch">
+                    <i class="fas fa-search"></i>
+                    Tìm kiếm
+                </button>
+            </div>
+
+            <h2>Kết quả tìm kiếm
+                <span id="searchKeyword" style="font-weight: normal; color: #666;"></span>
+            </h2>
+            <div class="book-grid" id="bookGrid"></div>
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <p>Không tìm thấy kết quả phù hợp</p>
+            </div>
+            <div class="load-more">
+                <button id="btnLoadMore">
+                    Xem thêm <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </section>
+    </main>
+        <footer class="footer">
+        <div class="footer-container">
+            <!-- Cột 1 -->
+            <div class="footer-col social">
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-square"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <!-- Cột 2 -->
+            <div class="footer-col">
+                <h4>Thư viện</h4>
+                <ul>
+                    <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 3 -->
+            <div class="footer-col">
+                <h4>Chính sách</h4>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Chính sách độc giả</a></li>
+                    <li><a href="#">Điều khoản</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 4 -->
+            <div class="footer-col">
+                <h4>Bản quyền</h4>
+                <ul>
+                    <li><a href="#">Hỗ trợ</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    <button id="btnScrollTop" class="scroll-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+    <script src="/Trang_ket_qua_tim_kiem_user/Trang_ket_qua_tim_kiem_user.js"></script>
+</body>
+</html>

@@ -115,4 +115,27 @@ btnScrollTop.addEventListener('click', () => {
   });
 });
 
+// ================== SEARCH ==================
+const searchInput = document.getElementById('searchInput');
+const btnSearch = document.getElementById('btnSearch');
+
+btnSearch.addEventListener('click', () => {
+  const keyword = searchInput.value.trim();
+
+  if (!keyword) {
+   // alert('Vui lòng nhập từ khóa tìm kiếm');
+    return;
+  }
+
+  // Chuyển sang trang kết quả + query param
+  window.location.href =
+    `/Trang_ket_qua_tim_kiem_user/Trang_ket_qua_tim_kiem_user.html?keyword=${encodeURIComponent(keyword)}`;
+});
+
+// Enter để tìm
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    btnSearch.click();
+  }
+});
 
