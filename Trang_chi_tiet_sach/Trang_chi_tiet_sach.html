@@ -139,8 +139,19 @@
         </section>
         <!-- Cùng thể loại -->
         <section class="related-section">
-            <h3>Cùng thể loại</h3>
-            <div class="related-grid">
+            <div class="related-header">
+                <h3>Cùng thể loại</h3>
+                <div class="related-nav">
+                    <button id="btn-prev-related">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="btn-next-related">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="related-grid" id="related-grid">
                 <!-- item -->
             </div>
         </section>
@@ -177,7 +188,9 @@
             </div>
         </div>
     </footer>
-
+    <button id="btnScrollTop" class="scroll-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
     <script src="/Trang_chi_tiet_sach/Trang_chi_tiet_sach.js"></script>
 </body>
 

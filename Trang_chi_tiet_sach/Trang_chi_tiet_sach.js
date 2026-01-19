@@ -1,139 +1,294 @@
-document.addEventListener('DOMContentLoaded', () => {
-  checkLoginUI();
-  const params = new URLSearchParams(window.location.search);
-  const sachId = params.get('sachId');
-  console.log('Sach ID:', sachId);
-  if (!sachId) {
-    console.error('Không tìm thấy sachId trong URL');
-    return;
-  }
-  
-  loadBookDetail(sachId);
-});
+// ================== GLOBAL ==================
+let allBanSao = [];
+let visibleCount = 4;
+const STEP = 4;
 
-function checkLoginUI() {
-  const username = sessionStorage.getItem('username');
-  const token = sessionStorage.getItem('token');
-  console.log('Logged in user:', username);
-  console.log('Auth token:', token);
-  const loginLink = document.querySelector('.login-link');
-  const userMenu = document.querySelector('.user-menu');
-  const libraryActions = document.querySelector('.library-actions');
-  const usernameText = document.querySelector('.username-text');
-  const btnUser = document.querySelector('.btn-user');
-  const logoutBtn = document.querySelector('.btn-logout');
+let relatedPage = 0;
+const RELATED_SIZE = 5;
+let relatedTotalPages = 0;
+let currentTheLoai = null;
 
-  // Chưa đăng nhập
-  if (!username || !token) {
-    return;
-  }
+// ================== DOM READY ==================
+document.addEventListener("DOMContentLoaded", () => {
+    checkLoginUI();
 
-  // Đã đăng nhập
-  loginLink.style.display = 'none';
-  userMenu.style.display = 'block';
-  libraryActions.style.display = 'block';
-  usernameText.textContent = username;
-
-  btnUser.addEventListener('click', () => {
-    userMenu.classList.toggle('show');
-  });
-
-  logoutBtn.addEventListener('click', () => {
-    sessionStorage.clear();
-    window.location.href = '/Dang_nhap/Dang_nhap.html';
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!userMenu.contains(e.target) && !btnUser.contains(e.target)) {
-      userMenu.classList.remove('show');
-    }
-  });
-}
-
-async function loadBookDetail() {
     const params = new URLSearchParams(window.location.search);
     const sachId = params.get("sachId");
 
-    console.log("Sach ID:", sachId);
-
     if (!sachId) {
-        console.error("Không có sachId");
+        console.error("Không tìm thấy sachId trong URL");
         return;
     }
 
-    const token = sessionStorage.getItem("token");
+    loadBookDetail(sachId);
 
+    // Gắn sự kiện xem thêm (AN TOÀN)
+    const viewMoreBtn = document.querySelector(".view-more");
+    if (viewMoreBtn) {
+        viewMoreBtn.addEventListener("click", () => {
+            visibleCount += STEP;
+            renderBanSaoSach();
+            toggleViewMoreButton();
+        });
+    }
+});
+
+// ================== LOGIN UI ==================
+function checkLoginUI() {
+    const username = sessionStorage.getItem("username");
+    const token = sessionStorage.getItem("token");
+    const giosach= sessionStorage.getItem("cart");
+    console.log("CART CONTENT:", giosach);
+    if (!username || !token) return;
+
+    const loginLink = document.querySelector(".login-link");
+    const userMenu = document.querySelector(".user-menu");
+    const libraryActions = document.querySelector(".library-actions");
+    const usernameText = document.querySelector(".username-text");
+    const btnUser = document.querySelector(".btn-user");
+    const logoutBtn = document.querySelector(".btn-logout");
+
+    loginLink.style.display = "none";
+    userMenu.style.display = "block";
+    libraryActions.style.display = "block";
+    usernameText.textContent = username;
+
+    btnUser.addEventListener("click", () => {
+        userMenu.classList.toggle("show");
+    });
+
+    logoutBtn.addEventListener("click", () => {
+        sessionStorage.clear();
+        window.location.href = "/Dang_nhap/Dang_nhap.html";
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!userMenu.contains(e.target) && !btnUser.contains(e.target)) {
+            userMenu.classList.remove("show");
+        }
+    });
+}
+
+// ================== BOOK DETAIL ==================
+async function loadBookDetail(sachId) {
     try {
         const res = await fetch(
-            `http://localhost:8080/api/sach/chitietsach?sachId=${sachId}`,
-            {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
+            `http://localhost:8080/api/sach/chitietsach?sachId=${sachId}`
         );
 
-        if (!res.ok) {
-            throw new Error("API lỗi");
-        }
-
+        if (!res.ok) throw new Error("Lỗi API chi tiết sách");
+        
         const data = await res.json();
+        console.log("Book Detail Data:", data);
         renderBookData(data);
-
+        loadBanSaoSach(sachId);
     } catch (err) {
-        console.error("Lỗi tải chi tiết sách:", err);
+        console.error(err);
     }
 }
 
-document.addEventListener("DOMContentLoaded", loadBookDetail);
-
-
-
-// Hàm này bạn sẽ gọi sau khi fetch() từ API thành công
 function renderBookData(data) {
-    // Ảnh bìa
     document.getElementById("api-cover").src =
         data.anhBia || "https://via.placeholder.com/220x320";
 
-    // Tên sách
     document.getElementById("api-title").innerText = data.tenSach;
 
-    // Tác giả (nhiều tác giả)
-    const authors = data.tacGiaList
-        .map(tg => tg.tenTacGia)
-        .join(", ");
-
-    // Năm xuất bản (format)
+    const authors = data.tacGiaList.map(t => t.tenTacGia).join(", ");
     const year = data.namXuatBan
         ? new Date(data.namXuatBan).getFullYear()
         : "";
 
-    document.getElementById("api-meta").innerText =
-        `${authors} • ${year}`;
+    document.getElementById("api-meta").innerText = `${authors} • ${year}`;
 
-    // Grid thông tin
     document.getElementById("api-publisher").innerText = data.nhaXuatBan;
     document.getElementById("api-year").innerText = year;
     document.getElementById("api-pages").innerText = data.soTrang;
     document.getElementById("api-id").innerText = data.sachId;
     document.getElementById("api-category").innerText = data.theLoai;
     document.getElementById("api-field").innerText = data.linhVuc;
+
+    currentTheLoai = data.theLoai;
+    loadRelatedBooks();
+}
+
+// ================== RELATED BOOKS ==================
+async function loadRelatedBooks() {
+    console.log("Loading related books for TheLoaiId:", currentTheLoai);
+    if (!currentTheLoai) return;
+    const token = sessionStorage.getItem("token");
+    try {
+        const res = await fetch(
+            `http://localhost:8080/api/sach/theloai/?tenTheLoai=${encodeURIComponent(currentTheLoai)}`
+        );
+
+        if (!res.ok) throw new Error("Lỗi API sách liên quan");
+
+        const data = await res.json();
+        relatedTotalPages = data.totalPages;
+        renderRelatedBooks(data.content);
+        updateRelatedNav();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function renderRelatedBooks(list) {
+    const container = document.getElementById("related-grid");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    list.forEach(book => {
+        const authors = book.tacGiaList.map(t => t.tenTacGia).join(", ");
+        container.innerHTML += `
+            <div class="related-card"
+                 onclick="goToBookDetail(${book.sachId})">
+                <img src="${book.anhBia || "https://via.placeholder.com/150"}">
+                <h4>${book.tenSach}</h4>
+                <p>${authors}</p>
+            </div>
+        `;
+    });
+}
+
+function updateRelatedNav() {
+    document.getElementById("btn-prev-related").disabled =
+        relatedPage === 0;
+
+    document.getElementById("btn-next-related").disabled =
+        relatedPage >= relatedTotalPages - 1;
+}
+
+function goToBookDetail(sachId) {
+    window.location.href =
+        `/Trang_chi_tiet_sach/Trang_chi_tiet_sach.html?sachId=${sachId}`;
+}
+
+// ================== COPY LIST ==================
+async function loadBanSaoSach(sachId) {
+    try {
+        const res = await fetch(
+            `http://localhost:8080/api/bansaosach/danhsach?sachId=${sachId}`
+        );
+
+        if (!res.ok) throw new Error("Lỗi API bản sao");
+
+        const data = await res.json();
+        allBanSao = data.content || [];
+        visibleCount = 4;
+
+        renderBanSaoSach();
+        toggleViewMoreButton();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function renderBanSaoSach() {
+    const container = document.querySelector(".copy-card-grid");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    allBanSao.slice(0, visibleCount).forEach(item => {
+        const trangThaiText =
+            item.trangThaiBanSaoSach === "CON"
+                ? "Còn"
+                : item.trangThaiBanSaoSach === "DA_MUON"
+                ? "Đã mượn"
+                : "Hư hỏng";
+
+        const statusClass =
+            item.trangThaiBanSaoSach === "CON"
+                ? "available"
+                : "borrowed";
+
+        const disabled =
+            item.trangThaiBanSaoSach !== "CON" ? "disabled" : "";
+
+        container.innerHTML += `
+            <div class="copy-card">
+                <div class="copy-info">
+                    <div class="copy-field">
+                        <span>MÃ BẢN SAO</span>
+                        <p>${item.banSaoSachId}</p>
+                    </div>
+                    <div class="copy-field">
+                        <span>TÌNH TRẠNG</span>
+                        <p>${item.tinhTrangBanSaoSach === "MOI" ? "Mới" : "Cũ"}</p>
+                    </div>
+                    <div class="copy-field">
+                        <span>TRẠNG THÁI</span>
+                        <p class="status ${statusClass}">${trangThaiText}</p>
+                    </div>
+                </div>
+
+                <button class="btn-copy-add"
+                        ${disabled}
+                        onclick="handleCopyAdd(${item.banSaoSachId})">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        `;
+    });
 }
 
 
+function toggleViewMoreButton() {
+    const viewMoreBtn = document.querySelector(".view-more");
+    if (!viewMoreBtn) return;
 
-// Hàm render danh sách sách liên quan
-function renderRelatedList(books) {
-    const container = document.getElementById("related-api-list");
-    container.innerHTML = books
-        .map(
-            (book) => `
-        <div class="book-item-card">
-            <img src="${book.cover}" alt="${book.title}">
-            <h4>${book.title}</h4>
-            <p>${book.author}</p>
-        </div>
-    `
-        )
-        .join("");
+    viewMoreBtn.style.display =
+        visibleCount >= allBanSao.length ? "none" : "block";
 }
+
+// ================== SCROLL TOP ==================
+const btnScrollTop = document.getElementById("btnScrollTop");
+if (btnScrollTop) {
+    window.addEventListener("scroll", () => {
+        btnScrollTop.style.display =
+            window.scrollY > 300 ? "flex" : "none";
+    });
+
+    btnScrollTop.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+}
+
+function isLoggedIn() {
+    const username = sessionStorage.getItem("username");
+    const token = sessionStorage.getItem("token");
+    return username && token;
+}
+
+function handleCopyAdd(banSaoSachId) {
+    if (!isLoggedIn()) {
+        alert("Bạn cần đăng nhập để thêm bản sao!");
+        return;
+    }
+
+    let cartRaw = sessionStorage.getItem("cart");
+    let cart;
+
+    try {
+        cart = cartRaw ? JSON.parse(cartRaw) : null;
+    } catch {
+        cart = null;
+    }
+
+    if (!cart || !Array.isArray(cart.selectedBanSaoSachIds)) {
+        cart = { selectedBanSaoSachIds: [] };
+    }
+
+    if (cart.selectedBanSaoSachIds.includes(banSaoSachId)) {
+        alert("Bản sao này đã có trong giỏ!");
+        return;
+    }
+
+    cart.selectedBanSaoSachIds.push(banSaoSachId);
+    sessionStorage.setItem("cart", JSON.stringify(cart));
+
+    alert("Đã thêm bản sao vào giỏ sách!");
+}
+
+

@@ -14,6 +14,7 @@
 <body>
     <header>
         <nav class="navbar">
+            <!-- Logo + menu trái -->
             <div class="nav-left">
                 <a href="/Trang_chu/Trang_chu.html" class="logo">
                     <img src="/Assets/Images/logo.png" alt="Logo GTQTD">
@@ -23,17 +24,22 @@
                     <li><a href="/Trang_chu/Trang_chu.html">Trang chủ</a></li>
                 </ul>
             </div>
+            <!-- Nút bên phải -->
             <div class="nav-right">
-                <a href="#"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
-                <a href="#"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
-                <div class="user-menu">
+                <div class="library-actions" style="display: none;">
+                    <a href="/Trang_lich_su_muon/Trang_lich_su_muon.html"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
+                    <a href="/Trang_gio_sach/Gio_sach.html"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
+                </div>
+                <a href="/Dang_nhap/Dang_nhap.html" class="login-link"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
+                <div class="user-menu" style="display:none;">
                     <button class="btn-user">
-                        <i class="fas fa-user-circle"></i>
-                        <span class="username-text">Giáp</span>
+                    <i class="fas fa-user-circle"></i>
+                    <span class="username-text"></span>
                     </button>
+
                     <div class="dropdown">
-                        <a href="/User_profile/User_profile.html">Profile</a>
-                        <a href="/Dang_nhap/Dang_nhap.html" class="btn-logout">Đăng xuất</a>
+                    <a href="/User_profile/User_profile.html">Profile</a>
+                    <a href="/Dang_nhap/Dang_nhap.html" class="btn-logout">Đăng xuất</a>
                     </div>
                 </div>
             </div>
@@ -43,10 +49,22 @@
     <main class="loan-container">
         <div class="loan-header">
             <h1 class="loan-title">Phiếu mượn</h1>
+
             <div class="filter-box">
-                <button class="btn-filter">Tất cả <i class="fas fa-chevron-down"></i></button>
+                <button class="btn-filter" id="filterBtn">
+                    Tất cả <i class="fas fa-chevron-down"></i>
+                </button>
+
+                <ul class="filter-menu" id="filterMenu">
+                    <li data-status="ALL">Tất cả</li>
+                    <li data-status="PENDING">Đang chờ</li>
+                    <li data-status="BORROWING">Đang mượn</li>
+                    <li data-status="CANCELLED">Huỷ</li>
+                    <li data-status="DONE">Hoàn thành</li>
+                </ul>
             </div>
         </div>
+
 
         <div id="loan-list" class="loan-list">
             <div class="loan-card">
@@ -73,7 +91,7 @@
                         <p class="status-text">Chờ</p>
                     </div>
                     <div class="action-group">
-                        <button class="btn-detail-loan"><i class="fas fa-book"></i> Chi tiết mượn trả</button>
+                        <button class="btn-detail-loan" onclick="window.location.href='/Trang_chi_tiet_muon_tra/Trang_chi_tiet_muon_tra.html'"><i class="fas fa-book"></i> Chi tiết mượn trả</button>
                     </div>
                 </div>
             </div>

@@ -27,7 +27,7 @@
             <!-- Nút bên phải -->
             <div class="nav-right">
                 <div class="library-actions" style="display: none;">
-                    <a href="#"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
+                    <a href="/Trang_lich_su_muon/Trang_lich_su_muon.html"><button class="btn-lichsumuon"><i class="fas fa-history"></i></button></a>
                     <a href="/Trang_gio_sach/Gio_sach.html"><button class="btn-giosach"><i class="fas fa-book-open"></i></button></a>
                 </div>
                 <a href="/Dang_nhap/Dang_nhap.html" class="login-link"><button class="btn-dangnhap"><i class="fas fa-user-circle"></i></button></a>
@@ -50,49 +50,15 @@
 
             <!-- Cột trái -->
             <div class="cart-left">
-            <div class="cart-header">
-                <h2>Giỏ sách</h2>
-                <span class="cart-sub">Sách trong giỏ</span>
-                <button class="clear-cart">✕ Xóa hết</button>
-            </div>
-
-            <!-- Item -->
-            <div class="cart-item">
-                <img src="/Assets/Images/sample1.jpg" alt="Book">
-
-                <div class="cart-info">
-                <h4>The Great Gatsby</h4>
-                <p class="author">F. Scott Fitzgerald</p>
-                <p class="meta">Mã bản sao: TGG-1</p>
-                <p class="status new">Tình trạng: Mới</p>
+                <div class="cart-header">
+                    <h2>Giỏ sách</h2>
+                    <span class="cart-sub">Sách trong giỏ</span>
+                    <button class="clear-cart">✕ Xóa hết</button>
                 </div>
 
-                <div class="cart-actions">
-                <input type="checkbox">
-                <button class="remove-item">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div id="cart-items" class="cart-items">
+                    <!-- Các mục sách sẽ được thêm vào đây bởi JavaScript -->
                 </div>
-            </div>
-
-            <!-- Item -->
-            <div class="cart-item">
-                <img src="/Assets/Images/sample2.jpg" alt="Book">
-
-                <div class="cart-info">
-                <h4>Sapiens: A Brief History</h4>
-                <p class="author">Yuval Noah Harari</p>
-                <p class="meta">Mã bản sao: SABH-1</p>
-                <p class="status old">Tình trạng: Cũ</p>
-                </div>
-
-                <div class="cart-actions">
-                <input type="checkbox">
-                <button class="remove-item">
-                    <i class="fas fa-trash"></i>
-                </button>
-                </div>
-            </div>
             </div>
 
             <!-- Cột phải -->
@@ -149,6 +115,9 @@
             </div>
         </div>
     </footer>
+     <button id="btnScrollTop" class="scroll-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
     <script src="/Trang_gio_sach/Gio_sach.js"></script>
 </body>
 </html>

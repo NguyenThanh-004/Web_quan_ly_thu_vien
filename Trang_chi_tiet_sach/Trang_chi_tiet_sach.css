@@ -249,6 +249,32 @@ header {
     cursor: pointer;
 }
 
+.scroll-top {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 70px;
+    height: 70px;
+    border-radius: 6px;
+    border: none;
+    background-color: #237245; 
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 999;
+}
+
+.scroll-top:hover {
+    transform: translateY(-3px);
+    background-color: #256628;
+}
+
+
 /* Responsive */
 @media (max-width: 900px) {
     .copy-card-grid {

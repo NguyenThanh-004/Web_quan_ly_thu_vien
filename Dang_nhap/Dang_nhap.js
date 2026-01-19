@@ -70,7 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.setItem('username', data.username);
       sessionStorage.setItem('role', data.role);
       sessionStorage.setItem('token', data.token);
-
+      if (!sessionStorage.getItem("cart")) {
+        sessionStorage.setItem("cart", JSON.stringify([]));
+      }
       // nối đến trang chủ
       if (data.role === 'ADMIN') {
         window.location.href = '/Trang_chu_admin/Trang_chu_admin.html';
