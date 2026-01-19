@@ -50,6 +50,53 @@ function renderBooks(books) {
   });
 }
 
+/* ===== SEARCH FUNCTION ===== */
+const searchInput = document.getElementById('searchInput');
+const btnSearch = document.getElementById('btnSearch');
+
+async function searchBooks(keyword) {
+  // If search box is empty, reload all books
+  if (!keyword.trim()) {
+    bookGrid.innerHTML = '';
+    page = 0;
+    btnLoadMore.style.display = 'block';
+    loadBooks();
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `${apiBase}/api/sach/search?keyword=${encodeURIComponent(keyword)}&page=0&size=100`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (!res.ok) {
+      alert('Không thể tìm kiếm sách');
+      return;
+    }
+
+    const data = await res.json();
+    bookGrid.innerHTML = '';
+    page = 0;
+    renderBooks(data.content || data);
+    btnLoadMore.style.display = data.last ? 'none' : 'block';
+  } catch (err) {
+    console.error('Search error:', err);
+    alert('Lỗi khi tìm kiếm');
+  }
+}
+
+btnSearch.addEventListener('click', () => {
+  const keyword = searchInput.value.trim();
+  searchBooks(keyword);
+});
+
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    btnSearch.click();
+  }
+});
+
 /* ===== SCROLL TOP ===== */
 main.addEventListener('scroll', () => {
   btnScrollTop.style.display = main.scrollTop > 300 ? 'block' : 'none';
