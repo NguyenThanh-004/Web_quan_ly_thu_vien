@@ -316,6 +316,118 @@ body {
 .add-button:hover {
   background: #237245;
 }
+
+/* ================= COPY SECTION ================= */
+.copy-section {
+  margin-bottom: 80px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.copy-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 40px;
+}
+
+.copy-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s ease;
+}
+
+.copy-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.copy-info {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 40px;
+}
+
+.copy-field span {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.copy-field p {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.status.available {
+  color: #16a34a;
+}
+
+.status.borrowed {
+  color: #9ca3af;
+}
+
+.btn-copy-action {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-copy-action:hover {
+  background: #e5e7eb;
+  color: #2563eb;
+}
+
+.copy-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-copy-update,
+.btn-copy-delete {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-copy-update:hover {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.btn-copy-delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
 .book-page-container {
   max-width: 1200px;
   margin: 40px auto;

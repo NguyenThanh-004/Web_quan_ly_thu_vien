@@ -23,7 +23,7 @@ async function loadBanSaoSach(sachId) {
         });
         if (!resp.ok) throw new Error("Không thể tải danh sách bản sao");
         const data = await resp.json();
-        renderBanSaoSach(data);
+        renderBanSaoSach(data.content || []);
     } catch (err) {
         alert("Không thể tải danh sách bản sao");
     }
@@ -222,27 +222,58 @@ function renderBanSaoSach(list) {
         return;
     }
     list.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "copy-card";
-        card.innerHTML = `
-            <div class="copy-info">
-                <div class="copy-field">
-                    <span>Mã bản sao</span>
-                    <p>${item.banSaoSachId}</p>
+        const trangThaiText = 
+            item.trangThaiBanSaoSach === "CON" ? "Còn"
+            : item.trangThaiBanSaoSach === "DA_MUON" ? "Đã mượn"
+            : "Hư hỏng";
+        
+        const statusClass = 
+            item.trangThaiBanSaoSach === "CON" ? "available" : "borrowed";
+        
+        const tinhTrangText = 
+            item.tinhTrangBanSaoSach === "MOI" ? "Mới" : "Cũ";
+        
+        container.innerHTML += `
+            <div class="copy-card">
+                <div class="copy-info">
+                    <div class="copy-field">
+                        <span>MÃ BẢN SAO</span>
+                        <p>${item.banSaoSachId}</p>
+                    </div>
+                    <div class="copy-field">
+                        <span>TÌNH TRẠNG</span>
+                        <p>${tinhTrangText}</p>
+                    </div>
+                    <div class="copy-field">
+                        <span>TRẠNG THÁI</span>
+                        <p class="status ${statusClass}">${trangThaiText}</p>
+                    </div>
                 </div>
-                <div class="copy-field">
-                    <span>Tình trạng</span>
-                    <p>${item.tinhTrangBanSaoSach || ""}</p>
-                </div>
-                <div class="copy-field">
-                    <span>Trạng thái</span>
-                    <p class="status ${item.trangThaiBanSaoSach === 'AVAILABLE' ? 'available' : 'borrowed'}">
-                        ${item.trangThaiBanSaoSach === 'AVAILABLE' ? 'Có sẵn' : 'Đã mượn'}
-                    </p>
+                <div class="copy-actions">
+                    <button class="btn-copy-update" data-id="${item.banSaoSachId}" title="Cập nhật">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="btn-copy-delete" data-id="${item.banSaoSachId}" title="Xóa">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 </div>
             </div>
         `;
-        container.appendChild(card);
+    });
+    
+    // Bind update and delete handlers
+    document.querySelectorAll('.btn-copy-update').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const copyId = e.currentTarget.dataset.id;
+            openUpdateCopyModal(copyId, list.find(item => item.banSaoSachId == copyId));
+        });
+    });
+    
+    document.querySelectorAll('.btn-copy-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const copyId = e.currentTarget.dataset.id;
+            handleDeleteCopy(copyId);
+        });
     });
 }
 });
@@ -274,6 +305,122 @@ function renderBookData(data) {
     document.getElementById("api-id").innerText = data.sachId || "";
     document.getElementById("api-category").innerText = data.theLoai || "";
     document.getElementById("api-field").innerText = data.linhVuc || "";
+}
+
+/* ===== COPY MODAL FUNCTIONS ===== */
+async function openUpdateCopyModal(copyId, copyData) {
+    const modal = document.getElementById("update-modal");
+    if (!modal) return;
+    
+    const token = sessionStorage.getItem("token");
+    
+    modal.innerHTML = `
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Cập nhật bản sao</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input id="copy-id" type="text" placeholder="Mã bản sao" value="${copyData.banSaoSachId}" disabled>
+                <label>
+                    Tình trạng
+                    <select id="copy-tinhtrang">
+                        <option value="MOI" ${copyData.tinhTrangBanSaoSach === 'MOI' ? 'selected' : ''}>Mới</option>
+                        <option value="CU" ${copyData.tinhTrangBanSaoSach === 'CU' ? 'selected' : ''}>Cũ</option>
+                    </select>
+                </label>
+                <label>
+                    Trạng thái
+                    <select id="copy-trangthai">
+                        <option value="CON" ${copyData.trangThaiBanSaoSach === 'CON' ? 'selected' : ''}>Còn</option>
+                        <option value="DA_MUON" ${copyData.trangThaiBanSaoSach === 'DA_MUON' ? 'selected' : ''}>Đã mượn</option>
+                        <option value="HU_HONG" ${copyData.trangThaiBanSaoSach === 'HU_HONG' ? 'selected' : ''}>Hư hỏng</option>
+                    </select>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel">Hủy</button>
+                <button class="btn-save">Lưu</button>
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = "flex";
+    
+    modal.querySelector('.modal-close').onclick = () => {
+        modal.style.display = "none";
+        modal.innerHTML = "";
+    };
+    
+    modal.querySelector('.btn-cancel').onclick = () => {
+        modal.style.display = "none";
+        modal.innerHTML = "";
+    };
+    
+    modal.querySelector('.btn-save').onclick = () => handleUpdateCopy(copyId, modal);
+}
+
+async function handleUpdateCopy(copyId, modal) {
+    const token = sessionStorage.getItem("token");
+    const sachId = new URLSearchParams(window.location.search).get("sachId");
+    
+    const payload = {
+        banSaoSachId: copyId,
+        sachId: Number(sachId),
+        tinhTrangBanSaoSach: document.getElementById("copy-tinhtrang").value,
+        trangThaiBanSaoSach: document.getElementById("copy-trangthai").value
+    };
+    
+    try {
+        const resp = await fetch(`${apiBase}/api/bansaosach/update`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        const text = await resp.text();
+        if (!resp.ok) {
+            alert(text || "Cập nhật bản sao thất bại");
+            return;
+        }
+        
+        alert(text || "Cập nhật bản sao thành công");
+        modal.style.display = "none";
+        modal.innerHTML = "";
+        loadBanSaoSach(sachId);
+    } catch (err) {
+        alert("Không thể cập nhật bản sao");
+    }
+}
+
+async function handleDeleteCopy(copyId) {
+    if (!confirm("Bạn có chắc muốn xóa bản sao này?")) return;
+    
+    const token = sessionStorage.getItem("token");
+    const sachId = new URLSearchParams(window.location.search).get("sachId");
+    
+    try {
+        const resp = await fetch(`${apiBase}/api/bansaosach/delete?banSaoSachId=${encodeURIComponent(copyId)}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        
+        const text = await resp.text();
+        if (!resp.ok) {
+            alert(text || "Xóa bản sao thất bại");
+            return;
+        }
+        
+        alert(text || "Xóa bản sao thành công");
+        loadBanSaoSach(sachId);
+    } catch (err) {
+        alert("Không thể xóa bản sao");
+    }
 }
 /* ===== LOGOUT ===== */
 document.getElementById('logout_function').onclick = () => {
