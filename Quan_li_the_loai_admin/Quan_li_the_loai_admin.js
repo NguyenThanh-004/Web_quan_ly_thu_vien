@@ -3,16 +3,205 @@ import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 console.debug('Quan_li_the_loai_admin loaded, API base:', API_CONFIG.BASE_URL);
 const apiBase = API_CONFIG.BASE_URL;
 
-// ================= LOGOUT =================
+/* ================= HELPER ================= */
+function buildHeaders() {
+  const headers = { 'Content-Type': 'application/json' };
+  const token = sessionStorage.getItem('token');
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
+/* ================= PAGINATION ================= */
+let currentPage = 0;
+let pageSize = 7;
+let totalPages = 1;
+
+/* ================= FETCH ================= */
+async function fetchTheLoai(page = 0, size = 7) {
+  const resp = await fetch(
+    `${apiBase}/theloai/all?page=${page}&size=${size}`,
+    { headers: buildHeaders() }
+  );
+
+  const data = await resp.json();
+  renderTable(data);
+}
+
+/* ================= CREATE ================= */
+async function createTheLoai(tenTheLoai) {
+  const resp = await fetch(`${apiBase}/theloai/create`, {
+    method: 'POST',
+    headers: buildHeaders(),
+    body: JSON.stringify({ tenTheLoai })
+  });
+
+  if (!resp.ok) {
+    alert('Thêm thể loại thất bại');
+    return;
+  }
+
+  alert('Thêm thể loại thành công');
+  fetchTheLoai(0, pageSize);
+}
+
+/* ================= UPDATE ================= */
+async function updateTheLoai(id, tenTheLoai) {
+  const resp = await fetch(`${apiBase}/theloai/update`, {
+    method: 'PUT',
+    headers: buildHeaders(),
+    body: JSON.stringify({
+      theLoaiId: id,
+      tenTheLoai
+    })
+  });
+
+  if (!resp.ok) {
+    alert('Cập nhật thất bại');
+    return;
+  }
+
+  alert('Cập nhật thành công');
+  fetchTheLoai(currentPage, pageSize);
+}
+
+/* ================= DELETE ================= */
+async function deleteTheLoai(id) {
+  if (!confirm('Bạn chắc chắn muốn xóa thể loại này?')) return;
+
+  try {
+    const resp = await fetch(
+      `${apiBase}/theloai/delete?theLoaiId=${id}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders()
+      }
+    );
+
+    if (!resp.ok) {
+      alert('Xóa thất bại');
+      return;
+    }
+
+    alert('Đã xóa thể loại');
+    fetchTheLoai(currentPage, pageSize);
+
+  } catch (err) {
+    console.error(err);
+    alert('Không kết nối được server');
+  }
+}
+
+/* ================= MODAL ================= */
+function openModal(mode, data = {}) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+
+  modal.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>${mode === 'add' ? 'Thêm thể loại' : 'Sửa thể loại'}</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <input id="theloai-name" placeholder="Tên thể loại"
+          value="${data.tenTheLoai || ''}">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel">Hủy</button>
+        <button class="btn-save">Lưu</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('.modal-close').onclick =
+  modal.querySelector('.btn-cancel').onclick = () => modal.remove();
+
+  modal.querySelector('.btn-save').onclick = () => {
+    const name = document.getElementById('theloai-name').value.trim();
+    if (!name) {
+      alert('Tên thể loại không được để trống');
+      return;
+    }
+
+    if (mode === 'add') {
+      createTheLoai(name);
+    } else {
+      updateTheLoai(data.theLoaiId, name);
+    }
+
+    modal.remove();
+  };
+}
+
+/* ================= RENDER ================= */
+function renderTable(pageData) {
+  currentPage = pageData.number;
+  totalPages = pageData.totalPages;
+
+  const tbody = document.getElementById('publishers-table-body');
+  tbody.innerHTML = '';
+
+  if (!pageData.content.length) {
+    tbody.innerHTML = `<tr><td colspan="3">Không có thể loại</td></tr>`;
+    return;
+  }
+
+  pageData.content.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.theLoaiId}</td>
+      <td>${item.tenTheLoai}</td>
+      <td>
+        <div class="btn-action">
+          <button class="btn-edit">Sửa</button>
+          <button class="btn-delete">Xóa</button>
+        </div>
+      </td>
+    `;
+
+    tr.querySelector('.btn-edit').onclick = () =>
+      openModal('edit', item);
+
+    tr.querySelector('.btn-delete').onclick = () =>
+      deleteTheLoai(item.theLoaiId);
+
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('page-info').textContent =
+    `Page ${currentPage + 1} / ${totalPages}`;
+
+  document.getElementById('prev-page').disabled = currentPage === 0;
+  document.getElementById('next-page').disabled =
+    currentPage >= totalPages - 1;
+}
+
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.add-button').onclick = () =>
+    openModal('add');
+
+  document.getElementById('prev-page').onclick = () =>
+    fetchTheLoai(currentPage - 1, pageSize);
+
+  document.getElementById('next-page').onclick = () =>
+    fetchTheLoai(currentPage + 1, pageSize);
+
+  fetchTheLoai();
+});
+
+
+/* ================= LOGOUT ================= */
 document.addEventListener('DOMContentLoaded', () => {
   const logoutBtn = document.getElementById('logout_function');
   if (!logoutBtn) return;
 
   const logout = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('username');
-    sessionStorage.removeItem('role');
-    sessionStorage.removeItem('accountId');
+    sessionStorage.clear();
     window.location.href = '../Dang_nhap/Dang_nhap.html';
   };
 
@@ -21,40 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       logout();
-    }
-  });
-});
-
-// ================= SIDEBAR TOGGLE =================
-document.addEventListener('DOMContentLoaded', () => {
-  const menuToggle = document.getElementById('menu-toggle');
-  const sidebar = document.querySelector('.sidebar');
-  if (!menuToggle || !sidebar) return;
-
-  const toggle = () => {
-    const open = sidebar.classList.toggle('open');
-    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  };
-
-  menuToggle.addEventListener('click', toggle);
-  menuToggle.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggle();
-    }
-  });
-
-  document.addEventListener('click', e => {
-    if (!sidebar.classList.contains('open')) return;
-    if (e.target.closest('.sidebar') || e.target.closest('#menu-toggle')) return;
-    sidebar.classList.remove('open');
-    menuToggle.setAttribute('aria-expanded', 'false');
-  });
-
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-      sidebar.classList.remove('open');
-      menuToggle.setAttribute('aria-expanded', 'false');
     }
   });
 });
@@ -136,134 +291,104 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ================= PAGINATION STATE =================
-let currentPage = 0;
-let pageSize = 7;
-let totalPages = 1;
-
-// ================= HELPER =================
-function buildHeaders() {
-  const headers = {};
-  const token = sessionStorage.getItem('token');
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
-}
-
-function setStatus(msg) {
-  const wrapper = document.querySelector('.table-wrapper');
-  let status = document.getElementById('theloai-status');
-
-  if (!status && wrapper) {
-    status = document.createElement('div');
-    status.id = 'theloai-status';
-    status.style.margin = '8px 0';
-    status.style.fontStyle = 'italic';
-    wrapper.prepend(status);
-  }
-
-  if (status) status.textContent = msg || '';
-}
-
-// ================= FETCH DATA =================
-async function fetchTheLoai(page = 0, size = 7) {
-  setStatus('Đang tải...');
-  const url = `${apiBase}/theloai/all?page=${page}&size=${size}`;
-
-  try {
-    const resp = await fetch(url, { headers: buildHeaders() });
-
-    if (resp.status === 401) {
-      setStatus('Bạn chưa đăng nhập.');
-      return;
-    }
-    if (resp.status === 403) {
-      setStatus('Bạn không có quyền truy cập.');
-      return;
-    }
-    if (!resp.ok) {
-      setStatus(`Lỗi tải dữ liệu: ${resp.status}`);
-      return;
-    }
-
-    const data = await resp.json();
-    renderTable(data);
-    setStatus('');
-  } catch (err) {
-    console.error(err);
-    setStatus('Không thể tải dữ liệu.');
-  }
-}
-
-// ================= RENDER TABLE =================
-function renderTable(pageData) {
-  currentPage = pageData.number ?? 0;
-  pageSize = pageData.size ?? pageSize;
-  totalPages = pageData.totalPages ?? 1;
-
-  const tbody = document.getElementById('publishers-table-body');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  const list = pageData.content || [];
-  if (list.length === 0) {
-    tbody.innerHTML =
-      '<tr><td colspan="3">Không có thể loại.</td></tr>';
-    return;
-  }
-
-  list.forEach(item => {
-    const tr = document.createElement('tr');
-
-    tr.innerHTML = `
-      <td>${item.theLoaiId ?? ''}</td>
-      <td>${item.tenTheLoai ?? ''}</td>
-      <td>
-        <div class="btn-action">
-          <button class="btn-edit">Sửa</button>
-          <button class="btn-delete">Xóa</button>
-        </div>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-
-  updatePagination();
-}
-
-// ================= PAGINATION UI =================
-function updatePagination() {
-  const prev = document.getElementById('prev-page');
-  const next = document.getElementById('next-page');
-  const info = document.getElementById('page-info');
-
-  if (!prev || !next || !info) return;
-
-  prev.disabled = currentPage <= 0;
-  next.disabled = currentPage >= totalPages - 1;
-  info.textContent = `Page ${currentPage + 1} / ${totalPages}`;
-}
-
-// ================= INIT =================
+// Navigate to Quản lý Độc giả when menu item clicked
 document.addEventListener('DOMContentLoaded', () => {
-  const prev = document.getElementById('prev-page');
-  const next = document.getElementById('next-page');
+  const menuDocGia = document.getElementById('menu-doc-gia');
+  if (!menuDocGia) return;
 
-  if (prev)
-    prev.addEventListener('click', () =>
-      fetchTheLoai(currentPage - 1, pageSize)
-    );
+  const goTo = () => {
+    window.location.href =
+      menuDocGia.dataset.href ||
+      '../Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.html';
+  };
 
-  if (next)
-    next.addEventListener('click', () =>
-      fetchTheLoai(currentPage + 1, pageSize)
-    );
+  menuDocGia.addEventListener('click', goTo);
+  menuDocGia.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
 
-  const usernameEl = document.querySelector('.username-text');
-  if (usernameEl) {
-    usernameEl.textContent =
-      sessionStorage.getItem('username') || 'Khách';
-  }
+// Navigate to Quản lý sách when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuSach = document.getElementById('menu-sach');
+  if (!menuSach) return;
 
-  fetchTheLoai(0, pageSize);
+  const goTo = () => {
+    window.location.href =
+      menuSach.dataset.href ||
+      '../Quan_li_sach_admin/Quan_li_sach_admin.html';
+  };
+
+  menuSach.addEventListener('click', goTo);
+  menuSach.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý phiếu mượn when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuPhieuMuon = document.getElementById('menu-phieu-muon');
+  if (!menuPhieuMuon) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuPhieuMuon.dataset.href ||
+      '../Quan_li_phieu_muon_admin/Quan_li_phieu_muon_admin.html';
+  };
+
+  menuPhieuMuon.addEventListener('click', goTo);
+  menuPhieuMuon.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý thẻ thư viện when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuTheThuVien = document.getElementById('menu-the-thu_vien');
+  if (!menuTheThuVien) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuTheThuVien.dataset.href ||
+      '../Quan_li_the_thu_vien_admin/Quan_li_the_thu_vien_admin.html';
+  };
+
+  menuTheThuVien.addEventListener('click', goTo);
+  menuTheThuVien.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// ================= LOGOUT =================
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logout_function');
+  if (!logoutBtn) return;
+
+  const logout = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('accountId');
+    window.location.href = '../Dang_nhap/Dang_nhap.html';
+  };
+
+  logoutBtn.addEventListener('click', logout);
+  logoutBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      logout();
+    }
+  });
 });

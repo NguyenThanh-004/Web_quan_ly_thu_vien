@@ -2,17 +2,17 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý Lĩnh vực</title>
+    <title>Quản lý sách - Admin | GTQTD</title>
 
-    <link rel="stylesheet" href="/Quan_li_linh_vuc_admin/Quan_li_linh_vuc_admin.css">
+    <link rel="stylesheet" href="/Quan_li_sach_admin/Quan_li_sach_admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+    <link rel="icon" type="image/x-icon" href="../Assets/Images/logo.png">
 </head>
-<body>
 
+<body>
 <div class="layout">
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (GIỮ NGUYÊN) -->
     <aside class="sidebar">
         <div class="logo">
             <i class="fa-solid fa-book-open logo-icon"></i>
@@ -23,7 +23,7 @@
             <li id="menu-trang-chu" role="button" data-href="../Trang_chu_admin/Trang_chu_admin.html">
                 <i class="fa-solid fa-house"></i> Trang chủ
             </li>
-            <li id="menu-sach" role="button" data-href="../Quan_li_sach_admin/Quan_li_sach_admin.html">
+            <li class="active">
                 <i class="fa-solid fa-book"></i> Sách
             </li>
             <li id="menu-doc-gia" role="button" data-href="../Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.html">
@@ -38,13 +38,13 @@
             <li id="menu-nha-xuat-ban" role="button" data-href="../Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.html">
                 <i class="fa-solid fa-building"></i> Nhà xuất bản
             </li>
-            <li id="menu-the-thu_vien" role="button" data-href="../Quan_li_the_thu_vien_admin/Quan_li_the_thu_vien_admin.html">
+            <li id="menu-the-thu-vien" role="button" data-href="../Quan_li_the_thu_vien_admin/Quan_li_the_thu_vien_admin.html">
                 <i class="fa-solid fa-id-card"></i> Thẻ thư viện
             </li>
             <li id="menu-the-loai" role="button" data-href="../Quan_li_the_loai_admin/Quan_li_the_loai_admin.html">
                 <i class="fa-solid fa-layer-group"></i> Thể loại
             </li>
-            <li class="active">
+            <li id="menu-linh-vuc" role="button" data-href="../Quan_li_linh_vuc_admin/Quan_li_linh_vuc_admin.html">
                 <i class="fa-solid fa-tags"></i> Lĩnh vực
             </li>
         </ul>
@@ -59,62 +59,44 @@
 
         <!-- HEADER -->
         <div class="header">
-            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+            <h2>Quản lý sách</h2>
 
             <div class="user">
-                <div class="avatar">
-                    <i class="fa-solid fa-circle-user"></i>
-                </div>
+                <i class="fa-solid fa-circle-user"></i>
                 <span class="username-text"></span>
             </div>
         </div>
 
-        <!-- HEADER (mobile) -->
-        <div class="header">
-            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
-                <i class="fa-solid fa-bars"></i>
+        <!-- ACTION BAR -->
+         <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Nhập tên sách, tác giả...">
+            <button id="btnSearch">Tìm kiếm</button>
+        </div>
+
+        <div class="admin-actions">
+            <button id="btnAddBook" class="add-button">
+                <i class="fa-solid fa-plus"></i>
             </button>
         </div>
 
-        <!-- TITLE -->
-        <div class="content-header">
-            <h1>Quản lý lĩnh vực</h1>
-        </div>
+        <!-- BOOK GRID -->
+        <div class="book-section">
+            <div class="book-grid" id="bookGrid">
+                <!-- JS render sách -->
+            </div>
 
-        <!-- ADD BUTTON -->
-        <button class="add-button">
-            <i class="fa-solid fa-plus"></i>
+            <div class="load-more">
+                <button id="btnLoadMore">
+                    Xem thêm <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+        <button id="btnScrollTop" class="scroll-top">
+            <i class="fas fa-chevron-up"></i>
         </button>
-
-        <!-- TABLE -->
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mã lĩnh vực</th>
-                        <th>Tên lĩnh vực</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody id="publishers-table-body">
-                    <!-- JS render -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- PAGE -->
-        <div class="page" id="publishers-page">
-            <button id="prev-page" disabled>Prev</button>
-            <span id="page-info">Page 1 / 1</span>
-            <button id="next-page" disabled>Next</button>
-        </div>
 
     </main>
 </div>
-
-<script type="module" src="/Quan_li_linh_vuc_admin/Quan_li_linh_vuc_admin.js"></script>
-
+<script src="/Quan_li_sach_admin/Quan_li_sach_admin.js"></script>
 </body>
 </html>

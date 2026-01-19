@@ -2,32 +2,31 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý Nhà xuất bản</title>
+    <title>Quản lý Độc giả</title>
 
-    <link rel="stylesheet" href="/Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.css">
+    <link rel="stylesheet" href="/Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
-
 </head>
 <body>
 
 <div class="layout">
 
     <!-- SIDEBAR -->
-     <aside class="sidebar">
+    <aside class="sidebar">
         <div class="logo">
             <i class="fa-solid fa-book-open logo-icon"></i>
             <span class="logo-text">GTQTD</span>
         </div>
 
         <ul class="menu">
-             <li id="menu-trang-chu" data-href="../Trang_chu_admin/Trang_chu_admin.html">
+            <li id="menu-trang-chu" role="button" data-href="../Trang_chu_admin/Trang_chu_admin.html">
                 <i class="fa-solid fa-house"></i> Trang chủ
             </li>
             <li id="menu-sach" role="button" data-href="../Quan_li_sach_admin/Quan_li_sach_admin.html">
                 <i class="fa-solid fa-book"></i> Sách
             </li>
-            <li id="menu-doc-gia" role="button" data-href="../Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.html">
+            <li class="active">
                 <i class="fa-solid fa-user"></i> Độc giả
             </li>
             <li id="menu-phieu-muon" role="button" data-href="../Quan_li_phieu_muon_admin/Quan_li_phieu_muon_admin.html">
@@ -36,10 +35,10 @@
             <li id="menu-tac-gia" role="button" data-href="../Quan_li_tac_gia_admin/Quan_li_tac_gia_admin.html">
                 <i class="fa-solid fa-pen-nib"></i> Tác giả
             </li>
-            <li class="active" >
+            <li id="menu-nha-xuat-ban" role="button" data-href="../Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.html">
                 <i class="fa-solid fa-building"></i> Nhà xuất bản
             </li>
-            <li id="menu-the-thu_vien" role="button" data-href="../Quan_li_the_thu_vien_admin/Quan_li_the_thu_vien_admin.html">
+            <li id="menu-the-thu-vien" role="button" data-href="../Quan_li_the_thu_vien_admin/Quan_li_the_thu_vien_admin.html">
                 <i class="fa-solid fa-id-card"></i> Thẻ thư viện
             </li>
             <li id="menu-the-loai" role="button" data-href="../Quan_li_the_loai_admin/Quan_li_the_loai_admin.html">
@@ -60,20 +59,19 @@
 
         <!-- HEADER -->
         <div class="header">
-            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
-            <!-- User -->
-            <div class="user">              
+            <div class="user">
                 <div class="avatar">
                     <i class="fa-solid fa-circle-user"></i>
                 </div>
                 <span class="username-text"></span>
-            </div> 
+            </div>
         </div>
-        
-        <!-- HEADER (chỉ cho mobile toggle) -->
+
+        <!-- HEADER (mobile) -->
         <div class="header">
             <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
                 <i class="fa-solid fa-bars"></i>
@@ -82,32 +80,33 @@
 
         <!-- TITLE -->
         <div class="content-header">
-            <h1>Quản lý nhà xuất bản</h1>
+            <h1>Quản lý độc giả</h1>
         </div>
-
-            <!-- Thêm button -->
-                <button class="add-button">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
 
         <!-- TABLE -->
         <div class="table-wrapper">
             <table>
                 <thead>
-                    <tr>
-                        <th>Mã nhà xuất bản</th>
-                        <th>Tên nhà xuất bản</th>
-                        <th>Địa chỉ</th>
-                        <th>Hành động</th>
-                    </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên độc giả</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Ngày sinh</th>
+                    <th>Địa chỉ</th>
+                    <th>Ký quỹ</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
                 </thead>
-                <tbody id="publishers-table-body">
+                <tbody id="docgia-table-body">
+                    <!-- JS render -->
                 </tbody>
             </table>
         </div>
 
         <!-- PAGE -->
-        <div class="page" id="publishers-page">
+        <div class="page" id="docgia-page">
             <button id="prev-page" disabled>Prev</button>
             <span id="page-info">Page 1 / 1</span>
             <button id="next-page" disabled>Next</button>
@@ -116,7 +115,7 @@
     </main>
 </div>
 
-    <script type="module" src="/Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.js"></script>
+<script type="module" src="/Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.js"></script>
 
 </body>
 </html>

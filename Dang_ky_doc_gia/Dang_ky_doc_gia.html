@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký độc giả</title>
+    <link rel="stylesheet" href="/Dang_ky_doc_gia/Dang_ky_doc_gia.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+</head>
+<body>
+
+<div class="overlay">
+    <div class="form-container">
+
+        <!-- Nút thoát -->
+        <div class="close-btn" tabindex="0" data-href="../Trang_chu_admin/Trang_chu_admin.html">
+            <i class="fa-solid fa-xmark" ></i>
+        </div>
+
+        <h2>Đăng ký độc giả</h2>
+
+        <!-- Thông tin độc giả -->
+        <div class="form-section">
+            <h3>Thông tin độc giả</h3>
+
+            <div class="form-box">
+
+                <div class="form-group">
+                    <label>Tên độc giả</label>
+                    <input id="TenDocGia" type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input id="Email" type="email">
+                </div>
+
+                <div class="form-group">
+                    <label>Ngày sinh</label>
+                    <input id="NgaySinh" type="date">
+                </div>
+
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input id="SoDienThoai" type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Địa chỉ</label>
+                    <input id="DiaChi" type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input id="Password" type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Tiền quỹ</label>
+                    <input id="TienQuy" type="number">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Thông tin thẻ thư viện -->
+        <div class="form-section">
+            <h3>Thông tin thẻ thư viện</h3>
+
+            <div class="form-box">
+
+                <div class="form-group">
+                    <label>Ngày cấp</label>
+                    <input id="NgayCap" type="date">
+                </div>
+
+                <div class="form-group">
+                    <label>Ngày hết hạn</label>
+                    <input id="NgayHetHan" type="date">
+                </div>
+
+            </div>
+        </div>
+
+        <button class="btn-submit">Đăng ký</button>
+
+    </div>
+</div>
+
+    <script type="module" src="/Dang_ky_doc_gia/Dang_ky_doc_gia.js"></script>
+
+</body>
+</html>

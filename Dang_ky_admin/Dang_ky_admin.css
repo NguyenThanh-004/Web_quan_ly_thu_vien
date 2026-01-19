@@ -24,12 +24,12 @@
     position: relative;
 }
 
-/* Close button */
+/* thoát button */
 .close-btn {
     position: absolute;
     right: 25px;
     top: 20px;
-    font-size: 22px;
+    font-size: 40px;
     cursor: pointer;
     color: #333;
 }

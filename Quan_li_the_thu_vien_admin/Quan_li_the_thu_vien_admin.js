@@ -1,87 +1,34 @@
-// chuyển qua form đăng ký admin
+import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
+
+console.debug('Quan_li_the_thu_vien_admin loaded, API base:', API_CONFIG.BASE_URL);
+const apiBase = API_CONFIG.BASE_URL;
+
+// ================= LOGOUT =================
 document.addEventListener('DOMContentLoaded', () => {
-  const adminCard = document.getElementById('register-admin') || document.querySelector('.quick-card[aria-label="Đăng ký admin"]');
-  if (!adminCard) return;
+  const logoutBtn = document.getElementById('logout_function');
+  if (!logoutBtn) return;
 
-  const navigate = () => {
-    window.location.href = '/dang_ky_admin/Dang_ky_admin.html';
-  };
-
-  adminCard.addEventListener('click', navigate);
-  adminCard.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      navigate();
-    }
-  });
-});
-
-// chuyển qua form đăng ký độc giả
-
-document.addEventListener('DOMContentLoaded', () => {
-  const userCard = document.getElementById('register-user') || document.querySelector('.quick-card[aria-label="Đăng ký độc giả"]');
-  if (!userCard) return;
-
-  const navigate = () => {
-    window.location.href = '/dang_ky_doc_gia/Dang_ky_doc_gia.html';
-  };
-
-  userCard.addEventListener('click', navigate);
-  userCard.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      navigate();
-    }
-  });
-});
-
-// chuyển qua form phiếu mượn
-document.addEventListener('DOMContentLoaded', () => {
-  const phieuMuonCard = document.getElementById('phieu-muon');
-  if (!phieuMuonCard) return;
-
-  const goTo = () => {
-    const href = phieuMuonCard.dataset.href || '../Quan_li_phieu_muon_admin/Quan_li_phieu_muon_admin.html';
-    window.location.href = href;
-  };
-
-  phieuMuonCard.addEventListener('click', goTo);
-  phieuMuonCard.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      goTo();
-    }
-  });
-});
-
-// chuyển về trang đăng nhập //
-document.addEventListener('DOMContentLoaded', () => {
-  const logout_function = document.getElementById('logout_function') || document.querySelector('.logout');
-  if (!logout_function) return;
-
-  const navigate = () => {
-    // clear stored auth and redirect to login
+  const logout = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('username');
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('accountId');
-    window.location.href = '/Dang_nhap/Dang_nhap.html';
+    window.location.href = '../Dang_nhap/Dang_nhap.html';
   };
 
-  logout_function.addEventListener('click', navigate);
-  logout_function.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+  logoutBtn.addEventListener('click', logout);
+  logoutBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      navigate();
+      logout();
     }
   });
 });
 
-// Menu toggle for small screens
+// ================= SIDEBAR TOGGLE =================
 document.addEventListener('DOMContentLoaded', () => {
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.sidebar');
-
   if (!menuToggle || !sidebar) return;
 
   const toggle = () => {
@@ -90,28 +37,190 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   menuToggle.addEventListener('click', toggle);
-  menuToggle.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+  menuToggle.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       toggle();
     }
   });
 
-  // close sidebar when clicking outside (on small screens)
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', e => {
     if (!sidebar.classList.contains('open')) return;
     if (e.target.closest('.sidebar') || e.target.closest('#menu-toggle')) return;
     sidebar.classList.remove('open');
     menuToggle.setAttribute('aria-expanded', 'false');
   });
 
-  // ensure sidebar is closed when resizing to larger screens
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
       sidebar.classList.remove('open');
       menuToggle.setAttribute('aria-expanded', 'false');
     }
   });
+});
+
+// ================= MENU NAV =================
+document.addEventListener('DOMContentLoaded', () => {
+  const bindNav = (id, fallback) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const go = () => (window.location.href = el.dataset.href || fallback);
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        go();
+      }
+    });
+  };
+
+  bindNav('menu-trang-chu', '../Trang_chu_admin/Trang_chu_admin.html');
+  bindNav('menu-tac-gia', '../Quan_li_tac_gia_admin/Quan_li_tac_gia_admin.html');
+  bindNav('menu-nha-xuat-ban', '../Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.html');
+  bindNav('menu-linh-vuc', '../Quan_li_linh_vuc_admin/Quan_li_linh_vuc_admin.html');
+  bindNav('menu-doc-gia', '../Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.html');
+});
+
+// ================= PAGINATION STATE =================
+let currentPage = 0;
+let pageSize = 5;
+let totalPages = 1;
+
+// ================= HELPER =================
+function buildHeaders() {
+  const headers = {};
+  const token = sessionStorage.getItem('token');
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
+
+function setStatus(msg) {
+  const wrapper = document.querySelector('.table-wrapper');
+  let status = document.getElementById('thethuvien-status');
+
+  if (!status && wrapper) {
+    status = document.createElement('div');
+    status.id = 'thethuvien-status';
+    status.style.margin = '8px 0';
+    status.style.fontStyle = 'italic';
+    wrapper.prepend(status);
+  }
+
+  if (status) status.textContent = msg || '';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('vi-VN');
+}
+
+// ================= FETCH DATA =================
+async function fetchTheThuVien(page = 0, size = 5) {
+  setStatus('Đang tải...');
+  const url = `${apiBase}/thethuvien/all?page=${page}&size=${size}`;
+
+  try {
+    const resp = await fetch(url, { headers: buildHeaders() });
+
+    if (resp.status === 401) {
+      setStatus('Bạn chưa đăng nhập.');
+      return;
+    }
+    if (resp.status === 403) {
+      setStatus('Bạn không có quyền truy cập.');
+      return;
+    }
+    if (!resp.ok) {
+      setStatus(`Lỗi tải dữ liệu: ${resp.status}`);
+      return;
+    }
+
+    const data = await resp.json();
+    renderTable(data);
+    setStatus('');
+  } catch (err) {
+    console.error(err);
+    setStatus('Không thể tải dữ liệu.');
+  }
+}
+
+// ================= RENDER TABLE =================
+function renderTable(pageData) {
+  currentPage = pageData.number ?? 0;
+  pageSize = pageData.size ?? pageSize;
+  totalPages = pageData.totalPages ?? 1;
+
+  const tbody = document.getElementById('library-cards-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const list = pageData.content || [];
+  if (list.length === 0) {
+    tbody.innerHTML =
+      '<tr><td colspan="7">Không có thẻ thư viện.</td></tr>';
+    return;
+  }
+
+  list.forEach(item => {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${item.theThuVienId ?? ''}</td>
+      <td>${item.tenDocGia ?? ''}</td>
+      <td>${formatDate(item.ngayCap)}</td>
+      <td>${formatDate(item.ngayHetHan)}</td>
+      <td>${item.trangThai ?? ''}</td>
+      <td>${item.soLuongSachDuocMuon ?? 0}</td>
+      <td>
+        <div class="btn-action">
+          <button class="btn-edit">Sửa</button>
+          <button class="btn-delete">Xóa</button>
+        </div>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  updatePagination();
+}
+
+// ================= PAGINATION UI =================
+function updatePagination() {
+  const prev = document.getElementById('prev-page');
+  const next = document.getElementById('next-page');
+  const info = document.getElementById('page-info');
+
+  if (!prev || !next || !info) return;
+
+  prev.disabled = currentPage <= 0;
+  next.disabled = currentPage >= totalPages - 1;
+  info.textContent = `Page ${currentPage + 1} / ${totalPages}`;
+}
+
+// ================= INIT =================
+document.addEventListener('DOMContentLoaded', () => {
+  const prev = document.getElementById('prev-page');
+  const next = document.getElementById('next-page');
+
+  if (prev)
+    prev.addEventListener('click', () =>
+      fetchTheThuVien(currentPage - 1, pageSize)
+    );
+
+  if (next)
+    next.addEventListener('click', () =>
+      fetchTheThuVien(currentPage + 1, pageSize)
+    );
+
+  const usernameEl = document.querySelector('.username-text');
+  if (usernameEl) {
+    usernameEl.textContent =
+      sessionStorage.getItem('username') || 'Khách';
+  }
+
+  fetchTheThuVien(0, pageSize);
 });
 
 // Navigate to Quản lý Tác giả when menu item clicked
@@ -248,9 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Navigate to Quản thẻ thư viện when menu item clicked
+// Navigate to Quản lý thẻ thư viện when menu item clicked
 document.addEventListener('DOMContentLoaded', () => {
-  const menuTheThuVien = document.getElementById('menu-the-thu-vien');
+  const menuTheThuVien = document.getElementById('menu-the-thu_vien');
   if (!menuTheThuVien) return;
 
   const goTo = () => {
@@ -266,11 +375,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-// show username in header if present
-document.addEventListener('DOMContentLoaded', () => {
-  const usernameEl = document.querySelector('.username-text');
-  const storedUser = sessionStorage.getItem('username');
-  if (usernameEl) usernameEl.textContent = storedUser ? storedUser : 'Khách';
-});
-

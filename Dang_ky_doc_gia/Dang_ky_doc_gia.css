@@ -1,0 +1,176 @@
+/* ================= ROOT ================= */
+:root {
+  --bg-overlay: rgba(0, 0, 0, 0.35);
+  --bg-page: #ffffff;
+  --bg-form: #f6f8f6;
+  --bg-white: #ffffff;
+  --input-bg: #e0e0e0;
+  --primary: #2f6f44;
+}
+
+/* ================= BODY ================= */
+body {
+  margin: 0;
+  background: var(--bg-page);
+}
+
+/* ================= OVERLAY ================= */
+.overlay {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ================= FORM CONTAINER ================= */
+.form-container {
+  width: 100%;
+  max-width: 880px;       /* 👈 thu gọn form */
+  background: var(--bg-form);
+  border-radius: 12px;
+  padding: 28px;
+  border: 1px solid #ddd;
+}
+
+/* ================= TITLE ================= */
+.form-container h2 {
+  text-align: left;
+  font-size: 26px;
+  margin-bottom: 24px;
+}
+
+/* ================= SECTION ================= */
+.form-section {
+  background: var(--bg-white);
+  border: 2px solid #2ecc71;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-section h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+/* ================= GRID ================= */
+.form-box {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+}
+
+/* ================= FORM GROUP ================= */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group input {
+  height: 38px;                 /* 👈 giảm chiều cao */
+  padding: 0 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--input-bg);
+  font-size: 14px;
+}
+
+/* ================= FULL WIDTH FIELDS ================= */
+.form-group:nth-child(1),
+.form-group:nth-child(2),
+.form-group:nth-child(5),
+.form-group:nth-child(6),
+.form-group:nth-child(7) {
+  grid-column: span 2;
+}
+
+/* ================= BUTTON ================= */
+.btn-submit {
+  display: block;
+  margin: 16px auto 0;
+  padding: 12px 56px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background: #275e3a;
+}
+
+/* ================= CLOSE BUTTON ================= */
+.close-btn {
+  top: 1px;
+  right: 18px;
+  font-size: 40px;
+  cursor: pointer;
+  margin-left: 97%;
+}
+
+/* ================================================= */
+/* ================= RESPONSIVE ==================== */
+/* ================================================= */
+
+/* -------- Tablet -------- */
+@media (max-width: 1024px) {
+  .form-container {
+    max-width: 760px;
+    padding: 24px;
+  }
+
+  .form-box {
+    gap: 14px 18px;
+  }
+}
+
+/* -------- Mobile -------- */
+@media (max-width: 768px) {
+  .overlay {
+    padding: 16px;
+  }
+
+  .form-container {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .form-box {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group {
+    grid-column: span 1 !important;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+/* -------- Small Mobile -------- */
+@media (max-width: 480px) {
+  .form-container h2 {
+    font-size: 20px;
+  }
+
+  .form-section {
+    padding: 16px;
+  }
+
+  .form-group input {
+    height: 36px;
+    font-size: 13px;
+  }
+}

@@ -1,6 +1,8 @@
-// hiển thị mật khẩu //
 import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 
+console.debug('Dang_nhap module loaded, API base:', API_CONFIG.BASE_URL);
+
+// hiển thị mật khẩu //
 document.addEventListener('DOMContentLoaded', () => {
   const passwordInput = document.getElementById('password');
   const eye = document.querySelector('.password-box .eye');

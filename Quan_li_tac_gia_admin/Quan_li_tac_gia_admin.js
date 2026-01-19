@@ -1,99 +1,244 @@
 import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 
-console.debug('Quan_li_tac_gia_admin module loaded, API base:', API_CONFIG.BASE_URL);
+console.debug('Quan_li_tac_gia_admin loaded:', API_CONFIG.BASE_URL);
 const apiBase = API_CONFIG.BASE_URL;
 
-// nút đăng xuất
-document.addEventListener('DOMContentLoaded', () => {
-  const logout_function = document.getElementById('logout_function');
-  if (!logout_function) return;
+/* ================= STATE ================= */
+let currentPage = 0;
+let pageSize = 7;
+let totalPages = 1;
+let editingId = null;
 
-  const navigate = () => {
-    // clear local auth data then redirect to login
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('username');
-    sessionStorage.removeItem('role');
-    sessionStorage.removeItem('accountId');
-    window.location.href = '../Dang_nhap/Dang_nhap.html';
+/* ================= HELPER ================= */
+function buildHeaders(isJson = true) {
+  const headers = {};
+  if (isJson) headers['Content-Type'] = 'application/json';
+  const token = sessionStorage.getItem('token');
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
+
+/* ================= FETCH ================= */
+async function fetchTacGia(page = 0, size = 7) {
+  const url = `${apiBase}/tacgia/all?page=${page}&size=${size}`;
+  const resp = await fetch(url, { headers: buildHeaders(false) });
+  const data = await resp.json();
+  renderTable(data);
+}
+
+/* ================= RENDER (GIỮ NGUYÊN) ================= */
+function renderTable(pageData) {
+  currentPage = pageData.number ?? 0;
+  pageSize = pageData.size ?? pageSize;
+  totalPages = pageData.totalPages ?? 1;
+
+  const tbody = document.getElementById('books-table-body');
+  tbody.innerHTML = '';
+
+  if (!pageData.content || pageData.content.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">Không có tác giả</td>
+      </tr>`;
+    return;
+  }
+
+  pageData.content.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.tacGiaId}</td>
+      <td>${item.tenTacGia}</td>
+      <td>${item.noiLam || ''}</td>
+      <td>${item.diaChi || ''}</td>
+      <td>${item.ngaySinh || ''}</td>
+      <td>
+        <div class="btn-action">
+          <button class="btn-edit">Sửa</button>
+          <button class="btn-delete">Xóa</button>
+        </div>
+      </td>
+    `;
+
+    tr.querySelector('.btn-edit').onclick = () => openModal(item);
+    tr.querySelector('.btn-delete').onclick =
+      () => deleteTacGia(item.tacGiaId);
+
+    tbody.appendChild(tr);
+  });
+
+  updatePagination();
+}
+
+/* ================= PAGINATION ================= */
+function updatePagination() {
+  document.getElementById('prev-page').disabled = currentPage <= 0;
+  document.getElementById('next-page').disabled = currentPage >= totalPages - 1;
+  document.getElementById('page-info').textContent =
+    `Page ${currentPage + 1} / ${totalPages}`;
+}
+
+/* ================= MODAL ================= */
+function openModal(data = null) {
+  editingId = data?.tacGiaId || null;
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>${editingId ? 'Sửa tác giả' : 'Thêm tác giả'}</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <input id="tenTacGia" placeholder="Tên tác giả"
+               value="${data?.tenTacGia || ''}">
+        <input id="noiLam" placeholder="Nơi làm"
+               value="${data?.noiLam || ''}">
+        <input id="diaChi" placeholder="Địa chỉ"
+               value="${data?.diaChi || ''}">
+        <input id="ngaySinh" type="date"
+               value="${data?.ngaySinh || ''}">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel">Hủy</button>
+        <button class="btn-save">Lưu</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('.modal-close').onclick =
+  modal.querySelector('.btn-cancel').onclick = () => modal.remove();
+
+  modal.querySelector('.btn-save').onclick = submitForm;
+}
+
+/* ================= CREATE / UPDATE ================= */
+async function submitForm() {
+  const payload = {
+    tenTacGia: document.getElementById('tenTacGia').value.trim(),
+    noiLamViec: document.getElementById('noiLam').value.trim(),
+    diaChi: document.getElementById('diaChi').value.trim(),
+    ngayThangNamSinh: document.getElementById('ngaySinh').value
   };
 
-  logout_function.addEventListener('click', navigate);
-  logout_function.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+
+  if (!payload.tenTacGia) {
+    alert('Tên tác giả không được để trống');
+    return;
+  }
+
+  // UPDATE
+  if (editingId) {
+    payload.tacGiaId = editingId;
+  }
+
+  const url = editingId
+    ? `${apiBase}/tacgia/update`
+    : `${apiBase}/tacgia/create`;
+
+  const method = editingId ? 'PUT' : 'POST';
+
+  try {
+    const resp = await fetch(url, {
+      method,
+      headers: buildHeaders(),
+      body: JSON.stringify(payload)
+    });
+
+    const text = await resp.text();
+
+    if (!resp.ok) {
+      alert(text || 'Thao tác thất bại');
+      return;
+    }
+
+    alert(text || 'Thành công');
+    document.querySelector('.modal-overlay').remove();
+    fetchTacGia(currentPage, pageSize);
+
+  } catch (err) {
+    console.error(err);
+    alert('Không kết nối được server');
+  }
+}
+
+/* ================= DELETE ================= */
+async function deleteTacGia(id) {
+  if (!confirm('Bạn có chắc muốn xóa tác giả này?')) return;
+
+  try {
+    const resp = await fetch(`${apiBase}/tacgia/delete`, {
+      method: 'DELETE',
+      headers: buildHeaders(),
+      body: JSON.stringify({ tacGiaId: id })
+    });
+
+    const text = await resp.text();
+
+    if (!resp.ok) {
+      alert(text || 'Xóa thất bại');
+      return;
+    }
+
+    alert(text || 'Xóa thành công');
+    fetchTacGia(currentPage, pageSize);
+
+  } catch (err) {
+    console.error(err);
+    alert('Không kết nối được server');
+  }
+}
+
+/* ================= INIT ================= */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('prev-page').onclick =
+    () => fetchTacGia(Math.max(0, currentPage - 1), pageSize);
+
+  document.getElementById('next-page').onclick =
+    () => fetchTacGia(Math.min(totalPages - 1, currentPage + 1), pageSize);
+
+  const addBtn = document.querySelector('.add-button');
+  if (addBtn) addBtn.onclick = () => openModal();
+
+  fetchTacGia(0, pageSize);
+});
+
+// ================= MENU TRANG CHỦ =================
+document.addEventListener('DOMContentLoaded', () => {
+  const menuHome = document.getElementById('menu-trang-chu');
+  if (!menuHome) return;
+
+  const goHome = () => {
+    window.location.href =
+      menuHome.dataset.href ||
+      '../Trang_chu_admin/Trang_chu_admin.html';
+  };
+
+  menuHome.addEventListener('click', goHome);
+  menuHome.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      navigate();
+      goHome();
     }
   });
 });
 
-// sidebar toggle
+// Navigate to Quản lý nhà xuất bản when menu item clicked
 document.addEventListener('DOMContentLoaded', () => {
-  const menuToggle = document.getElementById('menu-toggle');
-  const sidebar = document.querySelector('.sidebar');
-
-  if (!menuToggle || !sidebar) return;
-
-  const toggle = () => {
-    const open = sidebar.classList.toggle('open');
-    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  };
-
-  menuToggle.addEventListener('click', toggle);
-  menuToggle.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      toggle();
-    }
-  });
-
-  // tắt sidebar khi click ngoài
-  document.addEventListener('click', (e) => {
-    if (!sidebar.classList.contains('open')) return;
-    if (e.target.closest('.sidebar') || e.target.closest('#menu-toggle')) return;
-    sidebar.classList.remove('open');
-    menuToggle.setAttribute('aria-expanded', 'false');
-  });
-
-  // tắt sidebar khi zoom to màn hình
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-      sidebar.classList.remove('open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-    }
-  });
-});
-
-// quay về trang chủ admin
-document.addEventListener('DOMContentLoaded', () => {
-  const menuTrangChu = document.getElementById('menu-trang-chu');
-  if (!menuTrangChu) return;
-
-  const navigateToAdminHome = () => {
-    const href = menuTrangChu.dataset.href || '../Trang_chu_admin/Trang_chu_admin.html';
-    window.location.href = href;
-  };
-
-  menuTrangChu.addEventListener('click', navigateToAdminHome);
-  menuTrangChu.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      navigateToAdminHome();
-    }
-  });
-});
-
-// Navigate to Quản lý nhà x when menu item clicked
-document.addEventListener('DOMContentLoaded', () => {
-  const menuNhaXuatBan = document.getElementById('menu-nha-xuat-ban');
-  if (!menuNhaXuatBan) return;
+  const menuNhaxuatban = document.getElementById('menu-nha-xuat-ban');
+  if (!menuNhaxuatban) return;
 
   const goTo = () => {
-    const href = menuNhaXuatBan.dataset.href || '../Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.html';
+    const href = menuNhaxuatban.dataset.href || '../Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.html';
     window.location.href = href;
   };
 
-  menuNhaXuatBan.addEventListener('click', goTo);
-  menuNhaXuatBan.addEventListener('keydown', (e) => {
+  menuNhaxuatban.addEventListener('click', goTo);
+  menuNhaxuatban.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
       e.preventDefault();
       goTo();
@@ -139,199 +284,104 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ---- lấy tác giả và render bảng ----
-let currentPage = 0;
-let pageSize = 7; // hiển thị 7 tác giả mỗi trang
-let totalPages = 1;
-
-function formatDate(dateString) {
-  if (!dateString) return '';
-  const d = new Date(dateString);
-  if (Number.isNaN(d.getTime())) return dateString;
-  return d.toLocaleDateString('vi-VN');
-}
-
-function setStatus(msg) {
-  const statusEl = document.getElementById('authors-status');
-  if (statusEl) statusEl.textContent = msg;
-  else if (msg) console.info('Status:', msg);
-}
-
-function buildHeaders(isJson = true) {
-  const headers = {};
-  if (isJson) headers['Content-Type'] = 'application/json';
-  const token = sessionStorage.getItem('token');
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
-}
-
-async function fetchAuthors(page = 0, size = 7) {
-  setStatus('Đang tải...');
-  const url = `${apiBase}/tacgia/all?page=${page}&size=${size}`;
-  console.debug('Fetching authors from', url);
-  try {
-    const resp = await fetch(url, { headers: buildHeaders(false) });
-
-    if (resp.status === 401) {
-      setStatus('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
-      console.warn('Fetch authors unauthorized (401)');
-      return;
-    }
-    if (resp.status === 403) {
-      setStatus('Bạn không có quyền truy cập (403). Xin đăng nhập bằng tài khoản quản trị.');
-      console.warn('Fetch authors forbidden (403)');
-      return;
-    }
-
-    if (!resp.ok) {
-      const text = await resp.text().catch(() => '');
-      console.error('Fetch authors failed', resp.status, text);
-      setStatus(`Lỗi tải dữ liệu: ${resp.status}`);
-      const tbody = document.getElementById('books-table-body');
-      if (tbody) tbody.innerHTML = `<tr><td colspan="6">Lỗi tải dữ liệu: ${resp.status}</td></tr>`;
-      return;
-    }
-
-    const data = await resp.json();
-    renderAuthorsTable(data);
-    setStatus('');
-  } catch (err) {
-    console.error('Failed to fetch authors', err);
-    setStatus('Không thể tải dữ liệu: ' + (err.message || err));
-    const tbody = document.getElementById('books-table-body');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6">Không thể tải dữ liệu.</td></tr>';
-  }
-}
-
-function renderAuthorsTable(pageData) {
-  currentPage = pageData.number ?? 0;
-  pageSize = pageData.size ?? pageSize;
-  totalPages = pageData.totalPages ?? 1;
-
-  const tbody = document.getElementById('books-table-body');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  const list = pageData.content || [];
-  if (list.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">Không có tác giả.</td></tr>';
-  }
-
-  list.forEach((item, idx) => {
-    const tr = document.createElement('tr');
-
-    const idTd = document.createElement('td');
-    idTd.textContent = item.tacGiaId ?? '';
-
-    const nameTd = document.createElement('td');
-    nameTd.textContent = item.tenTacGia ?? '';
-
-    const placeTd = document.createElement('td');
-    placeTd.textContent = item.noiLamViec ?? '';
-
-    const addressTd = document.createElement('td');
-    addressTd.textContent = item.diaChi ?? '';
-
-    const dobTd = document.createElement('td');
-    dobTd.textContent = formatDate(item.ngayThangNamSinh);
-
-    const actionTd = document.createElement('td');
-    const actions = document.createElement('div');
-    actions.className = 'btn-action';
-
-    const editBtn = document.createElement('button');
-    editBtn.className = 'btn-edit';
-    editBtn.textContent = 'Sửa';
-    editBtn.addEventListener('click', () => onEditAuthor(item.tacGiaId));
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'btn-delete';
-    deleteBtn.textContent = 'Xóa';
-    deleteBtn.addEventListener('click', () => onDeleteAuthor(item.tacGiaId));
-
-    actions.appendChild(editBtn);
-    actions.appendChild(deleteBtn);
-    actionTd.appendChild(actions);
-
-    tr.appendChild(idTd);
-    tr.appendChild(nameTd);
-    tr.appendChild(placeTd);
-    tr.appendChild(addressTd);
-    tr.appendChild(dobTd);
-    tr.appendChild(actionTd);
-
-    tbody.appendChild(tr);
-  });
-
-  updatePaginationControls();
-}
-
-function updatePaginationControls() {
-  const prev = document.getElementById('prev-page');
-  const next = document.getElementById('next-page');
-  const info = document.getElementById('page-info');
-  if (!prev || !next || !info) return;
-
-  prev.disabled = currentPage <= 0;
-  next.disabled = currentPage >= totalPages - 1;
-  info.textContent = `Page ${currentPage + 1} / ${totalPages}`;
-}
-
-/*function onEditAuthor(tacGiaId) {
-  // sửa tác giả
-  window.location.href = `sua_tac_gia.html?tacGiaId=${tacGiaId}`;
-}*/
-
-/*async function onDeleteAuthor(tacGiaId) {
-  //xóa tác giả
-  const ok = confirm('Bạn có chắc muốn xóa tác giả này không?');
-  if (!ok) return;
-  try {
-    const resp = await fetch(`${apiBase}/tacgia/${tacGiaId}`, { method: 'DELETE' });
-    if (!resp.ok) throw new Error(`Delete failed: ${resp.status}`);
-    // refresh trang
-    alert('Xóa tác giả thành công.');
-    fetchAuthors(currentPage, pageSize);
-  } catch (err) {
-    console.error('Delete failed', err);
-    alert('Không thể xóa tác giả.');
-  }
-}*/
-
-// Create author form will be implemented later; the interactive prompt-based create was removed.
-
-// khởi tạo trang
+// Navigate to Quản lý Độc giả when menu item clicked
 document.addEventListener('DOMContentLoaded', () => {
-  const prev = document.getElementById('prev-page');
-  const next = document.getElementById('next-page');
-  const wrapper = document.querySelector('.table-wrapper');
+  const menuDocGia = document.getElementById('menu-doc-gia');
+  if (!menuDocGia) return;
 
-  if (prev) prev.addEventListener('click', () => fetchAuthors(Math.max(0, currentPage - 1), pageSize));
-  if (next) next.addEventListener('click', () => fetchAuthors(Math.min(totalPages - 1, currentPage + 1), pageSize));
+  const goTo = () => {
+    window.location.href =
+      menuDocGia.dataset.href ||
+      '../Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.html';
+  };
 
-  // Note: 'Add' control removed; will add a proper form later.
+  menuDocGia.addEventListener('click', goTo);
+  menuDocGia.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
 
-  // thêm phần trạng thái (hiển thị lỗi/đang tải)
-  if (wrapper && !document.getElementById('authors-status')) {
-    const status = document.createElement('div');
-    status.id = 'authors-status';
-    status.style.margin = '8px 0';
-    status.style.color = '#333';
-    status.style.fontStyle = 'italic';
-    // insert after the add button container if present, otherwise at top
-    const after = wrapper.querySelector('.add-button-container') || wrapper.firstChild;
-    if (after && after.parentNode) after.parentNode.insertBefore(status, after.nextSibling);
-    else wrapper.insertBefore(status, wrapper.firstChild);
-    console.debug('Authors status element added');
-  }
+// Navigate to Quản lý sách when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuSach = document.getElementById('menu-sach');
+  if (!menuSach) return;
 
-  // hiển thị username nếu có token
-  const usernameEl = document.querySelector('.username-text');
-  const storedUser = sessionStorage.getItem('username');
-  if (usernameEl) {
-    usernameEl.textContent = storedUser ? storedUser : 'Khách';
-  }
+  const goTo = () => {
+    window.location.href =
+      menuSach.dataset.href ||
+      '../Quan_li_sach_admin/Quan_li_sach_admin.html';
+  };
 
-  // lấy dữ liệu 
-  fetchAuthors(0, pageSize);
+  menuSach.addEventListener('click', goTo);
+  menuSach.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý phiếu mượn when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuPhieuMuon = document.getElementById('menu-phieu-muon');
+  if (!menuPhieuMuon) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuPhieuMuon.dataset.href ||
+      '../Quan_li_phieu_muon_admin/Quan_li_phieu_muon_admin.html';
+  };
+
+  menuPhieuMuon.addEventListener('click', goTo);
+  menuPhieuMuon.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý thẻ thư viện when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuTheThuVien = document.getElementById('menu-the-thu_vien');
+  if (!menuTheThuVien) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuTheThuVien.dataset.href ||
+      '../Quan_li_the_thu_vien_admin/Quan_li_the_thu_vien_admin.html';
+  };
+
+  menuTheThuVien.addEventListener('click', goTo);
+  menuTheThuVien.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// ================= LOGOUT =================
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logout_function');
+  if (!logoutBtn) return;
+
+  const logout = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('accountId');
+    window.location.href = '../Dang_nhap/Dang_nhap.html';
+  };
+
+  logoutBtn.addEventListener('click', logout);
+  logoutBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      logout();
+    }
+  });
 });

@@ -135,6 +135,7 @@ body {
     margin-bottom: 16px;
 }
 
+/* ===== ADD BUTTON ===== */
 .add-button {
     width: 40px;
     height: 40px;
@@ -168,7 +169,8 @@ thead {
     background: #f0f0f0;
 }
 
-th, td {
+th,
+td {
     padding: 12px;
     text-align: left;
     font-size: 14px;
@@ -178,13 +180,29 @@ tbody tr {
     border-top: 1px solid #eee;
 }
 
-.action i {
-    margin-right: 10px;
-    cursor: pointer;
+/* ===== ACTION BUTTONS ===== */
+.btn-action {
+    display: inline-flex;
+    gap: 8px;
 }
 
-.action i.fa-trash {
-    color: red;
+.btn-edit,
+.btn-delete {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-edit {
+    background: #2ecc71;
+    color: #fff;
+}
+
+.btn-delete {
+    background: #e74c3c;
+    color: #fff;
 }
 
 /* ===== PAGE ===== */
@@ -297,28 +315,79 @@ tbody tr {
         width: 260px;
     }
 }
-.btn-action {
-    display: inline-flex;
-    gap: 8px;
+/* ================= FILTER BAR (FIGMA STYLE) ================= */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* ĐẨY CẢ 2 NÚT SANG PHẢI */
+    gap: 12px;     
 }
 
-.btn-edit,
-.btn-delete {
-    padding: 6px 10px;
-    border-radius: 6px;
+/* ================= ADD BUTTON (+) ================= */
+.btn-add {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
-    font-weight: 600;
+
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
 }
 
-.btn-edit {
+.btn-add i {
+    font-size: 18px;
+    color: #333;
+}
+
+.btn-add:hover {
     background: #2ecc71;
+    transform: translateY(-1px);
+}
+
+.btn-add:hover i {
     color: #fff;
 }
 
-.btn-delete {
-    background: #e74c3c;
-    color: #fff;
+/* ================= FILTER SELECT ================= */
+#filter-status {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+
+    background: #f0f2f1;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+
+    cursor: pointer;
+    outline: none;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='%23333' stroke-width='2' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px;
+}
+
+#filter-status:hover {
+    background-color: #eafaf1;
+}
+
+#filter-status:focus {
+    box-shadow: 0 0 0 3px rgba(46,204,113,0.35);
 }
 .modal-overlay {
   position: fixed;

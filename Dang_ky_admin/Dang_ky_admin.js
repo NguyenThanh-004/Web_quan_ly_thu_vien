@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ================= NAVIGATION ================= */
   const navigateHome = () => {
     debugLog('Navigate home');
-    window.location.href = '/Trang_chu_admin/Trang_chu_admin.html';
+    window.location.href = '../Trang_chu_admin/Trang_chu_admin.html';
   };
 
   const closeBtn = document.querySelector('.close-btn');
@@ -71,12 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
     debugLog('submitBtn ' + (state ? 'disabled' : 'enabled'));
   };
 
+  /* ================= SUBMIT ================= */
   submitBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     debugLog('Submit clicked');
 
-    const username = usernameInput ? usernameInput.value.trim() : '';
-    const password = passwordInput ? passwordInput.value : '';
+    const username = usernameInput?.value.trim() || '';
+    const password = passwordInput?.value || '';
 
     if (!username || !password) {
       debugLog('validation failed: missing username or password');
@@ -87,28 +88,44 @@ document.addEventListener('DOMContentLoaded', () => {
     setDisabled(true);
 
     try {
+      debugLog('Sending request to /api/accounts/create/admin');
+
       const res = await fetch('http://localhost:8080/api/accounts/create/admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
       });
 
-      debugLog('Status: ' + res.status);
+      debugLog('HTTP status: ' + res.status);
 
-      // ⚠️ ĐỌC BODY 1 LẦN DUY NHẤT
-       const rawText = await res.text();
-      debugLog('Response: ' + rawText);
+      // ⚠️ đọc body 1 lần duy nhất
+      const rawText = await res.text();
+      debugLog('Response body: ' + rawText);
 
       let data = null;
-      try { data = rawText ? JSON.parse(rawText) : null; } catch {}
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch {
+        debugLog('Response is not JSON');
+      }
 
-      if (res.status === 201) {
-        alert('Tạo admin thành công');
+      if (res.status === 201 || res.status === 200) {
+        alert('Tạo admin thành công 🎉');
         navigateHome();
         return;
       }
 
-      const msg = data?.message || data?.error || rawText || 'Unknown error';
+      const msg =
+        data?.message ||
+        data?.error ||
+        rawText ||
+        'Không xác định';
+
       alert('Lỗi: ' + msg);
 
     } catch (err) {
@@ -119,16 +136,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  /* ================= ENTER TO SUBMIT ================= */
   if (passwordInput) {
     passwordInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        debugLog('Enter pressed in password, submitting');
+        debugLog('Enter pressed in password');
         submitBtn.click();
       }
     });
   } else {
-    debugLog('passwordInput not found; Enter will not submit');
+    debugLog('passwordInput not found; Enter disabled');
   }
 
 });
