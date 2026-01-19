@@ -85,7 +85,6 @@ function renderTable(pageData) {
       <td>
         <div class="btn-action">
           <button class="btn-edit">Sửa</button>
-          <button class="btn-delete">Xóa</button>
         </div>
       </td>
     `;

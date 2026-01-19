@@ -114,3 +114,181 @@ document.addEventListener('DOMContentLoaded', () => {
     calculateCardWidth(); // 👈 TÍNH WIDTH 1 LẦN DUY NHẤT
     loadBooks();
 });
+// ================= MENU TRANG CHỦ =================
+document.addEventListener('DOMContentLoaded', () => {
+  const menuHome = document.getElementById('menu-trang-chu');
+  if (!menuHome) return;
+
+  const goHome = () => {
+    window.location.href =
+      menuHome.dataset.href ||
+      '../Trang_chu_admin/Trang_chu_admin.html';
+  };
+
+  menuHome.addEventListener('click', goHome);
+  menuHome.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goHome();
+    }
+  });
+});
+
+// Navigate to Quản lý nhà xuất bản when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuNhaxuatban = document.getElementById('menu-nha-xuat-ban');
+  if (!menuNhaxuatban) return;
+
+  const goTo = () => {
+    const href = menuNhaxuatban.dataset.href || '../Quan_li_nha_xuat_ban_admin/Quan_li_nha_xuat_ban_admin.html';
+    window.location.href = href;
+  };
+
+  menuNhaxuatban.addEventListener('click', goTo);
+  menuNhaxuatban.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý thể loại when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuTheLoai = document.getElementById('menu-the-loai');
+  if (!menuTheLoai) return;
+
+  const goTo = () => {
+    const href = menuTheLoai.dataset.href || '../Quan_li_the_loai_admin/Quan_li_the_loai_admin.html';
+    window.location.href = href;
+  };
+
+  menuTheLoai.addEventListener('click', goTo);
+  menuTheLoai.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý lĩnh vực when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuLinhVuc = document.getElementById('menu-linh-vuc');
+  if (!menuLinhVuc) return;
+
+  const goTo = () => {
+    const href = menuLinhVuc.dataset.href || '../Quan_li_linh_vuc_admin/Quan_li_linh_vuc_admin.html';
+    window.location.href = href;
+  };
+
+  menuLinhVuc.addEventListener('click', goTo);
+  menuLinhVuc.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý Độc giả when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuDocGia = document.getElementById('menu-doc-gia');
+  if (!menuDocGia) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuDocGia.dataset.href ||
+      '../Quan_li_doc_gia_admin/Quan_li_doc_gia_admin.html';
+  };
+
+  menuDocGia.addEventListener('click', goTo);
+  menuDocGia.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý sách when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuSach = document.getElementById('menu-sach');
+  if (!menuSach) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuSach.dataset.href ||
+      '../Quan_li_sach_admin/Quan_li_sach_admin.html';
+  };
+
+  menuSach.addEventListener('click', goTo);
+  menuSach.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý phiếu mượn when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuPhieuMuon = document.getElementById('menu-phieu-muon');
+  if (!menuPhieuMuon) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuPhieuMuon.dataset.href ||
+      '../Quan_li_phieu_muon_admin/Quan_li_phieu_muon_admin.html';
+  };
+
+  menuPhieuMuon.addEventListener('click', goTo);
+  menuPhieuMuon.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// Navigate to Quản lý thẻ thư viện when menu item clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuTheThuVien = document.getElementById('menu-the-thu_vien');
+  if (!menuTheThuVien) return;
+
+  const goTo = () => {
+    window.location.href =
+      menuTheThuVien.dataset.href ||
+      '../Quan_li_the_thu_vien_admin/Quan_li_the_thu_vien_admin.html';
+  };
+
+  menuTheThuVien.addEventListener('click', goTo);
+  menuTheThuVien.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
+// ================= LOGOUT =================
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logout_function');
+  if (!logoutBtn) return;
+
+  const logout = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('accountId');
+    window.location.href = '../Dang_nhap/Dang_nhap.html';
+  };
+
+  logoutBtn.addEventListener('click', logout);
+  logoutBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      logout();
+    }
+  });
+});

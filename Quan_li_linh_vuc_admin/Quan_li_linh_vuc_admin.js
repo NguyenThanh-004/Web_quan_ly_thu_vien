@@ -102,13 +102,21 @@ async function createLinhVuc(tenLinhVuc) {
 }
 
 async function updateLinhVuc(id, tenLinhVuc) {
-  const resp = await fetch(`${apiBase}/linhvuc/update/${id}`, {
+  const resp = await fetch(`${apiBase}/linhvuc/update`, {
     method: 'PUT',
     headers: buildHeaders(),
-    body: JSON.stringify({ tenLinhVuc })
+    body: JSON.stringify({ 
+      linhVucId: id,
+      tenLinhVuc: tenLinhVuc
+     })
   });
 
-  if (!resp.ok) return alert('Cập nhật thất bại');
+  // if (!resp.ok) return alert('Cập nhật thất bại');
+  if (!resp.ok)  {
+    const errorData = await resp.json().catch(() => ({}));
+    console.error('Cập nhật thất bại:', errorData);
+    return alert('Cập nhật thất bại' + (errorData.message || "Loi system"));
+  }
   alert('Cập nhật thành công');
   fetchLinhVuc(currentPage, pageSize);
 }
@@ -116,14 +124,36 @@ async function updateLinhVuc(id, tenLinhVuc) {
 async function deleteLinhVuc(id) {
   if (!confirm('Bạn chắc chắn muốn xóa lĩnh vực này?')) return;
 
-  const resp = await fetch(`${apiBase}/linhvuc/delete/${id}`, {
-    method: 'DELETE',
-    headers: buildHeaders()
-  });
+  try {
+    const resp = await fetch(
+      `${apiBase}/linhvuc/delete?linhVucId=${id}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders()
+      }
+    );
 
-  if (!resp.ok) return alert('Xóa thất bại');
-  alert('Đã xóa');
-  fetchLinhVuc(currentPage, pageSize);
+    if (!resp.ok) {
+      alert('Xóa thất bại');
+      return;
+    }
+
+    alert('Đã xóa lĩnh vực');
+
+    /* ===== RELOAD BẢNG ===== */
+    currentPage = 0;
+
+    const tableBody = document.querySelector('#linhvucTableBody');
+    if (tableBody) {
+      tableBody.innerHTML = '';
+    }
+
+    fetchLinhVuc(currentPage, pageSize);
+
+  } catch (err) {
+    console.error(err);
+    alert('Không kết nối được server' + err.message);
+  }
 }
 
 // ================== RENDER ==================

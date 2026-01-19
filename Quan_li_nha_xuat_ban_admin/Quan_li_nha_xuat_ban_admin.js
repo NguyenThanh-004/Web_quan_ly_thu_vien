@@ -193,7 +193,7 @@ async function updatePublisher(id, data) {
   const resp = await fetch(`${apiBase}/nhaxuatban/update`, {
     method: 'PUT',
     headers: buildHeaders(),
-    body: JSON.stringify(data)
+    body: JSON.stringify({ nhaXuatBanId: id, ...data })
   });
 
   if (!resp.ok) return alert('Cập nhật thất bại');
@@ -204,13 +204,13 @@ async function updatePublisher(id, data) {
 async function deletePublisher(id) {
   if (!confirm('Bạn chắc chắn muốn xóa nhà xuất bản này?')) return;
 
-  const resp = await fetch(`${apiBase}/nhaxuatban/delete`, {
+  const resp = await fetch(`${apiBase}/nhaxuatban/delete?nhaXuatBanId=${id}`, {
     method: 'DELETE',
     headers: buildHeaders()
   });
 
   if (!resp.ok) return alert('Xóa thất bại');
-  alert('Đã xóa');
+  alert('Đã xóa nhà xuất bản');
   fetchPublishers(currentPage, pageSize);
 }
 

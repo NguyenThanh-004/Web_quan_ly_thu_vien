@@ -172,12 +172,6 @@ function renderTable(pageData) {
       <td>${formatDate(item.ngayHetHan)}</td>
       <td>${item.trangThai ?? ''}</td>
       <td>${item.soLuongSachDuocMuon ?? 0}</td>
-      <td>
-        <div class="btn-action">
-          <button class="btn-edit">Sửa</button>
-          <button class="btn-delete">Xóa</button>
-        </div>
-      </td>
     `;
 
     tbody.appendChild(tr);
