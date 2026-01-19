@@ -272,6 +272,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// Add book handler
+document.addEventListener('DOMContentLoaded', () => {
+  const themSachCard = document.getElementById('them-sach');
+  if (!themSachCard) return;
+
+  const goTo = () => {
+    // Navigate to book admin page where add book modal is available
+    window.location.href = '../Quan_li_sach_admin/Quan_li_sach_admin.html';
+  };
+
+  themSachCard.addEventListener('click', goTo);
+  themSachCard.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      goTo();
+    }
+  });
+});
+
 // show username in header if present
 document.addEventListener('DOMContentLoaded', () => {
   const usernameEl = document.querySelector('.username-text');

@@ -61,7 +61,9 @@
     <div class="header">
       <h2>Quản lý sách</h2>
       <div class="user">
-        <i class="fa-solid fa-circle-user"></i>
+        <div class="avatar">
+          <i class="fa-solid fa-circle-user"></i>
+        </div>
         <span class="username-text"></span>
       </div>
     </div>
@@ -73,9 +75,14 @@
         <button id="btnSearch">Tìm kiếm</button>
       </div>
 
-      <button id="btnAddBook" class="add-button">
-        <i class="fa-solid fa-plus"></i>
-      </button>
+      <div class="action-buttons">
+        <button id="btnReport" class="btn-report" title="Báo cáo">
+          <i class="fa-solid fa-file-pdf"></i> Báo cáo
+        </button>
+        <button id="btnAddBook" class="add-button" title="Thêm sách">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
     </div>
 
     <!-- BOOK GRID -->
@@ -97,6 +104,7 @@
   <i class="fas fa-chevron-up"></i>
 </button>
 
-<script src="/Quan_li_sach_admin/Quan_li_sach_admin.js"></script>
+<script src="/Assets/JS/Config/api.config.js"></script>
+<script type="module" src="/Quan_li_sach_admin/Quan_li_sach_admin.js"></script>
 </body>
 </html>

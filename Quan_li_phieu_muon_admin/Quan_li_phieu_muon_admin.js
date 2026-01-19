@@ -95,7 +95,9 @@ function setStatus(msg) {
 // ================= FETCH PHIẾU MƯỢN =================
 async function fetchPhieuMuon(page = 0, size = 5) {
   setStatus('Đang tải dữ liệu...');
-  const url = `${apiBase}/phieumuon/admin/load?page=${page}&size=${size}`;
+  // Always request all phiếu mượn by setting trangThai=TAT_CA
+  const url = `${apiBase}/phieumuon/admin/load?page=${page}&size=${size}&trangThai=TAT_CA`;
+  console.log('[fetchPhieuMuon] Fetching:', url);
 
   try {
     const resp = await fetch(url, { headers: buildHeaders() });
@@ -114,6 +116,7 @@ async function fetchPhieuMuon(page = 0, size = 5) {
     }
 
     const data = await resp.json();
+    console.log('[fetchPhieuMuon] API response:', data);
     renderPhieuMuon(data);
     setStatus('');
   } catch (err) {
@@ -134,15 +137,22 @@ function renderPhieuMuon(pageData) {
 
   const list = pageData.content || [];
   if (list.length === 0) {
-    container.innerHTML = '<p>Không có phiếu mượn.</p>';
+    // Show raw API response for debugging
+    container.innerHTML = `
+      <p>Không có phiếu mượn.</p>
+      <details style="margin-top:8px;">
+        <summary>API response (debug)</summary>
+        <pre style="max-width:100%;overflow:auto;background:#f8f8f8;border:1px solid #ccc;padding:8px;">${JSON.stringify(pageData, null, 2)}</pre>
+      </details>
+    `;
     updatePagination();
     return;
   }
 
+
   list.forEach(item => {
     const card = document.createElement('div');
     card.className = 'phieu-muon-card';
-
     card.innerHTML = `
       <div class="card-header">
         <span class="card-title">
@@ -161,7 +171,7 @@ function renderPhieuMuon(pageData) {
 
         <div class="info">
           <span class="label">Mã thẻ thư viện</span>
-          <span class="value">${item.theThuVien ?? ''}</span>
+          <span class="value">${item.theThuVien && item.theThuVien.theThuVienId ? item.theThuVien.theThuVienId : ''}</span>
         </div>
 
         <div class="info">
@@ -171,7 +181,21 @@ function renderPhieuMuon(pageData) {
 
         <div class="info">
           <span class="label">Trạng thái</span>
-          <span class="value">${mapTrangThai(item.trangThaiPhieuMuon)}</span>
+          <span class="value">
+            <select class="status-select" data-id="${item.phieuMuonId}">
+              <option value="DANG_CHO" ${item.trangThaiPhieuMuon === 'DANG_CHO' ? 'selected' : ''}>Đang chờ</option>
+              <option value="DANG_MUON" ${item.trangThaiPhieuMuon === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
+              <option value="HUY" ${item.trangThaiPhieuMuon === 'HUY' ? 'selected' : ''}>Huỷ</option>
+              <option value="HOAN_THANH" ${item.trangThaiPhieuMuon === 'HOAN_THANH' ? 'selected' : ''}>Hoàn thành</option>
+            </select>
+          </span>
+        </div>
+
+        <div class="info">
+          <span class="label">Chi tiết mượn trả</span>
+          <span class="value">
+            <button class="btn-chitietmuontra" data-id="${item.phieuMuonId}">Xem chi tiết</button>
+          </span>
         </div>
       </div>
 
@@ -181,7 +205,6 @@ function renderPhieuMuon(pageData) {
         </button>
       </div>
     `;
-
     container.appendChild(card);
   });
 
@@ -192,16 +215,18 @@ function renderPhieuMuon(pageData) {
 // ================= UPDATE STATUS =================
 async function updateTrangThaiPhieuMuon(phieuMuonId, trangThai) {
   try {
-    const resp = await fetch(`${apiBase}/phieumuon/admin/update-status`, {
+    const resp = await fetch(`${apiBase}/phieumuon/admin/update-status/${phieuMuonId}`, {
       method: 'POST',
       headers: buildHeaders(true),
-      body: JSON.stringify({ phieuMuonId, trangThai })
+      body: JSON.stringify({ trangThai })
     });
 
     if (!resp.ok) {
       alert('Cập nhật trạng thái thất bại');
       return;
     }
+    // Reload data after update
+    fetchPhieuMuon(currentPage, pageSize);
   } catch (err) {
     console.error(err);
     alert('Không thể cập nhật trạng thái');
@@ -241,6 +266,60 @@ function bindActions() {
       updateChiTietStatus(id);
     });
   });
+
+  document.querySelectorAll('.btn-chitietmuontra').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      await showChiTietMuonTraModal(id);
+    });
+  });
+// ================= SHOW CHI TIẾT MUỢN TRẢ MODAL =================
+async function showChiTietMuonTraModal(phieuMuonId) {
+  try {
+    const resp = await fetch(`${apiBase}/api/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`, {
+      headers: buildHeaders()
+    });
+    if (!resp.ok) {
+      alert('Không thể tải chi tiết mượn trả');
+      return;
+    }
+    const data = await resp.json();
+    showModalChiTietMuonTra(data);
+  } catch (err) {
+    console.error(err);
+    alert('Không thể tải chi tiết mượn trả');
+  }
+}
+
+function showModalChiTietMuonTra(list) {
+  let modal = document.getElementById('chitiet-muontra-modal');
+  if (modal) modal.remove();
+  modal = document.createElement('div');
+  modal.id = 'chitiet-muontra-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Chi tiết mượn trả</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        ${Array.isArray(list) && list.length > 0
+          ? list.map(ct => `
+              <div class='chitiet-muontra'>
+                <span>Mã chi tiết: ${ct.chiTietMuonTraId ?? ''}</span><br>
+                <span>Ngày trả: ${formatDate(ct.ngayTra)}</span><br>
+                <span>Tiền phạt: ${ct.tienPhat ?? ''}</span><br>
+              </div>
+            `).join('')
+          : 'Không có chi tiết.'}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.querySelector('.modal-close').onclick = () => modal.remove();
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+}
 }
 
 // ================= PAGINATION UI =================

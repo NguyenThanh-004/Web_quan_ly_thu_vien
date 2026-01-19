@@ -1,3 +1,11 @@
+// ================= USERNAME DISPLAY =================
+document.addEventListener('DOMContentLoaded', () => {
+  const username = sessionStorage.getItem('username');
+  const usernameText = document.querySelectorAll('.username-text');
+  if (username && usernameText.length) {
+    usernameText.forEach(el => el.textContent = username);
+  }
+});
 // Redirect to login if token is missing
 if (!sessionStorage.getItem('token')) {
   window.location.href = '/Dang_nhap/Dang_nhap.html';
