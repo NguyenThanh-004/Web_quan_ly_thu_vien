@@ -1,3 +1,7 @@
+// Redirect to login if token is missing
+if (!sessionStorage.getItem('token')) {
+  window.location.href = '/Dang_nhap/Dang_nhap.html';
+}
 import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 
 console.debug('Quan_li_tac_gia_admin loaded:', API_CONFIG.BASE_URL);
@@ -56,6 +60,14 @@ function renderTable(pageData) {
     return;
   }
 
+  function formatDateDMY(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
   pageData.content.forEach(item => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -63,7 +75,7 @@ function renderTable(pageData) {
       <td>${item.tenTacGia}</td>
       <td>${item.noiLamViec || ''}</td>
       <td>${item.diaChi || ''}</td>
-      <td>${formatDateDisplay(item.ngayThangNamSinh)}</td>
+      <td>${formatDateDMY(item.ngayThangNamSinh)}</td>
       <td>
         <div class="btn-action">
           <button class="btn-edit">Sửa</button>
@@ -71,10 +83,8 @@ function renderTable(pageData) {
         </div>
       </td>
     `;
-
     tr.querySelector('.btn-edit').onclick = () => openModal(item);
     tr.querySelector('.btn-delete').onclick = () => deleteTacGia(item.tacGiaId);
-
     tbody.appendChild(tr);
   });
 
@@ -104,13 +114,13 @@ function openModal(data = null) {
 
       <div class="modal-body">
         <input id="tenTacGia" placeholder="Tên tác giả"
-               value="${data?.tenTacGia }">
+               value="${data?.tenTacGia || ''}">
         <input id="noiLam" placeholder="Nơi làm"
-               value="${data?.noiLamViec }">
+               value="${data?.noiLamViec || ''}">
         <input id="diaChi" placeholder="Địa chỉ"
-               value="${data?.diaChi}">
+               value="${data?.diaChi || ''}">
         <input id="ngaySinh" type="date"
-               value="${formatDateForInput(data?.ngayThangNamSinh)}">
+               value="${data?.ngayThangNamSinh ? new Date(data.ngayThangNamSinh).toISOString().slice(0,10) : ''}" required>
       </div>
 
       <div class="modal-footer">
@@ -127,16 +137,35 @@ function openModal(data = null) {
   modal.querySelector('.modal-close').onclick =
   modal.querySelector('.btn-cancel').onclick = () => modal.remove();
 
-  modal.querySelector('.btn-save').onclick = submitForm;
+  modal.querySelector('.btn-save').onclick = () => {
+    const dateVal = document.getElementById('ngaySinh').value;
+    if (!dateVal) {
+      alert('Ngày tháng năm sinh không được để trống');
+      return;
+    } 
+    submitForm();
+  };
 }
 
 /* ================= FORM HELPERS ================= */
 function buildPayload() {
+  // Format date as dd/MM/yyyy and validate
+  const rawDate = document.getElementById('ngaySinh').value;
+  let ngayThangNamSinh = '';
+  if (rawDate) {
+    const d = new Date(rawDate);
+    if (!isNaN(d.getTime())) {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      ngayThangNamSinh = `${day}/${month}/${year}`;
+    }
+  }
   return {
     tenTacGia: document.getElementById('tenTacGia').value.trim(),
     noiLamViec: document.getElementById('noiLam').value.trim(),
     diaChi: document.getElementById('diaChi').value.trim(),
-    ngayThangNamSinh: document.getElementById('ngaySinh').value
+    ngayThangNamSinh
   };
 }
 
@@ -154,6 +183,8 @@ async function createTacGia() {
   if (!validatePayload(payload)) return;
 
   try {
+    console.log('Token for create:', sessionStorage.getItem('token'));
+    console.log('Payload for create:', payload);
     const resp = await fetch(`${apiBase}/tacgia/create`, {
       method: 'POST',
       headers: buildHeaders(),
@@ -185,6 +216,8 @@ async function updateTacGia() {
   payload.tacGiaId = editingId;
 
   try {
+    console.log('Token for update:', sessionStorage.getItem('token'));
+    console.log('Payload for update:', payload);
     const resp = await fetch(`${apiBase}/tacgia/update`, {
       method: 'PUT',
       headers: buildHeaders(),
@@ -222,13 +255,23 @@ async function deleteTacGia(id) {
   if (!confirm('Bạn có chắc muốn xóa tác giả này?')) return;
 
   try {
-    const resp = await fetch(`${apiBase}/tacgia/delete`, {
+    const token = sessionStorage.getItem('token');
+    // Send tacGiaId as query param for @RequestParam
+    const url = `${apiBase}/tacgia/delete?tacGiaId=${encodeURIComponent(id)}`;
+    const headers = buildHeaders();
+    // Remove Content-Type for DELETE with no body
+    delete headers['Content-Type'];
+    console.log('[DELETE] URL:', url);
+    console.log('[DELETE] Headers:', headers);
+    console.log('[DELETE] Token:', token);
+    const resp = await fetch(url, {
       method: 'DELETE',
-      headers: buildHeaders(),
-      body: JSON.stringify({ tacGiaId: id })
+      headers
     });
 
     const text = await resp.text();
+    console.log('[DELETE] Status:', resp.status);
+    console.log('[DELETE] Response:', text);
 
     if (!resp.ok) {
       alert(text || 'Xóa thất bại');
@@ -436,24 +479,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-  const usernameEl = document.querySelector('.username-text');
-  const username = sessionStorage.getItem('username');
-
-  if (usernameEl) {
-    usernameEl.textContent = username || 'Admin';
-  }
-});
-
-function formatDateDisplay(isoString) {
-  if (!isoString) return '';
-  const [datePart] = isoString.split('T');
-  const [y, m, d] = datePart.split('-');
-  return `${d}/${m}/${y}`;
-}
-
-function formatDateForInput(isoString) {
-  if (!isoString) return '';
-  return isoString.split('T')[0]; // yyyy-MM-dd
-}

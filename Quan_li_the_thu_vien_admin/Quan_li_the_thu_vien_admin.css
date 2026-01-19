@@ -1,3 +1,95 @@
+/* ===== UPDATE BUTTON ===== */
+.btn-update {
+    background: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+    box-shadow: 0 2px 8px rgba(39,174,96,0.08);
+}
+.btn-update:hover {
+    background: #237245;
+}
+/* ===== UPDATE MODAL ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 28px 24px 28px;
+    min-width: 340px;
+    max-width: 96vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    position: relative;
+}
+
+.modal-content h2 {
+    margin-bottom: 18px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #237245;
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #333;
+}
+
+.modal-content input[type="date"],
+.modal-content select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+.modal-content button[type="submit"] {
+    background: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.18s;
+}
+.modal-content button[type="submit"]:hover {
+    background: #237245;
+}
+
+.modal-content .close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    font-size: 26px;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.18s;
+}
+.modal-content .close:hover {
+    color: #e74c3c;
+}
 * {
     margin: 0;
     padding: 0;

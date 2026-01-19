@@ -1,4 +1,8 @@
-console.log('🔥 FILE JS DA CHAY');
+// Redirect to login if token is missing
+if (!sessionStorage.getItem('token')) {
+  window.location.href = '/Dang_nhap/Dang_nhap.html';
+}
+console.log('TOKEN:', sessionStorage.getItem('token'));
 // chuyển qua form đăng ký admin
 document.addEventListener('DOMContentLoaded', () => {
   const adminCard = document.getElementById('register-admin') || document.querySelector('.quick-card[aria-label="Đăng ký admin"]');
@@ -272,9 +276,22 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const usernameEl = document.querySelector('.username-text');
   const storedUser = sessionStorage.getItem('username');
-  const storedToken = sessionStorage.getItem('token');
-  console.log('Retrieved username from sessionStorage:', storedUser);
-  console.log('Retrieved token from sessionStorage:', storedToken);
   if (usernameEl) usernameEl.textContent = storedUser ? storedUser : 'Khách';
 });
+document.addEventListener('DOMContentLoaded', () => {
+  const token = sessionStorage.getItem('token');
+  const role = sessionStorage.getItem('role');
 
+  if (!token) {
+    alert('Bạn chưa đăng nhập');
+    window.location.href = '/Dang_nhap/Dang_nhap.html';
+    return;
+  }
+
+  // nếu là trang admin thì nên check role
+  if (role !== 'ADMIN') {
+    alert('Bạn không có quyền truy cập trang này');
+    sessionStorage.clear();
+    window.location.href = '/Dang_nhap/Dang_nhap.html';
+  }
+});

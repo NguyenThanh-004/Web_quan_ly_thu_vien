@@ -1,3 +1,13 @@
+// Format date to dd/mm/yyyy
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return '';
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
 import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 
 console.debug('Quan_li_doc_gia_admin loaded, API base:', API_CONFIG.BASE_URL);
@@ -78,7 +88,7 @@ function renderTable(pageData) {
       <td>${item.tenDocGia ?? ''}</td>
       <td>${item.email ?? ''}</td>
       <td>${item.soDienThoai ?? ''}</td>
-      <td>${item.ngaySinh ? item.ngaySinh.substring(0,10) : ''}</td>
+      <td>${formatDate(item.ngaySinh)}</td>
       <td>${item.diaChi ?? ''}</td>
       <td>${item.tienKyQuy ?? 0}</td>
       <td>${item.trangThaiDocGia ?? ''}</td>

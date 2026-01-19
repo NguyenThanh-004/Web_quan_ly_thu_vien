@@ -164,7 +164,6 @@ function renderTable(pageData) {
 
   list.forEach(item => {
     const tr = document.createElement('tr');
-
     tr.innerHTML = `
       <td>${item.theThuVienId ?? ''}</td>
       <td>${item.tenDocGia ?? ''}</td>
@@ -172,10 +171,79 @@ function renderTable(pageData) {
       <td>${formatDate(item.ngayHetHan)}</td>
       <td>${item.trangThai ?? ''}</td>
       <td>${item.soLuongSachDuocMuon ?? 0}</td>
+      <td><button class="btn-update" data-id="${item.theThuVienId}" data-exp="${item.ngayHetHan}" data-status="${item.trangThai}">Sửa</button></td>
     `;
-
     tbody.appendChild(tr);
   });
+  bindUpdateButtons();
+// ================= UPDATE MODAL & FUNCTION =================
+function bindUpdateButtons() {
+  document.querySelectorAll('.btn-update').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const exp = btn.dataset.exp;
+      const status = btn.dataset.status;
+      showUpdateModal(id, exp, status);
+    });
+  });
+}
+
+function showUpdateModal(theThuVienId, ngayHetHan, trangThai) {
+  const old = document.getElementById('update-modal');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'update-modal';
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <span class="close" id="close-update-modal">&times;</span>
+      <h2>Cập nhật thẻ thư viện</h2>
+      <form id="update-form">
+        <input type="hidden" name="theThuVienId" value="${theThuVienId}">
+        <div>
+          <label>Ngày hết hạn</label>
+          <input type="date" name="ngayHetHan" value="${ngayHetHan ? new Date(ngayHetHan).toISOString().slice(0,10) : ''}" required>
+        </div>
+        <div>
+          <label>Trạng thái</label>
+          <select name="trangThai">
+            <option value="HOAT_DONG" ${trangThai === 'HOAT_DONG' ? 'selected' : ''}>Hoạt động</option>
+            <option value="VO_HIEU" ${trangThai === 'VO_HIEU' ? 'selected' : ''}>Vô hiệu</option>
+          </select>
+        </div>
+        <button type="submit">Lưu</button>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('close-update-modal').onclick = () => modal.remove();
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  document.getElementById('update-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      theThuVienId: Number(form.theThuVienId.value),
+      ngayHetHan: form.ngayHetHan.value,
+      trangThai: form.trangThai.value
+    };
+    try {
+      const resp = await fetch(`${apiBase}/thethuvien/update`, {
+        method: 'PUT',
+        headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!resp.ok) {
+        alert('Cập nhật thất bại');
+        return;
+      }
+      alert('Cập nhật thành công');
+      modal.remove();
+      fetchTheThuVien(currentPage, pageSize);
+    } catch (err) {
+      alert('Lỗi khi cập nhật');
+    }
+  };
+}
 
   updatePagination();
 }
@@ -368,14 +436,4 @@ document.addEventListener('DOMContentLoaded', () => {
       goTo();
     }
   });
-});
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  const usernameEl = document.querySelector('.username-text');
-  const username = sessionStorage.getItem('username');
-
-  if (usernameEl) {
-    usernameEl.textContent = username || 'Admin';
-  }
 });
