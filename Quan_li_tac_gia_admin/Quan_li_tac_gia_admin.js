@@ -13,20 +13,33 @@ let editingId = null;
 function buildHeaders(isJson = true) {
   const headers = {};
   if (isJson) headers['Content-Type'] = 'application/json';
+
   const token = sessionStorage.getItem('token');
   if (token) headers['Authorization'] = `Bearer ${token}`;
+
   return headers;
 }
 
 /* ================= FETCH ================= */
 async function fetchTacGia(page = 0, size = 7) {
-  const url = `${apiBase}/tacgia/all?page=${page}&size=${size}`;
-  const resp = await fetch(url, { headers: buildHeaders(false) });
-  const data = await resp.json();
-  renderTable(data);
+  try {
+    const resp = await fetch(
+      `${apiBase}/tacgia/all?page=${page}&size=${size}`,
+      { headers: buildHeaders(false) }
+    );
+
+    if (!resp.ok) throw new Error(resp.status);
+
+    const data = await resp.json();
+    renderTable(data);
+
+  } catch (err) {
+    console.error(err);
+    alert('Không tải được danh sách tác giả');
+  }
 }
 
-/* ================= RENDER (GIỮ NGUYÊN) ================= */
+/* ================= RENDER TABLE ================= */
 function renderTable(pageData) {
   currentPage = pageData.number ?? 0;
   pageSize = pageData.size ?? pageSize;
@@ -48,9 +61,9 @@ function renderTable(pageData) {
     tr.innerHTML = `
       <td>${item.tacGiaId}</td>
       <td>${item.tenTacGia}</td>
-      <td>${item.noiLam || ''}</td>
+      <td>${item.noiLamViec || ''}</td>
       <td>${item.diaChi || ''}</td>
-      <td>${item.ngaySinh || ''}</td>
+      <td>${item.ngayThangNamSinh || ''}</td>
       <td>
         <div class="btn-action">
           <button class="btn-edit">Sửa</button>
@@ -60,8 +73,7 @@ function renderTable(pageData) {
     `;
 
     tr.querySelector('.btn-edit').onclick = () => openModal(item);
-    tr.querySelector('.btn-delete').onclick =
-      () => deleteTacGia(item.tacGiaId);
+    tr.querySelector('.btn-delete').onclick = () => deleteTacGia(item.tacGiaId);
 
     tbody.appendChild(tr);
   });
@@ -94,16 +106,18 @@ function openModal(data = null) {
         <input id="tenTacGia" placeholder="Tên tác giả"
                value="${data?.tenTacGia || ''}">
         <input id="noiLam" placeholder="Nơi làm"
-               value="${data?.noiLam || ''}">
+               value="${data?.noiLamViec || ''}">
         <input id="diaChi" placeholder="Địa chỉ"
                value="${data?.diaChi || ''}">
         <input id="ngaySinh" type="date"
-               value="${data?.ngaySinh || ''}">
+               value="${data?.ngayThangNamSinh || ''}">
       </div>
 
       <div class="modal-footer">
         <button class="btn-cancel">Hủy</button>
-        <button class="btn-save">Lưu</button>
+        <button class="btn-save">
+          ${editingId ? 'Cập nhật' : 'Thêm'}
+        </button>
       </div>
     </div>
   `;
@@ -116,35 +130,32 @@ function openModal(data = null) {
   modal.querySelector('.btn-save').onclick = submitForm;
 }
 
-/* ================= CREATE / UPDATE ================= */
-async function submitForm() {
-  const payload = {
+/* ================= FORM HELPERS ================= */
+function buildPayload() {
+  return {
     tenTacGia: document.getElementById('tenTacGia').value.trim(),
     noiLamViec: document.getElementById('noiLam').value.trim(),
     diaChi: document.getElementById('diaChi').value.trim(),
     ngayThangNamSinh: document.getElementById('ngaySinh').value
   };
+}
 
-
+function validatePayload(payload) {
   if (!payload.tenTacGia) {
     alert('Tên tác giả không được để trống');
-    return;
+    return false;
   }
+  return true;
+}
 
-  // UPDATE
-  if (editingId) {
-    payload.tacGiaId = editingId;
-  }
-
-  const url = editingId
-    ? `${apiBase}/tacgia/update`
-    : `${apiBase}/tacgia/create`;
-
-  const method = editingId ? 'PUT' : 'POST';
+/* ================= CREATE ================= */
+async function createTacGia() {
+  const payload = buildPayload();
+  if (!validatePayload(payload)) return;
 
   try {
-    const resp = await fetch(url, {
-      method,
+    const resp = await fetch(`${apiBase}/tacgia/create`, {
+      method: 'POST',
       headers: buildHeaders(),
       body: JSON.stringify(payload)
     });
@@ -152,17 +163,57 @@ async function submitForm() {
     const text = await resp.text();
 
     if (!resp.ok) {
-      alert(text || 'Thao tác thất bại');
+      alert(text || 'Thêm tác giả thất bại');
       return;
     }
 
-    alert(text || 'Thành công');
+    alert(text || 'Thêm tác giả thành công');
     document.querySelector('.modal-overlay').remove();
     fetchTacGia(currentPage, pageSize);
 
   } catch (err) {
     console.error(err);
     alert('Không kết nối được server');
+  }
+}
+
+/* ================= UPDATE ================= */
+async function updateTacGia() {
+  const payload = buildPayload();
+  if (!validatePayload(payload)) return;
+
+  payload.tacGiaId = editingId;
+
+  try {
+    const resp = await fetch(`${apiBase}/tacgia/update`, {
+      method: 'PUT',
+      headers: buildHeaders(),
+      body: JSON.stringify(payload)
+    });
+
+    const text = await resp.text();
+
+    if (!resp.ok) {
+      alert(text || 'Cập nhật tác giả thất bại');
+      return;
+    }
+
+    alert(text || 'Cập nhật thành công');
+    document.querySelector('.modal-overlay').remove();
+    fetchTacGia(currentPage, pageSize);
+
+  } catch (err) {
+    console.error(err);
+    alert('Không kết nối được server');
+  }
+}
+
+/* ================= SUBMIT ================= */
+function submitForm() {
+  if (editingId) {
+    updateTacGia();
+  } else {
+    createTacGia();
   }
 }
 
