@@ -1,10 +1,14 @@
+
 .detail-loan-container {
+    flex: 1;
     max-width: 1200px;
     margin: 40px auto;
-    padding: 0 40px;
+    padding: 40px 0px;
 }
 
 .loan-detail-card {
+    max-width: 1200px;
+    margin: 0 auto;
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
@@ -105,6 +109,25 @@
     color: #666;
     margin: 0;
 }
+
+.book-extra-info {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.book-extra-info span {
+    display: block;
+}
+
+.book-extra-info .fine {
+    color: #b00020;
+    font-weight: bold;
+}
+
 
 /* Mobile Responsive */
 @media (max-width: 768px) {

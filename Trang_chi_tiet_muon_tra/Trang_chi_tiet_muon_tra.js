@@ -158,51 +158,58 @@ async function loadChiTietMuonTra() {
 function mapAndDisplayFromAPI(phieuMuonId, list) {
     if (!list.length) return;
 
-    // Tổng tiền phạt
-    const totalFine = list.reduce((sum, item) => sum + item.tienPhat, 0);
-
-    // Lấy hạn trả (giống nhau)
+    // Hạn trả (giống nhau)
     const hanTra = list[0].hanTra;
 
-    // Ngày trả: nếu có 1 quyển chưa trả → Chưa trả
-    const allReturned = list.every(item => item.ngayTra);
-    const ngayTra = allReturned ? formatDate(list[0].ngayTra) : "Chưa trả";
-
-    // Đổ dữ liệu meta
-    document.getElementById("api-loan-id").innerText = `PM-${phieuMuonId}`;
-    document.getElementById("api-detail-id").innerText = `CTMT-${phieuMuonId}`;
+    // Meta chung
+    document.getElementById("api-loan-id").innerText = `${phieuMuonId}`;
+    document.getElementById("api-detail-id").innerText = `${phieuMuonId}`;
     document.getElementById("api-due-date").innerText = formatDate(hanTra);
-    document.getElementById("api-return-date").innerText = ngayTra;
-    document.getElementById("api-fine").innerText = formatMoney(totalFine);
 
-    // Render danh sách sách
+    // Danh sách sách
     const listContainer = document.getElementById("loan-books-list");
     listContainer.innerHTML = "";
 
     list.forEach(item => {
+        const ngayTraText = item.ngayTra
+            ? formatDate(item.ngayTra)
+            : "Chưa trả";
+
+        const tienPhatText = item.tienPhat > 0
+            ? formatMoney(item.tienPhat)
+            : "0đ";
+
         const html = `
             <div class="loan-book-item">
                 <img src="${item.anhBia}" alt="${item.tenSach}">
                 <div class="book-info">
                     <h3 class="book-title">${item.tenSach}</h3>
+
                     <p class="book-copy-id">
                         Mã bản sao sách: ${item.banSaoSachId}
                     </p>
-                    <p class="book-copy-id">
-                        Tình trạng: ${mapTinhTrang(item.tinhTrangKhiTra)}
-                    </p>
+
+                    <div class="book-extra-info">
+                        <span>Ngày trả: ${ngayTraText}</span>
+                        <span>Tình trạng: ${mapTinhTrang(item.tinhTrangKhiTra)}</span>
+                        <span class="fine">Tiền phạt: ${tienPhatText}</span>
+                    </div>
                 </div>
             </div>
         `;
+
         listContainer.insertAdjacentHTML("beforeend", html);
     });
 }
+
 
 function mapTinhTrang(status) {
     switch (status) {
         case "DA_TRA": return "Đã trả";
         case "HU_HONG": return "Hư hỏng";
         case "MAT": return "Mất";
-        default: return status;
+        case "DANG_MUON": return "Đang mượn";
+        case "QUA_HAN": return "Quá hạn";
+        default: return "Đang chờ";
     }
 }

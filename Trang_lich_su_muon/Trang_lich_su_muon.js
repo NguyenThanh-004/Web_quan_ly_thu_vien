@@ -177,7 +177,7 @@ function renderLoansFromAPI(list) {
                 <div class="info-group">
                     <div class="info-item">
                         <label>MÃ PHIẾU MƯỢN</label>
-                        <p>PM-${item.phieuMuonId}</p>
+                        <p>${item.phieuMuonId}</p>
                     </div>
                     <div class="info-item">
                         <label>MÃ THẺ THƯ VIỆN</label>
