@@ -130,8 +130,8 @@ function openEditModal(data) {
         <input id="dg-diachi" placeholder="Địa chỉ" value="${data.diaChi ?? ''}">
         <input id="dg-kyquy" type="number" placeholder="Ký quỹ" value="${data.tienKyQuy ?? 0}">
         <select id="dg-trangthai">
-          <option value="ACTIVE" ${data.trangThaiDocGia === 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
-          <option value="INACTIVE" ${data.trangThaiDocGia === 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+          <option value="HOAT_DONG" ${data.trangThaiDocGia === 'ACTIVE' ? 'selected' : ''}>HOAT_DONG</option>
+          <option value="VO_HIEU_HOA" ${data.trangThaiDocGia === 'INACTIVE' ? 'selected' : ''}>VO_HIEU_HOA</option>
         </select>
       </div>
 

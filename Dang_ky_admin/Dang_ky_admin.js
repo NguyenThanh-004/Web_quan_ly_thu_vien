@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   debugLog('submitBtn found');
   if (!usernameInput) debugLog('usernameInput not found'); else debugLog('usernameInput found');
   if (!passwordInput) debugLog('passwordInput not found'); else debugLog('passwordInput found');
-
+  console.log(usernameInput, passwordInput, submitBtn);
   const setDisabled = (state) => {
     submitBtn.disabled = state;
     submitBtn.textContent = state ? 'Đang gửi...' : 'Đăng ký';
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const username = usernameInput?.value.trim() || '';
     const password = passwordInput?.value || '';
-
+    const token = sessionStorage.getItem('token');
     if (!username || !password) {
       debugLog('validation failed: missing username or password');
       alert('Vui lòng nhập username và password');
@@ -93,7 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('http://localhost:8080/api/accounts/create/admin', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           username,

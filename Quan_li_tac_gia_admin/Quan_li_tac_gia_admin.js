@@ -63,7 +63,7 @@ function renderTable(pageData) {
       <td>${item.tenTacGia}</td>
       <td>${item.noiLamViec || ''}</td>
       <td>${item.diaChi || ''}</td>
-      <td>${item.ngayThangNamSinh || ''}</td>
+      <td>${formatDateDisplay(item.ngayThangNamSinh)}</td>
       <td>
         <div class="btn-action">
           <button class="btn-edit">Sửa</button>
@@ -104,13 +104,13 @@ function openModal(data = null) {
 
       <div class="modal-body">
         <input id="tenTacGia" placeholder="Tên tác giả"
-               value="${data?.tenTacGia || ''}">
+               value="${data?.tenTacGia }">
         <input id="noiLam" placeholder="Nơi làm"
-               value="${data?.noiLamViec || ''}">
+               value="${data?.noiLamViec }">
         <input id="diaChi" placeholder="Địa chỉ"
-               value="${data?.diaChi || ''}">
+               value="${data?.diaChi}">
         <input id="ngaySinh" type="date"
-               value="${data?.ngayThangNamSinh || ''}">
+               value="${formatDateForInput(data?.ngayThangNamSinh)}">
       </div>
 
       <div class="modal-footer">
@@ -436,3 +436,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const usernameEl = document.querySelector('.username-text');
+  const username = sessionStorage.getItem('username');
+
+  if (usernameEl) {
+    usernameEl.textContent = username || 'Admin';
+  }
+});
+
+function formatDateDisplay(isoString) {
+  if (!isoString) return '';
+  const [datePart] = isoString.split('T');
+  const [y, m, d] = datePart.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function formatDateForInput(isoString) {
+  if (!isoString) return '';
+  return isoString.split('T')[0]; // yyyy-MM-dd
+}

@@ -1,7 +1,13 @@
 import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 
-console.debug('Dang_ky_doc_gia loaded, API base:', API_CONFIG.BASE_URL);
-const apiBase = API_CONFIG.BASE_URL;
+console.log('API BASE:', API_CONFIG.BASE_URL);
+
+// ================= TOKEN / USER =================
+const token = sessionStorage.getItem('token');
+const usernameLogin = sessionStorage.getItem('username');
+
+console.log('Login username:', usernameLogin);
+console.log('Token:', token);
 
 // ================= HELPER =================
 function buildHeaders() {
@@ -9,54 +15,59 @@ function buildHeaders() {
     'Content-Type': 'application/json'
   };
 
-  const token = sessionStorage.getItem('token');
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   return headers;
 }
 
-// ================= CLOSE BUTTON =================
-document.addEventListener('DOMContentLoaded', () => {
-  const closeBtn = document.querySelector('.close-btn');
-  if (!closeBtn) return;
+// yyyy-MM-dd  -->  dd/MM/yyyy
+function formatDateToDDMMYYYY(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+}
 
-  const goHome = () => {
-    window.location.href =
-      closeBtn.dataset.href ||
-      '../Trang_chu_admin/Trang_chu_admin.html';
-  };
-
-  closeBtn.addEventListener('click', goHome);
-  closeBtn.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      goHome();
-    }
-  });
-});
-
-// ================= REGISTER DOC GIA =================
+// ================= REGISTER =================
 document.addEventListener('DOMContentLoaded', () => {
   const btnSubmit = document.querySelector('.btn-submit');
   if (!btnSubmit) return;
 
   const register = async () => {
+
+    // ================= PAYLOAD ĐÚNG BACKEND =================
     const payload = {
-      fullName: document.getElementById('TenDocGia')?.value.trim(),
-      email: document.getElementById('Email')?.value.trim(),
-      dateOfBirth: document.getElementById('NgaySinh')?.value,
-      phone: document.getElementById('SoDienThoai')?.value.trim(),
-      address: document.getElementById('DiaChi')?.value.trim(),
+      username: document.getElementById('Username')?.value.trim(),
       password: document.getElementById('Password')?.value,
-      deposit: Number(document.getElementById('TienQuy')?.value || 0),
-      cardIssueDate: document.getElementById('NgayCap')?.value,
-      cardExpireDate: document.getElementById('NgayHetHan')?.value,
-      role: 'USER'
+
+      tenDocGia: document.getElementById('TenDocGia')?.value.trim(),
+      email: document.getElementById('Email')?.value.trim(),
+      soDienThoai: document.getElementById('SoDienThoai')?.value.trim(),
+      diaChi: document.getElementById('DiaChi')?.value.trim(),
+
+      ngaySinh: formatDateToDDMMYYYY(
+        document.getElementById('NgaySinh')?.value
+      ),
+      ngayHetHan: formatDateToDDMMYYYY(
+        document.getElementById('NgayHetHan')?.value
+      ),
+
+      soLuongSachDuocMuon: Number(
+        document.getElementById('SoSachToiDa')?.value || 5
+      )
     };
 
-    // validate cơ bản
-    if (!payload.fullName || !payload.email || !payload.password) {
-      alert('Vui lòng nhập đầy đủ Tên độc giả, Email và Password');
+    console.log('REGISTER PAYLOAD:', payload);
+
+    // ================= VALIDATE =================
+    if (
+      !payload.username ||
+      !payload.password ||
+      !payload.tenDocGia ||
+      !payload.email
+    ) {
+      alert('Vui lòng nhập đầy đủ Username, Password, Tên độc giả, Email');
       return;
     }
 
@@ -65,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnSubmit.textContent = 'Đang đăng ký...';
 
       const resp = await fetch(
-        `${apiBase}/api/accounts/create/user`,
+        `${API_CONFIG.BASE_URL}/accounts/create/user`,
         {
           method: 'POST',
           headers: buildHeaders(),
@@ -80,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       alert('Đăng ký độc giả thành công 🎉');
 
-      // quay về trang chủ admin
       window.location.href =
         '../Trang_chu_admin/Trang_chu_admin.html';
 
@@ -94,10 +104,4 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   btnSubmit.addEventListener('click', register);
-  btnSubmit.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      register();
-    }
-  });
 });

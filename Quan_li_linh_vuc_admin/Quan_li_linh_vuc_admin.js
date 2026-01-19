@@ -398,3 +398,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const usernameEl = document.querySelector('.username-text');
+  const username = sessionStorage.getItem('username');
+
+  if (usernameEl) {
+    usernameEl.textContent = username || 'Admin';
+  }
+});

@@ -161,7 +161,7 @@ function renderPhieuMuon(pageData) {
 
         <div class="info">
           <span class="label">Mã thẻ thư viện</span>
-          <span class="value">${item.theThuVienId ?? ''}</span>
+          <span class="value">${item.theThuVien ?? ''}</span>
         </div>
 
         <div class="info">
@@ -171,11 +171,7 @@ function renderPhieuMuon(pageData) {
 
         <div class="info">
           <span class="label">Trạng thái</span>
-          <select class="status-select" data-id="${item.phieuMuonId}">
-            <option value="DANG_CHO" ${item.trangThai === 'DANG_CHO' ? 'selected' : ''}>Đang chờ</option>
-            <option value="HOAN_TAT" ${item.trangThai === 'HOAN_TAT' ? 'selected' : ''}>Hoàn tất</option>
-            <option value="QUA_HAN" ${item.trangThai === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
-          </select>
+          <span class="value">${mapTrangThai(item.trangThaiPhieuMuon)}</span>
         </div>
       </div>
 
@@ -443,3 +439,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+function mapTrangThai(status) {
+    switch (status) {
+        case "DANG_CHO": return "Đang chờ";
+        case "DANG_MUON": return "Đang mượn";
+        case "HUY": return "Huỷ";
+        case "HOAN_THANH": return "Hoàn thành";
+        default: return status;
+    }
+}

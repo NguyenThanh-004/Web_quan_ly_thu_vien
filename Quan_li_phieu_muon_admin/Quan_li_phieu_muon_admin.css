@@ -6,13 +6,15 @@
 }
 
 body {
-    background: #f6f8f5;
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* Layout */
 .layout {
     display: flex;
     height: 100vh;
+    overflow: hidden;
 }
 
 /* ===== SIDEBAR ===== */
@@ -23,6 +25,9 @@ body {
     border-right: 1px solid #eee;
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    flex-shrink: 0;
 }
 
 .logo {
@@ -102,6 +107,7 @@ body {
 .main {
     flex: 1;
     padding: 32px 44px;
+    overflow-y: auto;
 }
 
 /* ===== HEADER ===== */
@@ -436,4 +442,155 @@ tbody tr {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* ================= PHIẾU MƯỢN CARD ================= */
+.phieu-muon-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.phieu-muon-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.phieu-muon-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+/* ===== HEADER ===== */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-title i {
+    color: #2ecc71;
+    font-size: 16px;
+}
+
+.btn-edit {
+    border: none;
+    background: #f2f3f2;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit i {
+    color: #555;
+}
+
+.btn-edit:hover {
+    background: #eafaf1;
+}
+
+/* ===== BODY ===== */
+.card-body {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info .label {
+    font-size: 12px;
+    color: #777;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.info .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+}
+
+/* ===== STATUS SELECT ===== */
+.status-select {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    background: #f0f2f1;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+.status-select:focus {
+    box-shadow: 0 0 0 3px rgba(46,204,113,0.35);
+}
+
+/* ===== FOOTER ===== */
+.card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-detail {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-detail i {
+    color: #333;
+}
+
+.btn-detail:hover {
+    background: #eafaf1;
+    border-color: #2ecc71;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .card-body {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .card-body {
+        grid-template-columns: 1fr;
+    }
+
+    .card-footer {
+        justify-content: flex-start;
+    }
 }

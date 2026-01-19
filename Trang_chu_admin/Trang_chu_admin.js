@@ -1,3 +1,4 @@
+console.log('🔥 FILE JS DA CHAY');
 // chuyển qua form đăng ký admin
 document.addEventListener('DOMContentLoaded', () => {
   const adminCard = document.getElementById('register-admin') || document.querySelector('.quick-card[aria-label="Đăng ký admin"]');
@@ -271,6 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const usernameEl = document.querySelector('.username-text');
   const storedUser = sessionStorage.getItem('username');
+  const storedToken = sessionStorage.getItem('token');
+  console.log('Retrieved username from sessionStorage:', storedUser);
+  console.log('Retrieved token from sessionStorage:', storedToken);
   if (usernameEl) usernameEl.textContent = storedUser ? storedUser : 'Khách';
 });
 
