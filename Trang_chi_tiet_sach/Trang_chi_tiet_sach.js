@@ -47,7 +47,7 @@ function checkLoginUI() {
     const usernameText = document.querySelector(".username-text");
     const btnUser = document.querySelector(".btn-user");
     const logoutBtn = document.querySelector(".btn-logout");
-
+    
     loginLink.style.display = "none";
     userMenu.style.display = "block";
     libraryActions.style.display = "block";
@@ -65,6 +65,19 @@ function checkLoginUI() {
     document.addEventListener("click", (e) => {
         if (!userMenu.contains(e.target) && !btnUser.contains(e.target)) {
             userMenu.classList.remove("show");
+        }
+    });
+    document.getElementById("btn-prev-related")?.addEventListener("click", () => {
+        if (relatedPage > 0) {
+            relatedPage--;
+            loadRelatedBooks();
+        }
+    });
+
+    document.getElementById("btn-next-related")?.addEventListener("click", () => {
+        if (relatedPage < relatedTotalPages - 1) {
+            relatedPage++;
+            loadRelatedBooks();
         }
     });
 }
@@ -108,29 +121,39 @@ function renderBookData(data) {
     document.getElementById("api-field").innerText = data.linhVuc;
 
     currentTheLoai = data.theLoai;
+    relatedPage = 0;          //reset về trang đầu
     loadRelatedBooks();
 }
 
 // ================== RELATED BOOKS ==================
 async function loadRelatedBooks() {
-    console.log("Loading related books for TheLoaiId:", currentTheLoai);
     if (!currentTheLoai) return;
-    const token = sessionStorage.getItem("token");
+
     try {
         const res = await fetch(
-            `http://localhost:8080/api/sach/theloai/?tenTheLoai=${encodeURIComponent(currentTheLoai)}`
+            `http://localhost:8080/api/sach/theloai?tenTheLoai=${encodeURIComponent(currentTheLoai)}`
         );
 
         if (!res.ok) throw new Error("Lỗi API sách liên quan");
 
         const data = await res.json();
-        relatedTotalPages = data.totalPages;
-        renderRelatedBooks(data.content);
+
+        const allBooks = data.content || [];
+
+        relatedTotalPages = Math.ceil(allBooks.length / RELATED_SIZE);
+
+        const start = relatedPage * RELATED_SIZE;
+        const end = start + RELATED_SIZE;
+        const pageItems = allBooks.slice(start, end);
+
+        renderRelatedBooks(pageItems);
         updateRelatedNav();
     } catch (err) {
         console.error(err);
     }
 }
+
+
 
 function renderRelatedBooks(list) {
     const container = document.getElementById("related-grid");

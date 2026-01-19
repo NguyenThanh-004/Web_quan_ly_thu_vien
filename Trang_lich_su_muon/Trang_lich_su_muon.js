@@ -96,7 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
    
-    renderLoans(loans);
+    loadPhieuMuon("TAT_CA");
+
 });
 
 const filterBtn = document.getElementById("filterBtn");
@@ -122,4 +123,121 @@ document.addEventListener("click", (e) => {
     if (!e.target.closest(".filter-box")) {
         filterMenu.style.display = "none";
     }
+});
+
+
+function mapTrangThai(status) {
+    switch (status) {
+        case "DANG_CHO": return "Đang chờ";
+        case "DANG_MUON": return "Đang mượn";
+        case "HUY": return "Huỷ";
+        case "HOAN_THANH": return "Hoàn thành";
+        default: return status;
+    }
+}
+
+async function loadPhieuMuon(trangThai = "TAT_CA") {
+    const token = sessionStorage.getItem("token");
+
+    try {
+        const res = await fetch(
+            `http://localhost:8080/api/phieumuon/load?trangThai=${trangThai}`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!res.ok) throw new Error("Lỗi load phiếu mượn");
+
+        const data = await res.json();
+        renderLoansFromAPI(data.content || []);
+    } catch (err) {
+        console.error(err);
+        alert("Không tải được danh sách phiếu mượn");
+    }
+}
+
+
+function renderLoansFromAPI(list) {
+    const container = document.getElementById("loan-list");
+
+    if (!list.length) {
+        container.innerHTML = "<p>Không có phiếu mượn</p>";
+        return;
+    }
+
+    container.innerHTML = list.map(item => `
+        <div class="loan-card">
+            <div class="loan-card-header">
+                <i class="far fa-file-alt"></i> PHIẾU MƯỢN
+            </div>
+            <div class="loan-card-body">
+                <div class="info-group">
+                    <div class="info-item">
+                        <label>MÃ PHIẾU MƯỢN</label>
+                        <p>PM-${item.phieuMuonId}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>MÃ THẺ THƯ VIỆN</label>
+                        <p>${item.theThuVien}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>NGÀY MƯỢN</label>
+                        <p>${new Date(item.ngayMuon).toLocaleDateString("vi-VN")}</p>
+                    </div>
+                </div>
+
+                <div class="status-group">
+                    <label>TRẠNG THÁI</label>
+                    <p class="status-text">${mapTrangThai(item.trangThaiPhieuMuon)}</p>
+                </div>
+
+                <div class="action-group">
+                    <button class="btn-detail-loan"
+                        onclick="goToChiTiet(${item.phieuMuonId})">
+                        <i class="fas fa-book"></i> Chi tiết mượn trả
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+function goToChiTiet(phieuMuonId) {
+    window.location.href =
+        `/Trang_chi_tiet_muon_tra/Trang_chi_tiet_muon_tra.html?phieuMuonId=${phieuMuonId}`;
+}
+
+function filterPhieuMuon(status) {
+    let apiStatus = "TAT_CA";
+
+    switch (status) {
+        case "PENDING": apiStatus = "DANG_CHO"; break;
+        case "BORROWING": apiStatus = "DANG_MUON"; break;
+        case "CANCELLED": apiStatus = "HUY"; break;
+        case "DONE": apiStatus = "HOAN_THANH"; break;
+        default: apiStatus = "TAT_CA";
+    }
+
+    loadPhieuMuon(apiStatus);
+}
+
+
+const btnScrollTop = document.getElementById('btnScrollTop');
+
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 300) {
+    btnScrollTop.style.display = 'flex';
+  } else {
+    btnScrollTop.style.display = 'none';
+  }
+});
+
+btnScrollTop.addEventListener('click', () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 });

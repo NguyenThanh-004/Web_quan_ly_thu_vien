@@ -94,7 +94,7 @@ btnScrollTop.addEventListener('click', () => {
 
 function renderCartItems(list) {
     const container = document.getElementById('cart-items');
-    container.innerHTML = ''; // QUÉT SẠCH, KHÔNG CÒN TEMPLATE
+    container.innerHTML = ''; 
 
     list.forEach(item => {
         const authors = item.tacGiaList.map(a => a.tenTacGia).join(', ');
@@ -199,35 +199,28 @@ document.querySelector('.btn-borrow')
                     "Authorization": "Bearer " + token
                 },
                 body: JSON.stringify({
-                    banSaoSachIds: selectedBanSaoSachIds
+                    selectedBanSaoSachIds: selectedBanSaoSachIds
                 })
             }
         );
 
-        const datad = await res.json(); // ✅ CHỈ ĐỌC 1 LẦN
+        let data = null;
+        const contentType = res.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            data = await res.json();
+        } else {
+            data = await res.text(); // <-- TEXT tiếng Việt
+        }
 
         if (!res.ok) {
-            alert(datad.message || "Tạo phiếu mượn thất bại");
+            alert(data?.message || data || "Tạo phiếu mượn thất bại");
             return;
         }
 
         alert("📚 Mượn sách thành công!");
-        console.log("PHIEU MUON:", datad);
-
-
-        if (!res.ok) {
-            const err = await res.text();
-            throw new Error(err || 'Tạo phiếu mượn thất bại');
-        }
-
-        const data = await res.json();
-        console.log('PHIẾU MƯỢN:', data);
-
-        alert('📚 Mượn sách thành công!');
-
-        // Xóa các bản sao đã mượn khỏi giỏ
         removeBorrowedFromCart(selectedBanSaoSachIds);
-
+        window.location.href = '/Trang_lich_su_muon/Trang_lich_su_muon.html';
     } catch (err) {
         alert(err.message);
     }
@@ -256,9 +249,13 @@ function removeBorrowedFromCart(borrowedIds) {
 }
 
 function reloadCartFromAPI(ids) {
+    const token = sessionStorage.getItem('token');
     fetch('http://localhost:8080/api/cart/view', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
         body: JSON.stringify({
             selectedBanSaoSachIds: ids
         })

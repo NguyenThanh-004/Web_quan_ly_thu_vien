@@ -21,6 +21,20 @@ const mockLoanDetail = {
     ],
 };
 
+function formatDate(isoString) {
+    if (!isoString) return "Chưa trả";
+    return new Date(isoString).toLocaleDateString("vi-VN");
+}
+
+function formatMoney(amount) {
+    return amount.toLocaleString("vi-VN") + "đ";
+}
+
+function getPhieuMuonIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("phieuMuonId");
+}
+
 /**
  * Hàm hiển thị thông tin phiếu mượn lên giao diện
  */
@@ -99,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    displayLoanDetails(mockLoanDetail);
+    loadChiTietMuonTra();
 
     // Xử lý nút đóng (X) quay lại trang trước
     const btnClose = document.querySelector(".btn-close");
@@ -110,3 +124,85 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+async function loadChiTietMuonTra() {
+    const phieuMuonId = getPhieuMuonIdFromUrl();
+    const token = sessionStorage.getItem("token");
+
+    if (!phieuMuonId) {
+        alert("Thiếu mã phiếu mượn");
+        return;
+    }
+
+    try {
+        const res = await fetch(
+            `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!res.ok) throw new Error("Không tải được chi tiết mượn trả");
+
+        const data = await res.json();
+        mapAndDisplayFromAPI(phieuMuonId, data);
+    } catch (err) {
+        console.error(err);
+        alert("Lỗi khi tải chi tiết mượn trả");
+    }
+}
+
+
+function mapAndDisplayFromAPI(phieuMuonId, list) {
+    if (!list.length) return;
+
+    // Tổng tiền phạt
+    const totalFine = list.reduce((sum, item) => sum + item.tienPhat, 0);
+
+    // Lấy hạn trả (giống nhau)
+    const hanTra = list[0].hanTra;
+
+    // Ngày trả: nếu có 1 quyển chưa trả → Chưa trả
+    const allReturned = list.every(item => item.ngayTra);
+    const ngayTra = allReturned ? formatDate(list[0].ngayTra) : "Chưa trả";
+
+    // Đổ dữ liệu meta
+    document.getElementById("api-loan-id").innerText = `PM-${phieuMuonId}`;
+    document.getElementById("api-detail-id").innerText = `CTMT-${phieuMuonId}`;
+    document.getElementById("api-due-date").innerText = formatDate(hanTra);
+    document.getElementById("api-return-date").innerText = ngayTra;
+    document.getElementById("api-fine").innerText = formatMoney(totalFine);
+
+    // Render danh sách sách
+    const listContainer = document.getElementById("loan-books-list");
+    listContainer.innerHTML = "";
+
+    list.forEach(item => {
+        const html = `
+            <div class="loan-book-item">
+                <img src="${item.anhBia}" alt="${item.tenSach}">
+                <div class="book-info">
+                    <h3 class="book-title">${item.tenSach}</h3>
+                    <p class="book-copy-id">
+                        Mã bản sao sách: ${item.banSaoSachId}
+                    </p>
+                    <p class="book-copy-id">
+                        Tình trạng: ${mapTinhTrang(item.tinhTrangKhiTra)}
+                    </p>
+                </div>
+            </div>
+        `;
+        listContainer.insertAdjacentHTML("beforeend", html);
+    });
+}
+
+function mapTinhTrang(status) {
+    switch (status) {
+        case "DA_TRA": return "Đã trả";
+        case "HU_HONG": return "Hư hỏng";
+        case "MAT": return "Mất";
+        default: return status;
+    }
+}
