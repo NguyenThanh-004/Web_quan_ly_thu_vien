@@ -175,11 +175,20 @@ function renderRelatedBooks(list) {
 }
 
 function updateRelatedNav() {
-    document.getElementById("btn-prev-related").disabled =
-        relatedPage === 0;
+    const prevBtn = document.getElementById("btn-prev-related");
+    const nextBtn = document.getElementById("btn-next-related");
 
-    document.getElementById("btn-next-related").disabled =
-        relatedPage >= relatedTotalPages - 1;
+    // Nếu chỉ có 1 trang hoặc không có sách
+    if (relatedTotalPages <= 1) {
+        prevBtn.style.display = "none";
+        nextBtn.style.display = "none";
+        return;
+    }
+
+
+
+    prevBtn.disabled = relatedPage === 0;
+    nextBtn.disabled = relatedPage >= relatedTotalPages - 1;
 }
 
 function goToBookDetail(sachId) {
@@ -315,3 +324,24 @@ function handleCopyAdd(banSaoSachId) {
 }
 
 
+function renderRelatedBooks(list) {
+    const container = document.getElementById("related-grid");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    // 👇 THÊM
+    container.classList.toggle("single", list.length === 1);
+
+    list.forEach(book => {
+        const authors = book.tacGiaList.map(t => t.tenTacGia).join(", ");
+        container.innerHTML += `
+            <div class="related-card"
+                 onclick="goToBookDetail(${book.sachId})">
+                <img src="${book.anhBia || "https://via.placeholder.com/150"}">
+                <h4>${book.tenSach}</h4>
+                <p>${authors}</p>
+            </div>
+        `;
+    });
+}

@@ -315,6 +315,10 @@ header {
     justify-content: center;
 }
 
+.related-grid.single {
+    grid-template-columns: 220px;
+    justify-content: flex-start;
+}
 /* CARD */
 .related-card {
     background: #ffffff;
