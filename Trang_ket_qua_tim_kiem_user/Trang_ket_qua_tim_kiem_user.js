@@ -113,7 +113,7 @@ async function searchBooks(reset = false) {
         }
         const token = sessionStorage.getItem("token");
         const response = await fetch(
-            `http://localhost:8080/api/sach/search?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=${pageSize}`,
+            `http://localhost:8080/api/sach/search?keyword=${encodeURIComponent(keyword)}`,
             {
                 headers: {
                     "Authorization": `Bearer ${token}`
