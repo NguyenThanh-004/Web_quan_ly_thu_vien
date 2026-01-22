@@ -136,6 +136,7 @@ function renderPhieuMuon(pageData) {
   container.innerHTML = '';
 
   const list = pageData.content || [];
+
   if (list.length === 0) {
     // Show raw API response for debugging
     container.innerHTML = `
@@ -148,7 +149,7 @@ function renderPhieuMuon(pageData) {
     updatePagination();
     return;
   }
-
+    
 
   list.forEach(item => {
     const card = document.createElement('div');
@@ -158,6 +159,7 @@ function renderPhieuMuon(pageData) {
         <span class="card-title">
           <i class="fa-solid fa-file-invoice"></i> PHIẾU MƯỢN
         </span>
+
       </div>
 
       <div class="card-body">
@@ -168,7 +170,14 @@ function renderPhieuMuon(pageData) {
 
         <div class="info">
           <span class="label">Mã thẻ thư viện</span>
-          <span class="value">${item.theThuVien && item.theThuVien.theThuVienId ? item.theThuVien.theThuVienId : ''}</span>
+          <span class="value">${item.theThuVien ? item.theThuVien : ''}</span>
+        </div>
+
+        <div class="info">
+          <span class="label">Số sách mượn</span>
+          <span class="value" id="book-count-${item.phieuMuonId}">
+            <i>Đang tải...</i>
+          </span>
         </div>
 
         <div class="info">
@@ -195,14 +204,18 @@ function renderPhieuMuon(pageData) {
       </div>
     `;
     container.appendChild(card);
+      getSoSachDangMuon(item.phieuMuonId).then(count => {
+      const el = document.getElementById(`book-count-${item.phieuMuonId}`);
+      if (el) el.textContent = count;
+    });
   });
-
   bindActions();
   updatePagination();
 }
 
 // ================= UPDATE STATUS =================
 async function updateTrangThaiPhieuMuon(phieuMuonId, trangThai) {
+
   try {
     const resp = await fetch(`${apiBase}/phieumuon/admin/update-status/${phieuMuonId}`, {
       method: 'POST',
@@ -516,4 +529,20 @@ function mapTrangThai(status) {
         case "HOAN_THANH": return "Hoàn thành";
         default: return status;
     }
+}
+
+async function getSoSachDangMuon(phieuMuonId) {
+  const token = sessionStorage.getItem('token');
+  const res = await fetch(
+    `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`,
+    {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }        
+  });
+  if (!res.ok) return 0;
+  const list = await res.json();
+  if (!Array.isArray(list)) return 0;
+
+  return list.filter(ct => ct.ngayTra === null).length;
 }

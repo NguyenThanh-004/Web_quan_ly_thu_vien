@@ -510,7 +510,7 @@ tbody tr {
 /* ===== BODY ===== */
 .card-body {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 16px;
     margin-bottom: 14px;
 }
@@ -581,10 +581,15 @@ tbody tr {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
     .card-body {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
+@media (max-width: 480px) {
+    .card-body {
+        grid-template-columns: 1fr;
+    }
+}
 @media (max-width: 480px) {
     .card-body {
         grid-template-columns: 1fr;
