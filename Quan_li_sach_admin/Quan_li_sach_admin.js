@@ -7,7 +7,8 @@ const btnLoadMore = document.getElementById('btnLoadMore');
 const btnScrollTop = document.getElementById('btnScrollTop');
 
 let page = 0;
-const size = 10;
+const pagesize = 12;
+const moresize = 6;
 
 /* ===== AUTH CHECK ===== */
 if (!token) {
@@ -16,7 +17,8 @@ if (!token) {
 }
 
 /* ===== LOAD BOOK ===== */
-async function loadBooks() {
+async function loadBooks(isLoadMore = false) {
+  const size = isLoadMore ? moresize : pagesize;
   const res = await fetch(
     `${apiBase}/api/sach/all?page=${page}&size=${size}`,
     { headers: { Authorization: `Bearer ${token}` } }
@@ -98,16 +100,12 @@ searchInput.addEventListener('keydown', (e) => {
 });
 
 /* ===== SCROLL TOP ===== */
-main.addEventListener('scroll', () => {
-  btnScrollTop.style.display = main.scrollTop > 300 ? 'block' : 'none';
-});
-
 btnScrollTop.addEventListener('click', () => {
   main.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 /* ===== EVENTS ===== */
-btnLoadMore.addEventListener('click', loadBooks);
+btnLoadMore.addEventListener('click', () => loadBooks(true));
 
 /* ===== INIT ===== */
 loadBooks();
@@ -128,6 +126,7 @@ function showAddBookModal() {
   modal.className = 'modal';
   modal.id = 'addBookModal';
   modal.innerHTML = `
+    <div class="modal-box large">
     <div class="modal-header">
       <h2>Thêm sách</h2>
       <span class="close">&times;</span>
@@ -213,6 +212,7 @@ function showAddBookModal() {
         <button type="submit" class="btn-submit">Thêm</button>
       </form>
     </div>
+  </div>
   `;
   
   document.body.appendChild(modal);

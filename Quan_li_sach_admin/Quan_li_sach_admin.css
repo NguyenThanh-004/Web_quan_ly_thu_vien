@@ -92,8 +92,19 @@ body {
 /* ===== MAIN ===== */
 .main {
     flex: 1;
-    padding: 32px 44px;
+    padding: 0 44px 32px 44px;
     overflow-y: auto;
+}
+
+/* ===== STICKY HEADER CONTAINER ===== */
+.sticky-header-container {
+  position: sticky;
+  top: 0;
+  background: #f6f8f5;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0 -44px;
+  padding: 32px 44px 0 44px;
 }
 
 /* ===== HEADER (SYNC TRANG CHỦ) ===== */
@@ -102,7 +113,8 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
+  padding: 0;
+  margin-bottom: 0;
 }
 
 /* Search input trong header */
@@ -145,14 +157,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  background: #f6f8f5;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 0 -44px;
-  padding-left: 40px;
-  padding-right: 40px;
+  border-top: 1px solid #eee;
 }
 
 .search-box {
@@ -237,7 +242,8 @@ body {
 
 /* ===== BOOK GRID ===== */
 .book-section {
-  padding: 20px 40px;
+  padding: 20px 0;
+  margin-top: 24px;
 }
 
 .book-grid {
@@ -275,7 +281,7 @@ body {
   background: #237245;
   color: white;
   font-size: 22px;
-  display: none;
+  display: block;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
@@ -327,6 +333,23 @@ body {
 
 .close:hover {
   color: #333;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-box.large {
+  max-width: 900px;
 }
 
 .card {

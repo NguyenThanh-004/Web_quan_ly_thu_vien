@@ -14,6 +14,82 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!sachId) return;
     loadBookDetail(sachId);
     loadBanSaoSach(sachId);
+
+    // Add Copy Button: Show modal to create new copy
+    const addCopyBtn = document.getElementById("btn-add-copy");
+    if (addCopyBtn) {
+        addCopyBtn.onclick = () => openAddCopyModal(sachId);
+    }
+// ===== ADD COPY MODAL =====
+function openAddCopyModal(sachId) {
+    const modal = document.getElementById("update-modal");
+    if (!modal) return;
+    modal.innerHTML = `
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Thêm bản sao sách</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label>
+                    Tình trạng
+                    <select id="add-copy-tinhtrang">
+                        <option value="MOI">Mới</option>
+                        <option value="CU">Cũ</option>
+                    </select>
+                </label>
+                <label>
+                    Trạng thái
+                    <select id="add-copy-trangthai">
+                        <option value="CON">Còn</option>
+                        <option value="DA_MUON">Đã mượn</option>
+                        <option value="HU_HONG">Hư hỏng</option>
+                    </select>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel">Hủy</button>
+                <button class="btn-save">Thêm</button>
+            </div>
+        </div>
+    `;
+    modal.style.display = "flex";
+    modal.querySelector('.modal-close').onclick = () => closeAddCopyModal(modal);
+    modal.querySelector('.btn-cancel').onclick = () => closeAddCopyModal(modal);
+    modal.querySelector('.btn-save').onclick = () => handleAddCopy(sachId, modal);
+}
+
+function closeAddCopyModal(modal) {
+    modal.style.display = "none";
+    modal.innerHTML = "";
+}
+
+async function handleAddCopy(sachId, modal) {
+    const token = sessionStorage.getItem("token");
+    const payload = {
+        sachId: Number(sachId),
+        tinhTrangBanSaoSach: document.getElementById("add-copy-tinhtrang").value,
+        trangThaiBanSaoSach: document.getElementById("add-copy-trangthai").value
+    };
+    try {
+        const resp = await fetch(`${apiBase}/api/bansaosach/create`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+        const text = await resp.text();
+        if (!resp.ok) throw new Error(text || "Không thể thêm bản sao");
+        alert(text || "Thêm bản sao thành công");
+        modal.style.display = "none";
+        modal.innerHTML = "";
+        loadBanSaoSach(sachId);
+    } catch (err) {
+        alert(err.message || "Không thể thêm bản sao");
+    }
+}
 // ================== SHOW BOOK DUPLICATES ==================
 async function loadBanSaoSach(sachId) {
     try {
@@ -53,50 +129,118 @@ async function loadBanSaoSach(sachId) {
         const modal = document.getElementById("update-modal");
         if (!modal) return;
         modal.innerHTML = `
-            <div class="modal-box">
+            <div class="modal-box large">
                 <div class="modal-header">
-                    <h3>Cập nhật sách</h3>
-                    <button class="modal-close">&times;</button>
+                    <h2>Cập nhật sách</h2>
+                    <span class="close">&times;</span>
                 </div>
-                <div class="modal-body">
-                    <input id="update-title" placeholder="Tên sách" value="${data.tenSach || ''}">
-                    <input id="update-pages" type="number" min="1" placeholder="Số trang" value="${data.soTrang || ''}">
-                    <input id="update-khoSach" placeholder="Khổ sách" value="${data.khoSach || ''}">
-                    <input id="update-anhBia" placeholder="Ảnh bìa (URL)" value="${data.anhBia || ''}">
-                    <input id="update-giaTien" type="number" min="0" step="0.01" placeholder="Giá tiền" value="${data.giaTien || ''}">
-                                        <input id="update-namXuatBan" type="date" placeholder="Năm xuất bản" value="${data.namXuatBan ? new Date(data.namXuatBan).toISOString().slice(0,10) : ''}">
-                                        <label>
-                                            Nhà xuất bản
-                                            <select id="update-nhaXuatBanId">
-                                                <option value="">-- Đang tải --</option>
-                                            </select>
-                                        </label>
-                                        <label>
-                                            Lĩnh vực
-                                            <select id="update-linhVucId">
-                                                <option value="">-- Đang tải --</option>
-                                            </select>
-                                        </label>
-                                        <label>
-                                            Thể loại
-                                            <select id="update-theLoaiId">
-                                                <option value="">-- Đang tải --</option>
-                                            </select>
-                                        </label>
-                    <input id="update-tacGiaIds" placeholder="ID Tác giả (cách nhau bằng dấu phẩy)" value="${data.tacGiaList ? data.tacGiaList.map(t=>t.tacGiaId).join(',') : ''}">
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-cancel">Hủy</button>
-                    <button class="btn-save">Lưu</button>
+
+                <div class="card">
+                    <h3>Thông tin sách</h3>
+
+                    <form id="bookForm">
+                        <div class="form-grid">
+
+                            <!-- Ảnh -->
+                            <div class="image-box">
+                                <img id="previewImage" src="${data.anhBia || '/Assets/Images/no-cover.png'}" alt="Preview" />
+                                <button type="button" class="btn-upload" onclick="document.getElementById('imageInput').click()">
+                                    Tải ảnh
+                                </button>
+                                <input type="file" id="imageInput" hidden accept="image/*">
+                            </div>
+
+                            <!-- Thông tin -->
+                            <div class="fields">
+                                <label>
+                                    Tên sách
+                                    <input type="text" id="update-title" placeholder="Tên sách" value="${data.tenSach || ''}" required />
+                                </label>
+
+                                <label>
+                                    Năm xuất bản
+                                    <input type="date" id="update-namXuatBan" placeholder="Năm xuất bản" value="${data.namXuatBan ? new Date(data.namXuatBan).toISOString().slice(0,10) : ''}" />
+                                </label>
+
+                                <div class="row">
+                                    <label>
+                                        Số trang
+                                        <input type="number" id="update-pages" min="1" placeholder="Số trang" value="${data.soTrang || ''}" />
+                                    </label>
+
+                                    <label>
+                                        Khổ sách
+                                        <input type="text" id="update-khoSach" placeholder="Khổ sách" value="${data.khoSach || ''}" />
+                                    </label>
+                                </div>
+
+                                <div class="row">
+                                    <label>
+                                        Giá tiền
+                                        <input type="number" id="update-giaTien" min="0" step="0.01" placeholder="Giá tiền" value="${data.giaTien || ''}" />
+                                    </label>
+
+                                    <label>
+                                        Lĩnh vực
+                                        <select id="update-linhVucId" required>
+                                            <option value="">-- Đang tải --</option>
+                                        </select>
+                                    </label>
+                                </div>
+
+                                <div class="row">
+                                    <label>
+                                        Nhà xuất bản
+                                        <select id="update-nhaXuatBanId" required>
+                                            <option value="">-- Đang tải --</option>
+                                        </select>
+                                    </label>
+
+                                    <label>
+                                        Thể loại
+                                        <select id="update-theLoaiId" required>
+                                            <option value="">-- Đang tải --</option>
+                                        </select>
+                                    </label>
+                                </div>
+
+                                <label>
+                                    Tác giả ID (cách nhau bằng dấu phẩy)
+                                    <input type="text" id="update-tacGiaIds" placeholder="1,2,3" value="${data.tacGiaList ? data.tacGiaList.map(t=>t.tacGiaId).join(',') : ''}" required />
+                                </label>
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="btn-submit">Cập nhật</button>
+                    </form>
                 </div>
             </div>
         `;
         modal.style.display = "flex";
-        modal.querySelector('.modal-close').onclick = closeModal;
-        modal.querySelector('.btn-cancel').onclick = closeModal;
-        modal.querySelector('.btn-save').onclick = () => handleUpdateBook(data.sachId);
+        modal.querySelector('.close').onclick = closeModal;
+        modal.querySelector('.btn-submit').onclick = (e) => {
+            e.preventDefault();
+            handleUpdateBook(data.sachId);
+        };
+        
+        // Handle image preview
+        const imageInput = modal.querySelector('#imageInput');
+        const previewImage = modal.querySelector('#previewImage');
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    previewImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
         // populate selects for Nhà xuất bản / Lĩnh vực / Thể loại
         populateUpdateSelects(data, modal);
+        
         function closeModal() {
             modal.style.display = "none";
             modal.innerHTML = "";
@@ -265,9 +409,96 @@ function renderBanSaoSach(list) {
     document.querySelectorAll('.btn-copy-update').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const copyId = e.currentTarget.dataset.id;
-            openUpdateCopyModal(copyId, list.find(item => item.banSaoSachId == copyId));
+            const copyData = list.find(item => item.banSaoSachId == copyId);
+            openUpdateCopyModal(copyId, copyData);
         });
     });
+    /* ===== COPY UPDATE MODAL FUNCTIONS ===== */
+    async function openUpdateCopyModal(copyId, copyData) {
+        const modal = document.getElementById("update-modal");
+        if (!modal) return;
+    
+        const token = sessionStorage.getItem("token");
+    
+        modal.innerHTML = `
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h3>Cập nhật bản sao</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>
+                        Tình trạng
+                        <select id="copy-tinhtrang">
+                            <option value="MOI" ${copyData.tinhTrangBanSaoSach === 'MOI' ? 'selected' : ''}>Mới</option>
+                            <option value="CU" ${copyData.tinhTrangBanSaoSach === 'CU' ? 'selected' : ''}>Cũ</option>
+                        </select>
+                    </label>
+                    <label>
+                        Trạng thái
+                        <select id="copy-trangthai">
+                            <option value="CON" ${copyData.trangThaiBanSaoSach === 'CON' ? 'selected' : ''}>Còn</option>
+                            <option value="DA_MUON" ${copyData.trangThaiBanSaoSach === 'DA_MUON' ? 'selected' : ''}>Đã mượn</option>
+                            <option value="HU_HONG" ${copyData.trangThaiBanSaoSach === 'HU_HONG' ? 'selected' : ''}>Hư hỏng</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel">Hủy</button>
+                    <button class="btn-save">Lưu</button>
+                </div>
+            </div>
+        `;
+    
+        modal.style.display = "flex";
+    
+        modal.querySelector('.modal-close').onclick = () => {
+            modal.style.display = "none";
+            modal.innerHTML = "";
+        };
+    
+        modal.querySelector('.btn-cancel').onclick = () => {
+            modal.style.display = "none";
+            modal.innerHTML = "";
+        };
+    
+        modal.querySelector('.btn-save').onclick = () => handleUpdateCopy(copyId, modal);
+    }
+
+    async function handleUpdateCopy(copyId, modal) {
+        const token = sessionStorage.getItem("token");
+        const sachId = new URLSearchParams(window.location.search).get("sachId");
+    
+        const payload = {
+            banSaoSachId: copyId,
+            sachId: Number(sachId),
+            tinhTrangBanSaoSach: document.getElementById("copy-tinhtrang").value,
+            trangThaiBanSaoSach: document.getElementById("copy-trangthai").value
+        };
+    
+        try {
+            const resp = await fetch(`${apiBase}/api/bansaosach/update`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+        
+            const text = await resp.text();
+            if (!resp.ok) {
+                alert(text || "Cập nhật bản sao thất bại");
+                return;
+            }
+            alert(text || "Cập nhật bản sao thành công");
+            modal.style.display = "none";
+            modal.innerHTML = "";
+            loadBanSaoSach(sachId);
+        } catch (err) {
+            alert("Không thể cập nhật bản sao");
+        }
+    }
     
     document.querySelectorAll('.btn-copy-delete').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -312,7 +543,6 @@ async function openUpdateCopyModal(copyId, copyData) {
     const modal = document.getElementById("update-modal");
     if (!modal) return;
     
-    const token = sessionStorage.getItem("token");
     
     modal.innerHTML = `
         <div class="modal-box">
@@ -321,7 +551,6 @@ async function openUpdateCopyModal(copyId, copyData) {
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <input id="copy-id" type="text" placeholder="Mã bản sao" value="${copyData.banSaoSachId}" disabled>
                 <label>
                     Tình trạng
                     <select id="copy-tinhtrang">
