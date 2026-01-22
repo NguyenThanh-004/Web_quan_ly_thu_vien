@@ -161,11 +161,19 @@ function mapAndDisplayFromAPI(phieuMuonId, list) {
     // Hạn trả (giống nhau)
     const hanTra = list[0].hanTra;
 
+    let tongTienPhat = 0;
+    list.forEach(item => {
+        if (item.tienPhat) {
+            tongTienPhat += item.tienPhat;
+        }
+    });
+
     // Meta chung
     document.getElementById("api-loan-id").innerText = `${phieuMuonId}`;
-    document.getElementById("api-detail-id").innerText = `${phieuMuonId}`;
     document.getElementById("api-due-date").innerText = formatDate(hanTra);
-
+    document.getElementById("api-fine").innerText =
+        tongTienPhat > 0 ? formatMoney(tongTienPhat) : "0đ";
+        
     // Danh sách sách
     const listContainer = document.getElementById("loan-books-list");
     listContainer.innerHTML = "";
@@ -188,7 +196,9 @@ function mapAndDisplayFromAPI(phieuMuonId, list) {
                     <p class="book-copy-id">
                         Mã bản sao sách: ${item.banSaoSachId}
                     </p>
-
+                    <p class="book-borrow-detail-id">
+                        Mã chi tiết mượn trả: ${item.chiTietMuonTraId}
+                    </p>
                     <div class="book-extra-info">
                         <span>Ngày trả: ${ngayTraText}</span>
                         <span>Tình trạng: ${mapTinhTrang(item.tinhTrangKhiTra)}</span>

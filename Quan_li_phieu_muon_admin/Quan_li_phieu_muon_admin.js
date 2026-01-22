@@ -158,9 +158,6 @@ function renderPhieuMuon(pageData) {
         <span class="card-title">
           <i class="fa-solid fa-file-invoice"></i> PHIẾU MƯỢN
         </span>
-        <button class="btn-edit" data-id="${item.phieuMuonId}">
-          <i class="fa-solid fa-pen"></i>
-        </button>
       </div>
 
       <div class="card-body">
@@ -190,15 +187,7 @@ function renderPhieuMuon(pageData) {
             </select>
           </span>
         </div>
-
-        <div class="info">
-          <span class="label">Chi tiết mượn trả</span>
-          <span class="value">
-            <button class="btn-chitietmuontra" data-id="${item.phieuMuonId}">Xem chi tiết</button>
-          </span>
-        </div>
       </div>
-
       <div class="card-footer">
         <button class="btn-detail" data-id="${item.phieuMuonId}">
           <i class="fa-solid fa-eye"></i> Chi tiết mượn trả

@@ -104,4 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   btnSubmit.addEventListener('click', register);
+  document.querySelector('.close-btn').addEventListener('click', () => {
+    window.location.href = '../Trang_chu_admin/Trang_chu_admin.html';
+  });
 });
