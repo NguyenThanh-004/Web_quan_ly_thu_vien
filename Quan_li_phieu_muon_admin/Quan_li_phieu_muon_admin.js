@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
 let currentPage = 0;
 let pageSize = 5;
 let totalPages = 1;
+let currentTrangThai = 'TAT_CA';
+let currentKeyword = '';
 
 // ================= HELPER =================
 function buildHeaders(isJson = false) {
@@ -93,31 +95,17 @@ function setStatus(msg) {
 }
 
 // ================= FETCH PHIẾU MƯỢN =================
-async function fetchPhieuMuon(page = 0, size = 5) {
+async function fetchPhieuMuon(page = 0, size = 5, append = false) {
   setStatus('Đang tải dữ liệu...');
-  // Always request all phiếu mượn by setting trangThai=TAT_CA
-  const url = `${apiBase}/phieumuon/admin/load?page=${page}&size=${size}&trangThai=TAT_CA`;
-  console.log('[fetchPhieuMuon] Fetching:', url);
+  const trangThaiParam = currentTrangThai || 'TAT_CA';
+  const url = `${apiBase}/phieumuon/admin/load?page=${page}&size=${size}&trangThai=${trangThaiParam}`;
 
   try {
     const resp = await fetch(url, { headers: buildHeaders() });
-
-    if (resp.status === 401) {
-      setStatus('Bạn chưa đăng nhập.');
-      return;
-    }
-    if (resp.status === 403) {
-      setStatus('Bạn không có quyền truy cập.');
-      return;
-    }
-    if (!resp.ok) {
-      setStatus(`Lỗi tải dữ liệu: ${resp.status}`);
-      return;
-    }
+    if (!resp.ok) return;
 
     const data = await resp.json();
-    console.log('[fetchPhieuMuon] API response:', data);
-    renderPhieuMuon(data);
+    renderPhieuMuon(data, append);
     setStatus('');
   } catch (err) {
     console.error(err);
@@ -125,15 +113,18 @@ async function fetchPhieuMuon(page = 0, size = 5) {
   }
 }
 
+
 // ================= RENDER CARD =================
-function renderPhieuMuon(pageData) {
+function renderPhieuMuon(pageData, append = false) {
   currentPage = pageData.number ?? 0;
-  pageSize = pageData.size ?? pageSize;
   totalPages = pageData.totalPages ?? 1;
 
   const container = document.getElementById('phieu-muon-list');
   if (!container) return;
-  container.innerHTML = '';
+
+  if (!append) {
+    container.innerHTML = '';
+  }
 
   const list = pageData.content || [];
 
@@ -141,16 +132,17 @@ function renderPhieuMuon(pageData) {
     // Show raw API response for debugging
     container.innerHTML = `
       <p>Không có phiếu mượn.</p>
-      <details style="margin-top:8px;">
-        <summary>API response (debug)</summary>
-        <pre style="max-width:100%;overflow:auto;background:#f8f8f8;border:1px solid #ccc;padding:8px;">${JSON.stringify(pageData, null, 2)}</pre>
-      </details>
     `;
-    updatePagination();
+    const loadMoreBtn = document.getElementById('btn-load-more');
+    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+
     return;
   }
     
-
+    //  <details style="margin-top:8px;">
+    //     <summary>API response (debug)</summary>
+    //     <pre style="max-width:100%;overflow:auto;background:#f8f8f8;border:1px solid #ccc;padding:8px;">${JSON.stringify(pageData, null, 2)}</pre>
+    //   </details>
   list.forEach(item => {
     const card = document.createElement('div');
     card.className = 'phieu-muon-card';
@@ -192,7 +184,8 @@ function renderPhieuMuon(pageData) {
               <option value="DANG_CHO" ${item.trangThaiPhieuMuon === 'DANG_CHO' ? 'selected' : ''}>Đang chờ</option>
               <option value="DANG_MUON" ${item.trangThaiPhieuMuon === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
               <option value="HUY" ${item.trangThaiPhieuMuon === 'HUY' ? 'selected' : ''}>Huỷ</option>
-              <option value="HOAN_THANH" ${item.trangThaiPhieuMuon === 'HOAN_THANH' ? 'selected' : ''}>Hoàn thành</option>
+              <option value="QUA_HAN" ${item.trangThaiPhieuMuon === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
+              <option value="HOAN_TAT" ${item.trangThaiPhieuMuon === 'HOAN_TAT' ? 'selected' : ''}>Hoàn tất</option>
             </select>
           </span>
         </div>
@@ -210,30 +203,54 @@ function renderPhieuMuon(pageData) {
     });
   });
   bindActions();
-  updatePagination();
+  const loadMoreBtn = document.getElementById('btn-load-more');
+  if (loadMoreBtn) {
+    loadMoreBtn.style.display =
+      currentPage >= totalPages - 1 ? 'none' : 'block';
+  }
 }
 
 // ================= UPDATE STATUS =================
-async function updateTrangThaiPhieuMuon(phieuMuonId, trangThai) {
+async function updateTrangThaiPhieuMuon(phieuMuonId, trangThaiupdate) {
+  const token = sessionStorage.getItem('token');
+  if (!token) {
+    alert('Bạn chưa đăng nhập');
+    window.location.href = '../Dang_nhap/Dang_nhap.html';
+    return;
+  }
 
   try {
-    const resp = await fetch(`${apiBase}/phieumuon/admin/update-status/${phieuMuonId}`, {
-      method: 'POST',
-      headers: buildHeaders(true),
-      body: JSON.stringify({ trangThai })
-    });
+    const resp = await fetch(
+      `${apiBase}/phieumuon/admin/update-phieumuon-status?phieuMuonId=${phieuMuonId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          trangThai: trangThaiupdate
+        })
+      }
+    );
+
+    console.log(phieuMuonId, trangThaiupdate);
 
     if (!resp.ok) {
+      console.error(await resp.text());
       alert('Cập nhật trạng thái thất bại');
       return;
+    }else {
+      alert('Cập nhật trạng thái thành công');
     }
-    // Reload data after update
+
     fetchPhieuMuon(currentPage, pageSize);
   } catch (err) {
     console.error(err);
     alert('Không thể cập nhật trạng thái');
   }
 }
+
 
 // ================= UPDATE CHI TIẾT =================
 async function updateChiTietStatus(phieuMuonId) {
@@ -257,28 +274,21 @@ async function updateChiTietStatus(phieuMuonId) {
 function bindActions() {
   document.querySelectorAll('.status-select').forEach(select => {
     select.addEventListener('change', e => {
-      const id = e.target.dataset.id;
-      updateTrangThaiPhieuMuon(id, e.target.value);
+      updateTrangThaiPhieuMuon(e.target.dataset.id, e.target.value);
     });
   });
 
   document.querySelectorAll('.btn-detail').forEach(btn => {
     btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      updateChiTietStatus(id);
+      updateChiTietStatus(btn.dataset.id);
     });
   });
+}
 
-  document.querySelectorAll('.btn-chitietmuontra').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.id;
-      await showChiTietMuonTraModal(id);
-    });
-  });
 // ================= SHOW CHI TIẾT MUỢN TRẢ MODAL =================
 async function showChiTietMuonTraModal(phieuMuonId) {
   try {
-    const resp = await fetch(`${apiBase}/api/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`, {
+    const resp = await fetch(`${apiBase}/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`, {
       headers: buildHeaders()
     });
     if (!resp.ok) {
@@ -322,44 +332,61 @@ function showModalChiTietMuonTra(list) {
   modal.querySelector('.modal-close').onclick = () => modal.remove();
   modal.onclick = e => { if (e.target === modal) modal.remove(); };
 }
-}
 
-// ================= PAGINATION UI =================
-function updatePagination() {
-  const prev = document.getElementById('prev-page');
-  const next = document.getElementById('next-page');
-  const info = document.getElementById('page-info');
 
-  if (!prev || !next || !info) return;
-
-  prev.disabled = currentPage <= 0;
-  next.disabled = currentPage >= totalPages - 1;
-  info.textContent = `Page ${currentPage + 1} / ${totalPages}`;
-}
 
 // ================= INIT =================
 document.addEventListener('DOMContentLoaded', () => {
-  const prev = document.getElementById('prev-page');
-  const next = document.getElementById('next-page');
-
-  if (prev)
-    prev.addEventListener('click', () =>
-      fetchPhieuMuon(currentPage - 1, pageSize)
-    );
-
-  if (next)
-    next.addEventListener('click', () =>
-      fetchPhieuMuon(currentPage + 1, pageSize)
-    );
-
   const usernameEl = document.querySelector('.username-text');
   if (usernameEl) {
     usernameEl.textContent =
       sessionStorage.getItem('username') || 'Khách';
   }
 
-  fetchPhieuMuon(0, pageSize);
+  const searchInput = document.getElementById('search-keyword');
+
+  if (searchInput) {
+    let debounceTimer;
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+
+      debounceTimer = setTimeout(() => {
+        const keyword = searchInput.value.trim();
+        currentKeyword = keyword;
+
+        if (keyword === '') {
+          // 🔁 Quay về load bình thường
+          currentPage = 0;
+          fetchPhieuMuon(0, pageSize, false);
+        } else {
+          searchPhieuMuon(keyword, currentTrangThai);
+        }
+      }, 400); // debounce
+    });
+  }
+
+  const filterSelect = document.getElementById('filter-status');
+  if (!filterSelect) return;
+
+  // ✅ LOAD LẦN ĐẦU
+  currentTrangThai = 'TAT_CA';
+  fetchPhieuMuon(0, pageSize, false);
+
+  filterSelect.addEventListener('change', () => {
+    const value = filterSelect.value;
+    currentTrangThai = value === '' ? 'TAT_CA' : value;
+    currentPage = 0;
+
+    if (currentKeyword) {
+      searchPhieuMuon(currentKeyword, currentTrangThai);
+    } else {
+      fetchPhieuMuon(0, pageSize, false);
+    }
+  });
 });
+
+
  
 // ================= MENU TRANG CHỦ =================
 document.addEventListener('DOMContentLoaded', () => {
@@ -545,4 +572,59 @@ async function getSoSachDangMuon(phieuMuonId) {
   if (!Array.isArray(list)) return 0;
 
   return list.filter(ct => ct.ngayTra === null).length;
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btn-load-more');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    if (currentPage < totalPages - 1) {
+      fetchPhieuMuon(currentPage + 1, pageSize, true);
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btnScrollTop = document.getElementById('btnScrollTop');
+  const main = document.querySelector('.main');
+
+  if (!btnScrollTop || !main) return;
+
+  btnScrollTop.addEventListener('click', () => {
+    main.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+});
+
+
+async function searchPhieuMuon(keyword, trangThai) {
+  setStatus('Đang tìm kiếm...');
+  const url = `${apiBase}/phieumuon/admin/search?keyword=${encodeURIComponent(keyword)}&trangThai=${trangThai}`;
+
+  try {
+    const resp = await fetch(url, { headers: buildHeaders() });
+    if (!resp.ok) return;
+
+    const data = await resp.json();
+    console.log('SEARCH RESPONSE:', data);
+    // ⚠️ API search thường trả LIST, không phải PAGE
+    renderPhieuMuon({
+      content: Array.isArray(data.data) ? data.data : [],
+      number: 0,
+      totalPages: 1
+    }, false);
+    
+    // ❌ Search thì không cho xem thêm
+    const loadMoreBtn = document.getElementById('btn-load-more');
+    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+
+    setStatus('');
+  } catch (err) {
+    console.error(err);
+    setStatus('Không thể tìm kiếm.');
+  }
 }

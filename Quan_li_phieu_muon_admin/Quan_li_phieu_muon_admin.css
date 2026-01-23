@@ -325,8 +325,20 @@ tbody tr {
 .filter-bar {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* ĐẨY CẢ 2 NÚT SANG PHẢI */
     gap: 12px;     
+}
+
+#search-keyword {
+  padding: 8px 12px;
+  min-width: 400px;
+  border-radius: 6px;
+  border: 1px solid #101010;
+}
+
+.filter-right {
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
 }
 
 /* ================= ADD BUTTON (+) ================= */
@@ -553,7 +565,7 @@ tbody tr {
 /* ===== FOOTER ===== */
 .card-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
 }
 
 .btn-detail {
@@ -577,6 +589,61 @@ tbody tr {
     background: #eafaf1;
     border-color: #2ecc71;
 }
+
+#btn-load-more {
+  background: transparent;
+  border: none;
+  color: #111;             
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 12px;
+  margin: 16px auto 8px;
+
+  transition: all 0.2s ease;
+}
+
+
+/* Click */
+#btn-load-more:active {
+  transform: translateY(1px);
+}
+
+.load-more-wrapper {
+  text-align: center;
+}
+
+
+/* ===== SCROLL TOP ===== */
+.scroll-top {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  border: none;
+  background: #237245;
+  color: white;
+  font-size: 22px;
+  display: block;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+
+.scroll-top:hover {
+  background: #1a5a35;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {

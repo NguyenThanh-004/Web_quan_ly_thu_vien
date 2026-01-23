@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!sachId) {
         console.error("Không tìm thấy sachId trong URL");
+        window.location.href = '/Trang_chu/Trang_chu.html';
         return;
     }
 

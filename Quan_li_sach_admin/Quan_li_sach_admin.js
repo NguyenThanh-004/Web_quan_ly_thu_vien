@@ -7,8 +7,8 @@ const btnLoadMore = document.getElementById('btnLoadMore');
 const btnScrollTop = document.getElementById('btnScrollTop');
 
 let page = 0;
-const pagesize = 12;
-const moresize = 6;
+const pagesize = 10;
+const moresize = 10;
 
 /* ===== AUTH CHECK ===== */
 if (!token) {

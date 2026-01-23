@@ -78,31 +78,32 @@
 
         <!-- TOOLBAR (giống figma) -->
         <div class="filter-bar">
-            <button class="btn-add">
-                <i class="fa-solid fa-plus"></i>
-            </button>
-
-            <select id="filter-status">
-                <option value="">Tất cả</option>
-                <option value="DANG_CHO">Đang chờ</option>
-                <option value="QUA_HAN">Quá hạn</option>
-                <option value="HOAN_TAT">Hoàn tất</option>
-            </select>
+            <input type="text" id="search-keyword" placeholder="Tìm mã phiếu, mã thẻ..."/>
+            <div class="filter-right">
+                <select id="filter-status">
+                    <option value="">Tất cả</option>
+                    <option value="DANG_MUON">Đang mượn</option>
+                    <option value="DANG_CHO">Đang chờ</option>
+                    <option value="QUA_HAN">Quá hạn</option>
+                    <option value="HUY">Đã hủy</option>
+                    <option value="HOAN_TAT">Hoàn tất</option>
+                </select>
+            </div>
         </div>
 
         <!-- DANH SÁCH PHIẾU MƯỢN -->
         <div class="phieu-muon-list" id="phieu-muon-list">
-
-        <!-- PAGINATION -->
-        <div class="page">
-            <button id="prev-page" disabled>Prev</button>
-            <span id="page-info">Page 1 / 1</span>
-            <button id="next-page" disabled>Next</button>
+            
         </div>
-
+        <div class="load-more-wrapper">
+            <button id="btn-load-more">Xem thêm <i class="fa-solid fa-chevron-down"></i></button>
+        </div>
     </main>
 </div>
-
+<!-- SCROLL TOP -->
+<button id="btnScrollTop" class="scroll-top">
+  <i class="fas fa-chevron-up"></i>
+</button>
 <script type="module" src="/Quan_li_phieu_muon_admin/Quan_li_phieu_muon_admin.js"></script>
 
 </body>
