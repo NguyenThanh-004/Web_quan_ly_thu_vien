@@ -148,6 +148,7 @@ async function loadBanSaoSach(sachId) {
                                     Tải ảnh
                                 </button>
                                 <input type="file" id="imageInput" hidden accept="image/*">
+                                <input type="hidden" id="update-anhBia" value="${data.anhBia || ''}">
                             </div>
 
                             <!-- Thông tin -->
@@ -221,20 +222,70 @@ async function loadBanSaoSach(sachId) {
         modal.querySelector('.close').onclick = closeModal;
         modal.querySelector('.btn-submit').onclick = (e) => {
             e.preventDefault();
+            if (uploading) {
+                alert('Vui lòng chờ tải ảnh xong trước khi cập nhật sách!');
+                return;
+            }
             handleUpdateBook(data.sachId);
         };
         
-        // Handle image preview
+        // Handle image preview and upload
         const imageInput = modal.querySelector('#imageInput');
         const previewImage = modal.querySelector('#previewImage');
-        imageInput.addEventListener('change', (e) => {
+        const anhBiaInput = modal.querySelector('#update-anhBia');
+        let uploadedImageUrl = '';
+        let uploading = false;
+        
+        imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (file) {
+                // Show preview immediately
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     previewImage.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
+
+                // Show uploading status
+                previewImage.style.opacity = '0.5';
+                previewImage.title = 'Đang tải ảnh...';
+                uploading = true;
+                uploadedImageUrl = '';
+                try {
+                    const uploadForm = new FormData();
+                    uploadForm.append('file', file);
+                    const uploadResp = await fetch(`${apiBase}/api/images/upload`, {
+                        method: 'POST',
+                        headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
+                        body: uploadForm
+                    });
+                    
+                    if (uploadResp.ok) {
+                        const data = await uploadResp.json();
+                        uploadedImageUrl = data && data.imageUrl ? data.imageUrl : '';
+                        previewImage.src = uploadedImageUrl;
+                        anhBiaInput.value = uploadedImageUrl;
+                        previewImage.style.opacity = '1';
+                        previewImage.title = uploadedImageUrl ? 'Tải ảnh thành công' : 'Không nhận được URL ảnh';
+                        if (!uploadedImageUrl) alert('Không nhận được URL ảnh');
+                    } else {
+                        uploadedImageUrl = '';
+                        previewImage.title = 'Tải ảnh thất bại';
+                        let errorMsg = 'Tải ảnh thất bại';
+                        try {
+                            const errData = await uploadResp.json();
+                            if (errData && errData.error) errorMsg += ': ' + errData.error;
+                        } catch (parseErr) {
+                            // ignore JSON parse error
+                        }
+                        alert(errorMsg);
+                    }
+                } catch (err) {
+                    uploadedImageUrl = '';
+                    previewImage.title = 'Tải ảnh thất bại';
+                    alert('Tải ảnh thất bại: ' + (err && err.message ? err.message : err));
+                }
+                uploading = false;
             }
         });
         
@@ -249,6 +300,14 @@ async function loadBanSaoSach(sachId) {
 
     async function populateUpdateSelects(data, modal) {
         try {
+            console.log('[UPDATE FORM] Full data object:', JSON.stringify(data, null, 2));
+            console.log('[UPDATE FORM] Populating selects with data:', JSON.stringify({ 
+                linhVucId: data.linhVucId, 
+                nhaXuatBanId: data.nhaXuatBanId, 
+                theLoaiId: data.theLoaiId,
+                giaTien: data.giaTien
+            }, null, 2));
+            
             const token = sessionStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
             const [lvResp, nxbResp, tlResp] = await Promise.all([
@@ -266,26 +325,141 @@ async function loadBanSaoSach(sachId) {
             const selLv = modal.querySelector('#update-linhVucId');
             const selNxb = modal.querySelector('#update-nhaXuatBanId');
             const selTl = modal.querySelector('#update-theLoaiId');
+            const giaTienInput = modal.querySelector('#update-giaTien');
 
-            function fill(selectEl, items, idKey, nameKey) {
-                if (!selectEl) return;
+            console.log('[UPDATE FORM] Form elements found:', { 
+                selLv: !!selLv, 
+                selNxb: !!selNxb, 
+                selTl: !!selTl,
+                giaTienInput: !!giaTienInput
+            });
+
+            // Store items for later ID-to-text conversion
+            const lvMap = {};
+            const nxbMap = {};
+            const tlMap = {};
+
+            function fill(selectEl, items, idKey, nameKey, mapRef, selectedValue, selectedText) {
+                if (!selectEl) {
+                    console.warn('[UPDATE FORM] Select element is null, skipping fill');
+                    return;
+                }
                 selectEl.innerHTML = '<option value="">-- Chọn --</option>';
-                (items || []).forEach(it => {
+                let selectedCount = 0;
+                let selectedIdByText = null;
+                
+                console.log(`[UPDATE FORM] FILLING ${idKey}:`, {
+                    selectedValue,
+                    selectedText,
+                    itemsCount: items?.length || 0
+                });
+
+                (items || []).forEach((it, idx) => {
+                    const id = String(it[idKey]);
+                    const name = it[nameKey];
                     const opt = document.createElement('option');
-                    opt.value = it[idKey];
-                    opt.textContent = it[nameKey];
+                    opt.value = id;
+                    opt.textContent = name;
+                    
+                    // Check if this should be selected by ID
+                    let shouldSelect = selectedValue !== undefined && 
+                                       selectedValue !== null && 
+                                       String(selectedValue) === id;
+                    
+                    // If no ID match, try to match by text
+                    if (!shouldSelect && selectedText && name === selectedText) {
+                        shouldSelect = true;
+                        selectedIdByText = id;
+                    }
+                    
+                    if (shouldSelect) {
+                        opt.selected = true;
+                        selectedCount++;
+                        console.log(`[UPDATE FORM] ✓ SELECTED option ${idx}:`, {
+                            id,
+                            name,
+                            selectedValue,
+                            selectedText,
+                            matchedBy: selectedValue ? 'ID' : 'TEXT'
+                        });
+                    }
+                    
                     selectEl.appendChild(opt);
+                    mapRef[id] = name;
+                });
+                
+                console.log(`[UPDATE FORM] ✓ Filled ${idKey}:`, {
+                    itemsCount: items.length,
+                    selectedCount,
+                    selectedValue,
+                    selectedText,
+                    selectedIdByText,
+                    currentSelectValue: selectEl.value,
+                    currentSelectText: selectEl.options[selectEl.selectedIndex]?.text,
+                    allOptions: Array.from(selectEl.options).map((o, i) => ({
+                        index: i,
+                        value: o.value,
+                        text: o.text,
+                        selected: o.selected
+                    }))
                 });
             }
 
-            fill(selLv, lvData.content, 'linhVucId', 'tenLinhVuc');
-            fill(selNxb, nxbData.content, 'nhaXuatBanId', 'tenNhaXuatBan');
-            fill(selTl, tlData.content, 'theLoaiId', 'tenTheLoai');
+            // Set selected values if available on data
+            const nhaXuatBanIdValue = data.nhaXuatBanId;
+            const linhVucIdValue = data.linhVucId;
+            const theLoaiIdValue = data.theLoaiId;
+            const giaTienValue = data.giaTien;
+            
+            // Also get text values for matching when IDs are missing
+            const nhaXuatBanTextValue = data.nhaXuatBan;
+            const linhVucTextValue = data.linhVuc;
+            const theLoaiTextValue = data.theLoai;
 
-            // set selected values if available on data
-            if (data.nhaXuatBanId && selNxb) selNxb.value = data.nhaXuatBanId;
-            if (data.linhVucId && selLv) selLv.value = data.linhVucId;
-            if (data.theLoaiId && selTl) selTl.value = data.theLoaiId;
+            console.log('[UPDATE FORM] ========== START FILL ==========');
+            console.log('[UPDATE FORM] Book data IDs and TEXT:', JSON.stringify({
+                nhaXuatBanId: nhaXuatBanIdValue,
+                nhaXuatBanText: nhaXuatBanTextValue,
+                linhVucId: linhVucIdValue,
+                linhVucText: linhVucTextValue,
+                theLoaiId: theLoaiIdValue,
+                theLoaiText: theLoaiTextValue,
+                giaTien: giaTienValue
+            }, null, 2));
+
+            // Fill with pre-selection (ID or TEXT)
+            fill(selLv, lvData.content, 'linhVucId', 'tenLinhVuc', lvMap, linhVucIdValue, linhVucTextValue);
+            fill(selNxb, nxbData.content, 'nhaXuatBanId', 'tenNhaXuatBan', nxbMap, nhaXuatBanIdValue, nhaXuatBanTextValue);
+            fill(selTl, tlData.content, 'theLoaiId', 'tenTheLoai', tlMap, theLoaiIdValue, theLoaiTextValue);
+
+            // Add a small delay to ensure DOM is updated
+            await new Promise(resolve => setTimeout(resolve, 150));
+
+            // Set giaTien
+            if (giaTienInput && giaTienValue !== undefined && giaTienValue !== null) {
+                giaTienInput.value = giaTienValue;
+                console.log('[UPDATE FORM] Set giaTien to:', giaTienValue, 'actual input value:', giaTienInput.value);
+            }
+
+            // Verify selections
+            console.log('[UPDATE FORM] ========== FINAL FORM STATE ==========', JSON.stringify({
+                giaTien: giaTienInput?.value,
+                nhaXuatBan: {
+                    value: selNxb?.value,
+                    text: selNxb?.options[selNxb?.selectedIndex]?.text,
+                    selectedIndex: selNxb?.selectedIndex
+                },
+                linhVuc: {
+                    value: selLv?.value,
+                    text: selLv?.options[selLv?.selectedIndex]?.text,
+                    selectedIndex: selLv?.selectedIndex
+                },
+                theLoai: {
+                    value: selTl?.value,
+                    text: selTl?.options[selTl?.selectedIndex]?.text,
+                    selectedIndex: selTl?.selectedIndex
+                }
+            }, null, 2));
 
         } catch (err) {
             console.error('Populate update selects error:', err);
@@ -298,6 +472,10 @@ async function loadBanSaoSach(sachId) {
         // Build payload matching UpdateSachAdminRequest
         const tacGiaIdsRaw = document.getElementById("update-tacGiaIds").value.trim();
         const tacGiaIds = tacGiaIdsRaw ? tacGiaIdsRaw.split(',').map(id => Number(id.trim())).filter(id => !isNaN(id)) : [];
+        
+        const namXuatBanValue = document.getElementById("update-namXuatBan").value;
+        const namXuatBan = namXuatBanValue ? new Date(namXuatBanValue).toISOString().split('T')[0] : null;
+        
         const payload = {
             sachId,
             tenSach: document.getElementById("update-title").value.trim(),
@@ -305,7 +483,7 @@ async function loadBanSaoSach(sachId) {
             khoSach: document.getElementById("update-khoSach").value.trim(),
             anhBia: document.getElementById("update-anhBia").value.trim(),
             giaTien: Number(document.getElementById("update-giaTien").value),
-            namXuatBan: document.getElementById("update-namXuatBan").value ? new Date(document.getElementById("update-namXuatBan").value) : null,
+            namXuatBan: namXuatBan,
             nhaXuatBanId: Number(document.getElementById("update-nhaXuatBanId").value),
             linhVucId: Number(document.getElementById("update-linhVucId").value),
             theLoaiId: Number(document.getElementById("update-theLoaiId").value),

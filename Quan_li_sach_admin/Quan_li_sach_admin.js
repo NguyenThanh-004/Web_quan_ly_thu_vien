@@ -238,6 +238,8 @@ function showAddBookModal() {
 
   imageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
+    console.log('[IMAGE UPLOAD] File selected:', { fileName: file?.name, fileSize: file?.size, fileType: file?.type });
+    
     if (file) {
       // Show preview immediately
       const reader = new FileReader();
@@ -251,39 +253,62 @@ function showAddBookModal() {
       previewImage.title = 'Đang tải ảnh...';
       uploading = true;
       uploadedImageUrl = '';
+      
+      console.log('[IMAGE UPLOAD] Starting upload to:', `${apiBase}/api/images/upload`);
+      
       try {
         const uploadForm = new FormData();
         uploadForm.append('file', file);
+        console.log('[IMAGE UPLOAD] FormData prepared, sending request...');
+        
         const uploadResp = await fetch(`${apiBase}/api/images/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: uploadForm
         });
+        
+        console.log('[IMAGE UPLOAD] Response received:', { status: uploadResp.status, statusText: uploadResp.statusText });
+        
         if (uploadResp.ok) {
           // Backend now returns JSON { imageUrl: ... }
           const data = await uploadResp.json();
+          console.log('[IMAGE UPLOAD] Success - Response data:', data);
+          
           uploadedImageUrl = data && data.imageUrl ? data.imageUrl : '';
           previewImage.style.opacity = '1';
           previewImage.title = uploadedImageUrl ? 'Tải ảnh thành công' : 'Không nhận được URL ảnh';
-          if (!uploadedImageUrl) alert('Không nhận được URL ảnh');
+          
+          console.log('[IMAGE UPLOAD] Uploaded URL:', uploadedImageUrl);
+          
+          if (!uploadedImageUrl) {
+            console.warn('[IMAGE UPLOAD] Warning: No imageUrl in response');
+            alert('Không nhận được URL ảnh');
+          }
         } else {
           uploadedImageUrl = '';
           previewImage.title = 'Tải ảnh thất bại';
+          const errText = await uploadResp.text();
+          console.error('[IMAGE UPLOAD] Upload failed:', { status: uploadResp.status, error: errText });
+          
           let errorMsg = 'Tải ảnh thất bại';
           try {
-            const errData = await uploadResp.json();
+            const errData = JSON.parse(errText);
             if (errData && errData.error) errorMsg += ': ' + errData.error;
+            console.error('[IMAGE UPLOAD] Parsed error:', errData);
           } catch (parseErr) {
-            // ignore JSON parse error
+            console.error('[IMAGE UPLOAD] Error parsing response:', parseErr);
           }
           alert(errorMsg);
         }
       } catch (err) {
         uploadedImageUrl = '';
         previewImage.title = 'Tải ảnh thất bại';
+        console.error('[IMAGE UPLOAD] Exception during upload:', err);
         alert('Tải ảnh thất bại: ' + (err && err.message ? err.message : err));
       }
+      
       uploading = false;
+      console.log('[IMAGE UPLOAD] Upload process completed. Uploading:', uploading);
     }
   });
 
