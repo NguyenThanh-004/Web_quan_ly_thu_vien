@@ -425,6 +425,12 @@ body {
   font-size: 14px;
 }
 
+#select-theloai {
+  position: relative;
+  z-index: 1010;
+  transform-origin: bottom center;
+}
+
 .fields input,
 .fields select {
   margin-top: 4px;
@@ -505,5 +511,148 @@ body {
   color: #9ca3af;
   cursor: default;
   text-decoration: none;
+}
+
+/* ===== TACGIA DROPDOWN ===== */
+.tacgia-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.tacgia-dropdown-trigger {
+  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: border-color 0.2s ease;
+}
+
+.tacgia-dropdown-trigger:hover {
+  border-color: #237245;
+}
+
+.tacgia-dropdown-trigger i {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.tacgia-dropdown-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  margin-bottom: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.tacgia-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s ease;
+  font-size: 14px;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.tacgia-checkbox-item:last-child {
+  border-bottom: none;
+}
+
+.tacgia-checkbox-item:hover {
+  background: #f5f5f5;
+}
+
+.tacgia-checkbox-item span {
+  flex: 0 1 auto;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tacgia-checkbox-item input[type="checkbox"] {
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #237245;
+  margin: 0;
+}
+
+/* ===== THELOAI DROPDOWN ===== */
+.theloai-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.theloai-dropdown-trigger {
+  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: border-color 0.2s ease;
+}
+
+.theloai-dropdown-trigger:hover {
+  border-color: #237245;
+}
+
+.theloai-dropdown-trigger i {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.theloai-dropdown-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  margin-bottom: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.theloai-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s ease;
+  font-size: 14px;
+}
+
+.theloai-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.theloai-dropdown-item:hover {
+  background: #f5f5f5;
 }
 

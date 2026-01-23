@@ -270,9 +270,9 @@ function bindActions() {
   });
 
   document.querySelectorAll('.btn-chitietmuontra').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.id;
-      await showChiTietMuonTraModal(id);
+    btn.addEventListener('click', () => {
+      const phieuMuonId = btn.dataset.id;
+      window.location.href = `/Trang_chi_tiet_muon_tra/Trang_chi_tiet_muon_tra.html?phieuMuonId=${phieuMuonId}`;
     });
   });
 // ================= SHOW CHI TIẾT MUỢN TRẢ MODAL =================
@@ -534,7 +534,7 @@ function mapTrangThai(status) {
 async function getSoSachDangMuon(phieuMuonId) {
   const token = sessionStorage.getItem('token');
   const res = await fetch(
-    `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`,
+    `${apiBase}/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`,
     {
       headers: {
         "Authorization": `Bearer ${token}`
