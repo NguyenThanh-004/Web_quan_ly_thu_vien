@@ -206,8 +206,17 @@ async function loadBanSaoSach(sachId) {
                                 </div>
 
                                 <label>
-                                    Tác giả ID (cách nhau bằng dấu phẩy)
-                                    <input type="text" id="update-tacGiaIds" placeholder="1,2,3" value="${data.tacGiaList ? data.tacGiaList.map(t=>t.tacGiaId).join(',') : ''}" required />
+                                    Tác giả
+                                    <div class="tacgia-dropdown-wrapper">
+                                      <div class="tacgia-dropdown-trigger" id="update-tacgiaTrigger">
+                                        <span id="update-tacgiaPlaceholder">-- Chọn tác giả --</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                      </div>
+                                      <div class="tacgia-dropdown-menu" id="update-tacgiaDropdown" style="display: none;">
+                                        <div id="update-tacgiaList"></div>
+                                      </div>
+                                    </div>
+                                    <input type="hidden" id="update-tacGiaIds" required />
                                 </label>
                             </div>
 
@@ -310,16 +319,18 @@ async function loadBanSaoSach(sachId) {
             
             const token = sessionStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
-            const [lvResp, nxbResp, tlResp] = await Promise.all([
+            const [lvResp, nxbResp, tlResp, tgResp] = await Promise.all([
                 fetch(`${apiBase}/api/linhvuc/all?page=0&size=200`, { headers }),
                 fetch(`${apiBase}/api/nhaxuatban/all?page=0&size=200`, { headers }),
-                fetch(`${apiBase}/api/theloai/all?page=0&size=200`, { headers })
+                fetch(`${apiBase}/api/theloai/all?page=0&size=200`, { headers }),
+                fetch(`${apiBase}/api/tacgia/all?page=0&size=200`, { headers })
             ]);
 
-            const [lvData, nxbData, tlData] = await Promise.all([
+            const [lvData, nxbData, tlData, tgData] = await Promise.all([
                 lvResp.ok ? lvResp.json() : { content: [] },
                 nxbResp.ok ? nxbResp.json() : { content: [] },
-                tlResp.ok ? tlResp.json() : { content: [] }
+                tlResp.ok ? tlResp.json() : { content: [] },
+                tgResp.ok ? tgResp.json() : { content: [] }
             ]);
 
             const selLv = modal.querySelector('#update-linhVucId');
@@ -432,6 +443,9 @@ async function loadBanSaoSach(sachId) {
             fill(selNxb, nxbData.content, 'nhaXuatBanId', 'tenNhaXuatBan', nxbMap, nhaXuatBanIdValue, nhaXuatBanTextValue);
             fill(selTl, tlData.content, 'theLoaiId', 'tenTheLoai', tlMap, theLoaiIdValue, theLoaiTextValue);
 
+            // Populate tacgia dropdown with checkboxes
+            populateUpdateTacgiaDropdown(tgData.content || [], data.tacGiaList || []);
+
             // Add a small delay to ensure DOM is updated
             await new Promise(resolve => setTimeout(resolve, 150));
 
@@ -463,6 +477,96 @@ async function loadBanSaoSach(sachId) {
 
         } catch (err) {
             console.error('Populate update selects error:', err);
+        }
+
+        // Populate tacgia dropdown with checkboxes
+        function populateUpdateTacgiaDropdown(tacgiaList, selectedTacgiaList) {
+            const tacgiaListEl = modal.querySelector('#update-tacgiaList');
+            const tacgiaTrigger = modal.querySelector('#update-tacgiaTrigger');
+            const tacgiaDropdown = modal.querySelector('#update-tacgiaDropdown');
+            const tacGiaIdsInput = modal.querySelector('#update-tacGiaIds');
+            const tacgiaPlaceholder = modal.querySelector('#update-tacgiaPlaceholder');
+            
+            // Get IDs of currently selected authors for pre-checking
+            const selectedTacgiaIdSet = new Set((selectedTacgiaList || []).map(t => t.tacGiaId));
+            // Initialize with current authors for form submission, but don't display them yet
+            let selectedTacgiaIds = Array.from(selectedTacgiaIdSet);
+            
+            // Set hidden input with current authors so form submission works
+            tacGiaIdsInput.value = selectedTacgiaIds.join(',');
+
+            tacgiaListEl.innerHTML = '';
+            (tacgiaList || []).forEach(tg => {
+                const label = document.createElement('label');
+                label.className = 'tacgia-checkbox-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = tg.tacGiaId;
+                checkbox.checked = selectedTacgiaIdSet.has(tg.tacGiaId);
+                
+                const text = document.createElement('span');
+                text.textContent = tg.tenTacGia;
+                
+                label.appendChild(text);
+                label.appendChild(checkbox);
+                tacgiaListEl.appendChild(label);
+
+                // Manually handle checkbox toggle by tracking label clicks
+                label.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Read the current state before toggle
+                    const wasChecked = checkbox.checked;
+                    // Toggle it
+                    checkbox.checked = !wasChecked;
+                    
+                    // Now update the selectedTacgiaIds array based on new state
+                    const newCheckedState = checkbox.checked;
+                    if (newCheckedState) {
+                        if (!selectedTacgiaIds.includes(tg.tacGiaId)) {
+                            selectedTacgiaIds.push(tg.tacGiaId);
+                        }
+                    } else {
+                        selectedTacgiaIds = selectedTacgiaIds.filter(id => id !== tg.tacGiaId);
+                    }
+                    updateTacgiaDisplay();
+                });
+            });
+
+            function updateTacgiaDisplay() {
+                tacGiaIdsInput.value = selectedTacgiaIds.join(',');
+                if (selectedTacgiaIds.length === 0) {
+                    tacgiaPlaceholder.textContent = '-- Chọn tác giả --';
+                } else {
+                    const selectedNames = Array.from(tacgiaListEl.querySelectorAll('input:checked')).map(cb => {
+                        return cb.parentElement.textContent.trim();
+                    });
+                    tacgiaPlaceholder.textContent = selectedNames.join(', ');
+                }
+            }
+
+            // Toggle dropdown visibility
+            tacgiaTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isVisible = tacgiaDropdown.style.display !== 'none';
+                tacgiaDropdown.style.display = isVisible ? 'none' : 'block';
+            });
+
+            // Prevent clicks inside dropdown from propagating
+            tacgiaDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!modal.querySelector('.tacgia-dropdown-wrapper').contains(e.target)) {
+                    tacgiaDropdown.style.display = 'none';
+                }
+            }, { once: false });
+
+            // Display current authors in placeholder
+            updateTacgiaDisplay();
         }
     }
 

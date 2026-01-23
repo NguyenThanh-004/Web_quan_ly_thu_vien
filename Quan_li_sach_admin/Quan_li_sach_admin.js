@@ -195,15 +195,31 @@ function showAddBookModal() {
 
               <label>
                 Thể loại
-                <select name="theLoaiId" id="select-theloai" required>
-                  <option value="">-- Đang tải --</option>
-                </select>
+                <div class="theloai-dropdown-wrapper">
+                  <div class="theloai-dropdown-trigger" id="theloaiTrigger">
+                    <span id="theloaiPlaceholder">-- Chọn thể loại --</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </div>
+                  <div class="theloai-dropdown-menu" id="theloaiDropdown" style="display: none;">
+                    <div id="theloaiList"></div>
+                  </div>
+                </div>
+                <input type="hidden" name="theLoaiId" id="theLoaiId" required />
               </label>
             </div>
 
             <label>
-              Tác giả ID (cách nhau bằng dấu phẩy)
-              <input type="text" name="tacGiaIds" placeholder="1,2,3" required />
+              Tác giả
+              <div class="tacgia-dropdown-wrapper">
+                <div class="tacgia-dropdown-trigger" id="tacgiaTrigger">
+                  <span id="tacgiaPlaceholder">-- Chọn tác giả --</span>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="tacgia-dropdown-menu" id="tacgiaDropdown" style="display: none;">
+                  <div id="tacgiaList"></div>
+                </div>
+              </div>
+              <input type="hidden" name="tacGiaIds" id="tacGiaIds" required />
             </label>
           </div>
 
@@ -312,28 +328,30 @@ function showAddBookModal() {
     }
   });
 
-  // Populate select dropdowns (linh vuc, nha xuat ban, the loai)
+  // Populate select dropdowns (linh vuc, nha xuat ban, the loai) and tacgia dropdown
   (async function populateSelects() {
     try {
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [lvResp, nxbResp, tlResp] = await Promise.all([
+      const [lvResp, nxbResp, tlResp, tgResp] = await Promise.all([
         fetch(`${apiBase}/api/linhvuc/all?page=0&size=200`, { headers }),
         fetch(`${apiBase}/api/nhaxuatban/all?page=0&size=200`, { headers }),
-        fetch(`${apiBase}/api/theloai/all?page=0&size=200`, { headers })
+        fetch(`${apiBase}/api/theloai/all?page=0&size=200`, { headers }),
+        fetch(`${apiBase}/api/tacgia/all?page=0&size=200`, { headers })
       ]);
 
-      const [lvData, nxbData, tlData] = await Promise.all([
+      const [lvData, nxbData, tlData, tgData] = await Promise.all([
         lvResp.ok ? lvResp.json() : { content: [] },
         nxbResp.ok ? nxbResp.json() : { content: [] },
-        tlResp.ok ? tlResp.json() : { content: [] }
+        tlResp.ok ? tlResp.json() : { content: [] },
+        tgResp.ok ? tgResp.json() : { content: [] }
       ]);
 
       const selLv = modal.querySelector('#select-linhvuc');
       const selNxb = modal.querySelector('#select-nhaxuatban');
       const selTl = modal.querySelector('#select-theloai');
 
-      // helper to fill
+      // helper to fill regular selects
       function fill(selectEl, items, idKey, nameKey) {
         selectEl.innerHTML = '<option value="">-- Chọn --</option>';
         (items || []).forEach(it => {
@@ -346,12 +364,142 @@ function showAddBookModal() {
 
       fill(selLv, lvData.content, 'linhVucId', 'tenLinhVuc');
       fill(selNxb, nxbData.content, 'nhaXuatBanId', 'tenNhaXuatBan');
-      fill(selTl, tlData.content, 'theLoaiId', 'tenTheLoai');
+      // Populate theloai custom dropdown (upward)
+      populateTheloaiDropdown(tlData.content || []);
+
+      // Populate tacgia dropdown with checkboxes
+      populateTacgiaDropdown(tgData.content || []);
 
     } catch (err) {
       console.error('Populate selects error:', err);
     }
   })();
+
+  // Populate tacgia dropdown with checkboxes
+  function populateTacgiaDropdown(tacgiaList) {
+    const tacgiaListEl = modal.querySelector('#tacgiaList');
+    const tacgiaTrigger = modal.querySelector('#tacgiaTrigger');
+    const tacgiaDropdown = modal.querySelector('#tacgiaDropdown');
+    const tacGiaIdsInput = modal.querySelector('#tacGiaIds');
+    const tacgiaPlaceholder = modal.querySelector('#tacgiaPlaceholder');
+    
+    let selectedTacgiaIds = [];
+
+    tacgiaListEl.innerHTML = '';
+    (tacgiaList || []).forEach(tg => {
+      const label = document.createElement('label');
+      label.className = 'tacgia-checkbox-item';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = tg.tacGiaId;
+      
+      const text = document.createElement('span');
+      text.textContent = tg.tenTacGia;
+      
+      label.appendChild(text);
+      label.appendChild(checkbox);
+      tacgiaListEl.appendChild(label);
+
+      // Manually handle checkbox toggle by tracking label clicks
+      label.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Read the current state before toggle
+        const wasChecked = checkbox.checked;
+        // Toggle it
+        checkbox.checked = !wasChecked;
+        
+        // Now update the selectedTacgiaIds array based on new state
+        const newCheckedState = checkbox.checked;
+        if (newCheckedState) {
+          if (!selectedTacgiaIds.includes(tg.tacGiaId)) {
+            selectedTacgiaIds.push(tg.tacGiaId);
+          }
+        } else {
+          selectedTacgiaIds = selectedTacgiaIds.filter(id => id !== tg.tacGiaId);
+        }
+        updateTacgiaDisplay();
+      });
+    });
+
+    function updateTacgiaDisplay() {
+      tacGiaIdsInput.value = selectedTacgiaIds.join(',');
+      if (selectedTacgiaIds.length === 0) {
+        tacgiaPlaceholder.textContent = '-- Chọn tác giả --';
+      } else {
+        const selectedNames = Array.from(tacgiaListEl.querySelectorAll('input:checked')).map(cb => {
+          return cb.parentElement.textContent.trim();
+        });
+        tacgiaPlaceholder.textContent = selectedNames.join(', ');
+      }
+    }
+
+    // Toggle dropdown visibility
+    tacgiaTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = tacgiaDropdown.style.display !== 'none';
+      tacgiaDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+
+    // Prevent clicks inside dropdown from propagating
+    tacgiaDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!modal.querySelector('.tacgia-dropdown-wrapper').contains(e.target)) {
+        tacgiaDropdown.style.display = 'none';
+      }
+    }, { once: false });
+  }
+
+  // Populate theloai dropdown (upward, no checkboxes)
+  function populateTheloaiDropdown(theloaiList) {
+    const theloaiListEl = modal.querySelector('#theloaiList');
+    const theloaiTrigger = modal.querySelector('#theloaiTrigger');
+    const theloaiDropdown = modal.querySelector('#theloaiDropdown');
+    const theLoaiIdInput = modal.querySelector('#theLoaiId');
+    const theloaiPlaceholder = modal.querySelector('#theloaiPlaceholder');
+    
+    let selectedTheloaiId = null;
+
+    theloaiListEl.innerHTML = '';
+    (theloaiList || []).forEach(tl => {
+      const item = document.createElement('div');
+      item.className = 'theloai-dropdown-item';
+      item.textContent = tl.tenTheLoai;
+      theloaiListEl.appendChild(item);
+
+      // Handle item click
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedTheloaiId = tl.theLoaiId;
+        theLoaiIdInput.value = selectedTheloaiId;
+        theloaiPlaceholder.textContent = tl.tenTheLoai;
+        theloaiDropdown.style.display = 'none';
+      });
+    });
+
+    // Toggle dropdown visibility
+    theloaiTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = theloaiDropdown.style.display !== 'none';
+      theloaiDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+
+    // Prevent clicks inside dropdown from propagating
+    theloaiDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!modal.querySelector('.theloai-dropdown-wrapper').contains(e.target)) {
+        theloaiDropdown.style.display = 'none';
+      }
+    }, { once: false });
+  }
 
   // Handle form submission
   const bookForm = modal.querySelector('#bookForm');

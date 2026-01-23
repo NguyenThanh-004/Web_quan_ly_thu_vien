@@ -285,6 +285,7 @@ function bindActions() {
   });
 }
 
+
 // ================= SHOW CHI TIẾT MUỢN TRẢ MODAL =================
 async function showChiTietMuonTraModal(phieuMuonId) {
   try {
@@ -561,7 +562,7 @@ function mapTrangThai(status) {
 async function getSoSachDangMuon(phieuMuonId) {
   const token = sessionStorage.getItem('token');
   const res = await fetch(
-    `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`,
+    `${apiBase}/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`,
     {
       headers: {
         "Authorization": `Bearer ${token}`
