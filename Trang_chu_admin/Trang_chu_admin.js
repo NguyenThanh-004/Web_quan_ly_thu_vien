@@ -3,6 +3,64 @@ if (!sessionStorage.getItem('token')) {
   window.location.href = '/Dang_nhap/Dang_nhap.html';
 }
 console.log('TOKEN:', sessionStorage.getItem('token'));
+// ===== Real-time stats function =====
+async function fetchStat({ url, key, selector }) {
+  const token = sessionStorage.getItem('token');
+  const el = document.querySelector(selector);
+  console.log(`[BUGLOG] Fetching stat`, { url, key, selector, token });
+  if (!token) {
+    if (el) el.textContent = 'Lỗi: Không có token';
+    console.error(`[BUGLOG] No token for stat`, { url, key, selector });
+    return;
+  }
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+    console.log(`[BUGLOG] Response for ${url}:`, res);
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[BUGLOG] Error response for ${url}:`, errorText);
+      throw new Error(errorText || 'Lỗi kết nối API');
+    }
+    const data = await res.json();
+    console.log(`[BUGLOG] Data for ${url}:`, data);
+    if (el) el.textContent = data[key] !== undefined ? data[key] : '0';
+  } catch (err) {
+    if (el) el.textContent = `Lỗi: ${err.message}`;
+    console.error(`[BUGLOG] API ${url} error:`, err);
+  }
+}
+
+// Show real-time stats on page load
+document.addEventListener('DOMContentLoaded', () => {
+  fetchStat({
+    url: 'http://localhost:8080/api/bansaosach/count',
+    key: 'totalBanSaoSach',
+    selector: '#stat-totalBanSaoSach',
+  });
+  fetchStat({
+    url: 'http://localhost:8080/api/phieumuon/admin/count',
+    key: 'totalPhieuMuon',
+    selector: '#stat-totalPhieuMuon',
+  });
+  fetchStat({
+    url: 'http://localhost:8080/api/phieumuon/admin/count/qua-han',
+    key: 'totalPhieuMuonQuaHan',
+    selector: '#stat-totalPhieuMuonQuaHan',
+  });
+  fetchStat({
+    url: 'http://localhost:8080/api/docgia/admin/count',
+    key: 'totalDocGia',
+    selector: '#stat-totalDocGia',
+  });
+});
+
 // chuyển qua form đăng ký admin
 document.addEventListener('DOMContentLoaded', () => {
   const adminCard = document.getElementById('register-admin') || document.querySelector('.quick-card[aria-label="Đăng ký admin"]');

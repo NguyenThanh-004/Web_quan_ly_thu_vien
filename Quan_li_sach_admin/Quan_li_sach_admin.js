@@ -229,17 +229,61 @@ function showAddBookModal() {
     }
   });
 
-  // Handle image preview
+  // Handle image upload and preview
   const imageInput = modal.querySelector('#imageInput');
   const previewImage = modal.querySelector('#previewImage');
-  imageInput.addEventListener('change', (e) => {
+  // Use closure to share state between modal and handleAddBook
+  let uploadedImageUrl = '';
+  let uploading = false;
+
+  imageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Show preview immediately
       const reader = new FileReader();
       reader.onload = (event) => {
         previewImage.src = event.target.result;
       };
       reader.readAsDataURL(file);
+
+      // Show uploading status
+      previewImage.style.opacity = '0.5';
+      previewImage.title = 'Đang tải ảnh...';
+      uploading = true;
+      uploadedImageUrl = '';
+      try {
+        const uploadForm = new FormData();
+        uploadForm.append('file', file);
+        const uploadResp = await fetch(`${apiBase}/api/images/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: uploadForm
+        });
+        if (uploadResp.ok) {
+          // Backend now returns JSON { imageUrl: ... }
+          const data = await uploadResp.json();
+          uploadedImageUrl = data && data.imageUrl ? data.imageUrl : '';
+          previewImage.style.opacity = '1';
+          previewImage.title = uploadedImageUrl ? 'Tải ảnh thành công' : 'Không nhận được URL ảnh';
+          if (!uploadedImageUrl) alert('Không nhận được URL ảnh');
+        } else {
+          uploadedImageUrl = '';
+          previewImage.title = 'Tải ảnh thất bại';
+          let errorMsg = 'Tải ảnh thất bại';
+          try {
+            const errData = await uploadResp.json();
+            if (errData && errData.error) errorMsg += ': ' + errData.error;
+          } catch (parseErr) {
+            // ignore JSON parse error
+          }
+          alert(errorMsg);
+        }
+      } catch (err) {
+        uploadedImageUrl = '';
+        previewImage.title = 'Tải ảnh thất bại';
+        alert('Tải ảnh thất bại: ' + (err && err.message ? err.message : err));
+      }
+      uploading = false;
     }
   });
 
@@ -288,7 +332,11 @@ function showAddBookModal() {
   const bookForm = modal.querySelector('#bookForm');
   bookForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    await handleAddBook(modal, imageInput.files[0]);
+    if (uploading) {
+      alert('Vui lòng chờ tải ảnh xong trước khi thêm sách!');
+      return;
+    }
+    await handleAddBook(modal, uploadedImageUrl);
   });
 }
 
@@ -300,27 +348,10 @@ async function handleAddBook(modal, imageFile) {
   const tacGiaIdsStr = formData.get('tacGiaIds');
   const tacGiaIds = tacGiaIdsStr ? tacGiaIdsStr.split(',').map(id => Number(id.trim())).filter(id => !isNaN(id)) : [];
 
-  // Upload image if provided
+  // Use uploaded image URL if available
   let anhBia = '';
   if (imageFile) {
-    try {
-      const uploadForm = new FormData();
-      uploadForm.append('file', imageFile);
-      // TODO: Replace with actual image upload API endpoint
-      const uploadResp = await fetch(`${apiBase}/api/upload/image`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: uploadForm
-      });
-      if (uploadResp.ok) {
-        const uploadData = await uploadResp.json();
-        anhBia = uploadData.url || uploadData.imagePath || '';
-      }
-    } catch (err) {
-      console.error('Image upload error:', err);
-      alert('Tải ảnh thất bại');
-      return;
-    }
+    anhBia = imageFile;
   }
 
   // Create book payload
