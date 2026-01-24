@@ -1,7 +1,9 @@
+
 .loan-container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 40px;
+    min-height: calc(100vh - 80px - 220px);
 }
 
 .loan-header {

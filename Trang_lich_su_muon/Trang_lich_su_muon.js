@@ -130,8 +130,9 @@ function mapTrangThai(status) {
     switch (status) {
         case "DANG_CHO": return "Đang chờ";
         case "DANG_MUON": return "Đang mượn";
+        case "QUA_HAN": return "Quá hạn";
         case "HUY": return "Huỷ";
-        case "HOAN_THANH": return "Hoàn thành";
+        case "HOAN_TAT": return "Hoàn tất";
         default: return status;
     }
 }
@@ -214,10 +215,11 @@ function filterPhieuMuon(status) {
     let apiStatus = "TAT_CA";
 
     switch (status) {
-        case "PENDING": apiStatus = "DANG_CHO"; break;
-        case "BORROWING": apiStatus = "DANG_MUON"; break;
-        case "CANCELLED": apiStatus = "HUY"; break;
-        case "DONE": apiStatus = "HOAN_THANH"; break;
+        case "DANG_CHO": apiStatus = "DANG_CHO"; break;
+        case "DANG_MUON": apiStatus = "DANG_MUON"; break;
+        case "HUY": apiStatus = "HUY"; break;
+        case "HOAN_TAT": apiStatus = "HOAN_TAT"; break;
+        case "QUA_HAN": apiStatus = "QUA_HAN"; break;
         default: apiStatus = "TAT_CA";
     }
 
