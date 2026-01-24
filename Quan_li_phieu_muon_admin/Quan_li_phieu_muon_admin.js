@@ -614,9 +614,9 @@ async function searchPhieuMuon(keyword, trangThai) {
     console.log('SEARCH RESPONSE:', data);
     // ⚠️ API search thường trả LIST, không phải PAGE
     renderPhieuMuon({
-      content: Array.isArray(data.data) ? data.data : [],
-      number: 0,
-      totalPages: 1
+      content: Array.isArray(data.content) ? data.content : [],
+      number: data.number ?? 0,
+      totalPages: data.totalPages ?? 1
     }, false);
     
     // ❌ Search thì không cho xem thêm
