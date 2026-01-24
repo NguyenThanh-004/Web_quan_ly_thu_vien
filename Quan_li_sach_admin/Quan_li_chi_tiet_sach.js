@@ -479,37 +479,37 @@ async function loadBanSaoSach(sachId) {
             console.error('Populate update selects error:', err);
         }
 
-        // Populate tacgia dropdown with checkboxes
+        // Populate tacgia dropdown with checkboxes (match Quan_li_sach_admin.js)
         function populateUpdateTacgiaDropdown(tacgiaList, selectedTacgiaList) {
             const tacgiaListEl = modal.querySelector('#update-tacgiaList');
             const tacgiaTrigger = modal.querySelector('#update-tacgiaTrigger');
             const tacgiaDropdown = modal.querySelector('#update-tacgiaDropdown');
             const tacGiaIdsInput = modal.querySelector('#update-tacGiaIds');
             const tacgiaPlaceholder = modal.querySelector('#update-tacgiaPlaceholder');
-            
-            // Get IDs of currently selected authors for pre-checking
-            const selectedTacgiaIdSet = new Set((selectedTacgiaList || []).map(t => t.tacGiaId));
-            // Initialize with current authors for form submission, but don't display them yet
-            let selectedTacgiaIds = Array.from(selectedTacgiaIdSet);
-            
-            // Set hidden input with current authors so form submission works
+
+            let selectedTacgiaIds = (selectedTacgiaList || []).map(t => t.tacGiaId);
             tacGiaIdsInput.value = selectedTacgiaIds.join(',');
 
             tacgiaListEl.innerHTML = '';
             (tacgiaList || []).forEach(tg => {
                 const label = document.createElement('label');
                 label.className = 'tacgia-checkbox-item';
-                
+
+                // Create a container for checkbox and text
+                const container = document.createElement('div');
+                container.className = 'tacgia-checkbox-container';
+
+                const text = document.createElement('span');
+                text.textContent = tg.tenTacGia;
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.value = tg.tacGiaId;
-                checkbox.checked = selectedTacgiaIdSet.has(tg.tacGiaId);
-                
-                const text = document.createElement('span');
-                text.textContent = tg.tenTacGia;
-                
-                label.appendChild(text);
-                label.appendChild(checkbox);
+                checkbox.checked = selectedTacgiaIds.includes(tg.tacGiaId);
+
+                container.appendChild(text);
+                container.appendChild(checkbox);
+                label.appendChild(container);
                 tacgiaListEl.appendChild(label);
 
                 // Manually handle checkbox toggle by tracking label clicks
@@ -519,7 +519,7 @@ async function loadBanSaoSach(sachId) {
                     const wasChecked = checkbox.checked;
                     // Toggle it
                     checkbox.checked = !wasChecked;
-                    
+
                     // Now update the selectedTacgiaIds array based on new state
                     const newCheckedState = checkbox.checked;
                     if (newCheckedState) {
@@ -539,7 +539,8 @@ async function loadBanSaoSach(sachId) {
                     tacgiaPlaceholder.textContent = '-- Chọn tác giả --';
                 } else {
                     const selectedNames = Array.from(tacgiaListEl.querySelectorAll('input:checked')).map(cb => {
-                        return cb.parentElement.textContent.trim();
+                        // cb is inside container, so get previousSibling (span)
+                        return cb.parentElement.querySelector('span').textContent.trim();
                     });
                     tacgiaPlaceholder.textContent = selectedNames.join(', ');
                 }
@@ -547,7 +548,6 @@ async function loadBanSaoSach(sachId) {
 
             // Toggle dropdown visibility
             tacgiaTrigger.addEventListener('click', (e) => {
-                e.preventDefault();
                 e.stopPropagation();
                 const isVisible = tacgiaDropdown.style.display !== 'none';
                 tacgiaDropdown.style.display = isVisible ? 'none' : 'block';

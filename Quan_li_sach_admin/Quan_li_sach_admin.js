@@ -389,16 +389,21 @@ function showAddBookModal() {
     (tacgiaList || []).forEach(tg => {
       const label = document.createElement('label');
       label.className = 'tacgia-checkbox-item';
-      
+
+      // Create a container for checkbox and text
+      const container = document.createElement('div');
+      container.className = 'tacgia-checkbox-container';
+
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.value = tg.tacGiaId;
-      
+
       const text = document.createElement('span');
       text.textContent = tg.tenTacGia;
-      
-      label.appendChild(text);
-      label.appendChild(checkbox);
+
+      container.appendChild(text);
+      container.appendChild(checkbox);
+      label.appendChild(container);
       tacgiaListEl.appendChild(label);
 
       // Manually handle checkbox toggle by tracking label clicks
