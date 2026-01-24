@@ -342,3 +342,25 @@ header {
 .social-icons a:hover {
     opacity: 0.7;
 }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  margin-top: 6px; 
+}
+
+.status i {
+  font-size: 10px;
+}
+
+/* Hoạt động */
+.status.active {
+  color: #2ecc71; /* xanh */
+}
+
+/* Vô hiệu hoá */
+.status.disabled {
+  color: #e74c3c; /* đỏ */
+}

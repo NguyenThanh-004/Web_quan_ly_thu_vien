@@ -43,9 +43,12 @@ function setStatus(msg) {
 }
 
 /* ================= FETCH ================= */
-async function fetchDocGia(page = 0, size = 7) {
+let currentTrangThai = 'TAT_CA';
+async function fetchDocGia(page = 0, size = 7, trangThai = currentTrangThai) {
   setStatus('Đang tải...');
-  const url = `${apiBase}/docgia/all?page=${page}&size=${size}`;
+  const url = trangThai === 'TAT_CA'
+  ? `${apiBase}/docgia/all?page=${page}&size=${size}`
+  : `${apiBase}/docgia/all?page=${page}&size=${size}&trangThaiDocGia=${trangThai}`;
 
   try {
     const resp = await fetch(url, { headers: buildHeaders() });
@@ -140,8 +143,8 @@ function openEditModal(data) {
         <input id="dg-diachi" placeholder="Địa chỉ" value="${data.diaChi ?? ''}">
         <input id="dg-kyquy" type="number" placeholder="Ký quỹ" value="${data.tienKyQuy ?? 0}">
         <select id="dg-trangthai">
-          <option value="HOAT_DONG" ${data.trangThaiDocGia === 'ACTIVE' ? 'selected' : ''}>HOAT_DONG</option>
-          <option value="VO_HIEU_HOA" ${data.trangThaiDocGia === 'INACTIVE' ? 'selected' : ''}>VO_HIEU_HOA</option>
+          <option value="HOAT_DONG" ${data.trangThaiDocGia === 'HOAT_DONG' ? 'selected' : ''}>Hoạt động</option>
+          <option value="VO_HIEU_HOA" ${data.trangThaiDocGia === 'VO_HIEU_HOA' ? 'selected' : ''}>Vô hiệu hoá</option>
         </select>
       </div>
 
@@ -197,7 +200,7 @@ async function submitEditDocGia() {
 
     alert(text || 'Sửa độc giả thành công');
     document.querySelector('.modal-overlay').remove();
-    fetchDocGia(currentPage, pageSize);
+    fetchDocGia(currentPage, pageSize, currentTrangThai);
 
   } catch (err) {
     console.error(err);
@@ -210,8 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const prev = document.getElementById('prev-page');
   const next = document.getElementById('next-page');
 
-  if (prev) prev.onclick = () => fetchDocGia(currentPage - 1, pageSize);
-  if (next) next.onclick = () => fetchDocGia(currentPage + 1, pageSize);
+  if (prev) prev.onclick = () =>
+    fetchDocGia(currentPage - 1, pageSize, currentTrangThai);
+
+  if (next) next.onclick = () =>
+    fetchDocGia(currentPage + 1, pageSize, currentTrangThai);
 
   const usernameEl = document.querySelector('.username-text');
   if (usernameEl) {
@@ -219,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.getItem('username') || 'Khách';
   }
 
-  fetchDocGia(0, pageSize);
+  fetchDocGia(0, pageSize , currentTrangThai);
 });
 
 // ================= MENU TRANG CHỦ =================
@@ -401,5 +407,16 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       logout();
     }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const filterSelect = document.getElementById('filter-trangthai');
+  if (!filterSelect) return;
+
+  filterSelect.addEventListener('change', () => {
+    currentTrangThai = filterSelect.value;
+    currentPage = 0; // reset page
+    fetchDocGia(0, pageSize, currentTrangThai);
   });
 });

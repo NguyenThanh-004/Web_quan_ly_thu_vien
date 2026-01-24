@@ -116,9 +116,10 @@ function formatDate(dateStr) {
 }
 
 // ================= FETCH DATA =================
-async function fetchTheThuVien(page = 0, size = 5) {
+let currentTrangThai = 'TAT_CA';
+async function fetchTheThuVien(page = 0, size = 5 , trangThai = currentTrangThai) {
   setStatus('Đang tải...');
-  const url = `${apiBase}/thethuvien/all?page=${page}&size=${size}`;
+  const url = trangThai === 'TAT_CA' ? `${apiBase}/thethuvien/all?page=${page}&size=${size}` : `${apiBase}/thethuvien/all?page=${page}&size=${size}&trangThai=${trangThai}`;
 
   try {
     const resp = await fetch(url, { headers: buildHeaders() });
@@ -208,7 +209,7 @@ function showUpdateModal(theThuVienId, ngayHetHan, trangThai) {
           <label>Trạng thái</label>
           <select name="trangThai">
             <option value="HOAT_DONG" ${trangThai === 'HOAT_DONG' ? 'selected' : ''}>Hoạt động</option>
-            <option value="VO_HIEU" ${trangThai === 'VO_HIEU' ? 'selected' : ''}>Vô hiệu</option>
+            <option value="VO_HIEU_HOA" ${trangThai === 'VO_HIEU_HOA' ? 'selected' : ''}>Vô hiệu hoá</option>
           </select>
         </div>
         <button type="submit">Lưu</button>
@@ -238,7 +239,7 @@ function showUpdateModal(theThuVienId, ngayHetHan, trangThai) {
       }
       alert('Cập nhật thành công');
       modal.remove();
-      fetchTheThuVien(currentPage, pageSize);
+      fetchTheThuVien(currentPage, pageSize , currentTrangThai);
     } catch (err) {
       alert('Lỗi khi cập nhật');
     }
@@ -266,15 +267,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const prev = document.getElementById('prev-page');
   const next = document.getElementById('next-page');
 
-  if (prev)
-    prev.addEventListener('click', () =>
-      fetchTheThuVien(currentPage - 1, pageSize)
-    );
 
-  if (next)
-    next.addEventListener('click', () =>
-      fetchTheThuVien(currentPage + 1, pageSize)
-    );
+  prev.addEventListener('click', () =>
+    fetchTheThuVien(currentPage - 1, pageSize, currentTrangThai)
+  );
+
+  next.addEventListener('click', () =>
+    fetchTheThuVien(currentPage + 1, pageSize, currentTrangThai)
+  );
 
   const usernameEl = document.querySelector('.username-text');
   if (usernameEl) {
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.getItem('username') || 'Khách';
   }
 
-  fetchTheThuVien(0, pageSize);
+  fetchTheThuVien(0, pageSize , currentTrangThai);
 });
 
 // Navigate to Quản lý Tác giả when menu item clicked
@@ -435,5 +435,17 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       goTo();
     }
+  });
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const filterSelect = document.getElementById('filter-trangthai');
+  if (!filterSelect) return;
+
+  filterSelect.addEventListener('change', () => {
+    currentTrangThai = filterSelect.value;
+    currentPage = 0; // reset page
+    fetchTheThuVien(0, pageSize, currentTrangThai);
   });
 });

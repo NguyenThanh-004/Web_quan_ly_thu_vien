@@ -64,14 +64,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Profile data:', data);
 
     // ===== HIỂN THỊ =====
+
     document.getElementById('profileName').textContent = data.tenDocGia;
     document.getElementById('profileId').textContent = `ID: ${data.docGiaId}`;
 
     document.getElementById('profileMoney').textContent =
       data.tienKyQuy.toLocaleString('vi-VN') + ' VND';
 
-    document.getElementById('profileStatus').innerHTML =
-      `<i class="fas fa-circle"></i> ${data.trangThaiDocGia}`;
+    const statusEl = document.getElementById('profileStatus');
+    const isDisabled = data.trangThaiDocGia === 'VO_HIEU_HOA';
+    statusEl.className = isDisabled ? 'status disabled' : 'status active';
+    statusEl.innerHTML = `
+      <i class="fas fa-circle"></i> ${data.trangThaiDocGia === 'HOAT_DONG' ? 'Hoạt động' : 'Vô hiệu hoá'}
+    `;
 
     document.getElementById('infoName').textContent = data.tenDocGia;
     document.getElementById('infoEmail').textContent = data.email;
@@ -82,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('infoBirth').textContent = birthDate;
 
     document.getElementById('cardId').textContent = data.theThuVienId;
-    document.getElementById('cardStatus').textContent = data.trangThai;
+    document.getElementById('cardStatus').textContent = data.trangThai === 'HOAT_DONG' ? 'Hoạt động' : 'Vô hiệu hoá';
     document.getElementById('cardIssueDate').textContent = data.ngayCap;
     document.getElementById('cardExpiryDate').textContent = data.ngayHetHan;
 
