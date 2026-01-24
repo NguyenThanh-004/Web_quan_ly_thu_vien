@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+	<link rel="icon" type="image/x-icon" href="/Assets/Images/logo.png">
+	<title>CHI TIẾT MƯỢN TRẢ - ADMIN</title>
+	<link rel="stylesheet" href="/Quan_li_phieu_muon_admin/Quan_li_chi_tiet_muon_tra.css">
+</head>
+
+<body>
+	<main class="detail-loan-container">
+		<div class="loan-detail-card">
+			<div class="card-header">
+				<h2><i class="far fa-file-alt"></i> CHI TIẾT MƯỢN TRẢ</h2>
+				<a href="/Quan_li_phieu_muon_admin/Quan_li_phieu_muon_admin.html" class="btn-close"><i class="fas fa-times"></i></a>
+			</div>
+
+			<div class="loan-summary-grid">
+				<div class="summary-item">
+					<label>MÃ PHIẾU MƯỢN</label>
+					<p id="api-loan-id"></p>
+				</div>
+				<div class="summary-item">
+					<label>HẠN TRẢ</label>
+					<p id="api-due-date"></p>
+				</div>
+				<div class="summary-item">
+					<label>TỔNG TIỀN PHẠT</label>
+					<p id="api-fine" class="fine-text">0đ</p>
+				</div>
+			</div>
+
+			<div class="divider"></div>
+
+			<div id="loan-books-list" class="loan-books-list">
+				<!-- Danh sách sách sẽ được render ở đây -->
+			</div>
+		</div>
+	</main>
+	<script type="module" src="/Quan_li_phieu_muon_admin/Quan_li_chi_tiet_muon_tra.js"></script>
+</body>
+
+</html>

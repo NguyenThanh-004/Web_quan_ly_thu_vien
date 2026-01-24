@@ -189,12 +189,12 @@ function renderPhieuMuon(pageData, append = false) {
             </select>
           </span>
         </div>
-      </div>
       <div class="card-footer">
-        <button class="btn-detail" data-id="${item.phieuMuonId}">
+        <button class="btn-detail" onclick="goToChiTiet(${item.phieuMuonId})">
           <i class="fa-solid fa-eye"></i> Chi tiết mượn trả
         </button>
       </div>
+    </div>
     `;
     container.appendChild(card);
       getSoSachDangMuon(item.phieuMuonId).then(count => {
@@ -261,11 +261,27 @@ async function updateChiTietStatus(phieuMuonId) {
       body: JSON.stringify({ phieuMuonId })
     });
 
-    if (!resp.ok) {
-      alert('Cập nhật chi tiết thất bại');
+    if (resp.status === 403) {
+      console.error('[Quan_li_phieu_muon_admin.js] 403 Forbidden from update-chitiet-status');
+      alert('Bạn không có quyền thực hiện thao tác này. Vui lòng đăng nhập lại hoặc liên hệ quản trị viên.');
+      return;
     }
+    if (!resp.ok) {
+      // Nếu là lỗi 403, show message đặc biệt
+      if (resp.status === 403) {
+        console.error('[Quan_li_phieu_muon_admin.js] 403 Forbidden from update-chitiet-status');
+        alert('Bạn không có quyền thực hiện thao tác này. Vui lòng đăng nhập lại hoặc liên hệ quản trị viên.');
+        return;
+      }
+      // Nếu là lỗi khác, show lỗi chung
+      console.error('[Quan_li_phieu_muon_admin.js] Error updating chi tiết:', resp.status, await resp.text());
+      alert('Cập nhật chi tiết thất bại');
+      return;
+    }
+    // Nếu thành công, có thể reload hoặc thông báo
+    alert('Cập nhật chi tiết thành công');
   } catch (err) {
-    console.error(err);
+    console.error('[Quan_li_phieu_muon_admin.js] Exception in updateChiTietStatus:', err);
     alert('Không thể cập nhật chi tiết');
   }
 }
@@ -280,59 +296,30 @@ function bindActions() {
 
   document.querySelectorAll('.btn-detail').forEach(btn => {
     btn.addEventListener('click', () => {
-      updateChiTietStatus(btn.dataset.id);
+      // Always get the correct phieuMuonId from the card
+      let phieuMuonId = btn.getAttribute('data-id');
+      if (!phieuMuonId) {
+        // fallback: try to get from parent .phieu-muon-card
+        const card = btn.closest('.phieu-muon-card');
+        if (card) {
+          const valueEl = card.querySelector('.info .value');
+          if (valueEl) phieuMuonId = valueEl.textContent.trim();
+        }
+      }
+      console.log('[DEBUG] Navigating to chi tiết mượn trả, phieuMuonId:', phieuMuonId);
+      if (phieuMuonId) {
+        window.location.href = `/Quan_li_phieu_muon_admin/Quan_li_chi_tiet_muon_tra.html?phieuMuonId=${encodeURIComponent(phieuMuonId)}`;
+      } else {
+        alert('Không tìm thấy mã phiếu mượn để xem chi tiết!');
+      }
     });
   });
+  // Xóa modal chi tiết mượn trả nếu còn sót lại trong DOM
+  const oldModal = document.getElementById('chitiet-muontra-modal');
+  if (oldModal) oldModal.remove();
 }
 
 
-// ================= SHOW CHI TIẾT MUỢN TRẢ MODAL =================
-async function showChiTietMuonTraModal(phieuMuonId) {
-  try {
-    const resp = await fetch(`${apiBase}/phieumuon/chitietmuontra?phieuMuonId=${phieuMuonId}`, {
-      headers: buildHeaders()
-    });
-    if (!resp.ok) {
-      alert('Không thể tải chi tiết mượn trả');
-      return;
-    }
-    const data = await resp.json();
-    showModalChiTietMuonTra(data);
-  } catch (err) {
-    console.error(err);
-    alert('Không thể tải chi tiết mượn trả');
-  }
-}
-
-function showModalChiTietMuonTra(list) {
-  let modal = document.getElementById('chitiet-muontra-modal');
-  if (modal) modal.remove();
-  modal = document.createElement('div');
-  modal.id = 'chitiet-muontra-modal';
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3>Chi tiết mượn trả</h3>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        ${Array.isArray(list) && list.length > 0
-          ? list.map(ct => `
-              <div class='chitiet-muontra'>
-                <span>Mã chi tiết: ${ct.chiTietMuonTraId ?? ''}</span><br>
-                <span>Ngày trả: ${formatDate(ct.ngayTra)}</span><br>
-                <span>Tiền phạt: ${ct.tienPhat ?? ''}</span><br>
-              </div>
-            `).join('')
-          : 'Không có chi tiết.'}
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.querySelector('.modal-close').onclick = () => modal.remove();
-  modal.onclick = e => { if (e.target === modal) modal.remove(); };
-}
 
 
 

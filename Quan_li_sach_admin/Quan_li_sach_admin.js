@@ -140,7 +140,7 @@ function showAddBookModal() {
 
           <!-- Ảnh -->
           <div class="image-box">
-            <img id="previewImage" src="" alt="Preview" />
+            <img id="previewImage"/>
             <button type="button" class="btn-upload" onclick="document.getElementById('imageInput').click()">
               Tải ảnh
             </button>
