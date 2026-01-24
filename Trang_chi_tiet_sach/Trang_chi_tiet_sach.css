@@ -309,10 +309,11 @@ header {
 
 /* GRID căn giữa */
 .related-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 24px;
-    justify-content: center;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 220px;
+  gap: 24px;
+
 }
 
 .related-grid.single {

@@ -37,26 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Toggle dropdown
-  btnUser.addEventListener('click', () => {
-    userMenu.classList.toggle('show');
-  });
-
-  // Logout
-  logoutBtn.addEventListener('click', () => {
-    sessionStorage.clear();
-    window.location.href = '/Dang_nhap/Dang_nhap.html';
-  });
-
-
-  // Click ngoài → đóng dropdown
-  document.addEventListener('click', (e) => {
-    if (!userMenu.contains(e.target)) {
-      userMenu.classList.remove('show');
-    }
-  });
-
+    // LẤY KEYWORD TỪ URL
     const params = new URLSearchParams(window.location.search);
     keyword = params.get("keyword");
     if (keywordSpan && keyword) {
@@ -111,14 +92,9 @@ async function searchBooks(reset = false) {
             currentPage = 0;
             bookGrid.innerHTML = "";
         }
-        const token = sessionStorage.getItem("token");
+        //const token = sessionStorage.getItem("token");
         const response = await fetch(
-            `http://localhost:8080/api/sach/search?keyword=${encodeURIComponent(keyword)}`,
-            {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
+            `http://localhost:8080/api/sach/search?keyword=${encodeURIComponent(keyword)}&page=0&size=100`
         );
 
         if (!response.ok) {

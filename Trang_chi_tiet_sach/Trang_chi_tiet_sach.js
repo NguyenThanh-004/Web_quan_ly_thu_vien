@@ -68,20 +68,23 @@ function checkLoginUI() {
             userMenu.classList.remove("show");
         }
     });
-    document.getElementById("btn-prev-related")?.addEventListener("click", () => {
+    
+}
+
+document.getElementById("btn-prev-related")?.addEventListener("click", () => {
         if (relatedPage > 0) {
             relatedPage--;
             loadRelatedBooks();
         }
     });
 
-    document.getElementById("btn-next-related")?.addEventListener("click", () => {
+document.getElementById("btn-next-related")?.addEventListener("click", () => {
         if (relatedPage < relatedTotalPages - 1) {
             relatedPage++;
             loadRelatedBooks();
         }
-    });
-}
+});
+
 
 // ================== BOOK DETAIL ==================
 async function loadBookDetail(sachId) {
@@ -129,10 +132,10 @@ function renderBookData(data) {
 // ================== RELATED BOOKS ==================
 async function loadRelatedBooks() {
     if (!currentTheLoai) return;
-
+    const token = sessionStorage.getItem("token");
     try {
         const res = await fetch(
-            `http://localhost:8080/api/sach/theloai?tenTheLoai=${encodeURIComponent(currentTheLoai)}`
+            `http://localhost:8080/api/sach/theloai?tenTheLoai=${encodeURIComponent(currentTheLoai)}&page=0&size=100`
         );
 
         if (!res.ok) throw new Error("Lỗi API sách liên quan");
@@ -140,7 +143,7 @@ async function loadRelatedBooks() {
         const data = await res.json();
 
         const allBooks = data.content || [];
-
+        console.log("Related Books Data:", allBooks);
         relatedTotalPages = Math.ceil(allBooks.length / RELATED_SIZE);
 
         const start = relatedPage * RELATED_SIZE;
@@ -155,26 +158,6 @@ async function loadRelatedBooks() {
 }
 
 
-
-function renderRelatedBooks(list) {
-    const container = document.getElementById("related-grid");
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    list.forEach(book => {
-        const authors = book.tacGiaList.map(t => t.tenTacGia).join(", ");
-        container.innerHTML += `
-            <div class="related-card"
-                 onclick="goToBookDetail(${book.sachId})">
-                <img src="${book.anhBia || "https://via.placeholder.com/150"}">
-                <h4>${book.tenSach}</h4>
-                <p>${authors}</p>
-            </div>
-        `;
-    });
-}
-
 function updateRelatedNav() {
     const prevBtn = document.getElementById("btn-prev-related");
     const nextBtn = document.getElementById("btn-next-related");
@@ -185,8 +168,6 @@ function updateRelatedNav() {
         nextBtn.style.display = "none";
         return;
     }
-
-
 
     prevBtn.disabled = relatedPage === 0;
     nextBtn.disabled = relatedPage >= relatedTotalPages - 1;
