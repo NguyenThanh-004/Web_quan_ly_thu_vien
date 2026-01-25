@@ -6,9 +6,11 @@ const bookGrid = document.getElementById('bookGrid');
 const btnLoadMore = document.getElementById('btnLoadMore');
 const btnScrollTop = document.getElementById('btnScrollTop');
 
-let page = 0;
-const pagesize = 10;
-const moresize = 10;
+
+let allBooks = [];
+let renderIndex = 0;
+const PAGE_SIZE = 10;
+const MORE_SIZE = 5;
 
 /* ===== AUTH CHECK ===== */
 if (!token) {
@@ -17,23 +19,32 @@ if (!token) {
 }
 
 /* ===== LOAD BOOK ===== */
-async function loadBooks(isLoadMore = false) {
-  const size = isLoadMore ? moresize : pagesize;
+
+async function loadBooks() {
   const res = await fetch(
-    `${apiBase}/api/sach/all?page=${page}&size=${size}`,
+    `${apiBase}/api/sach/all?page=0&size=1000`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
-
   if (!res.ok) {
     alert('Không thể tải sách');
     return;
   }
-
   const data = await res.json();
-  renderBooks(data.content);
-  page++;
+  allBooks = data.content || [];
+  renderIndex = 0;
+  bookGrid.innerHTML = '';
+  renderMoreBooks(PAGE_SIZE);
+}
 
-  if (data.last) btnLoadMore.style.display = 'none';
+function renderMoreBooks(count) {
+  const nextBooks = allBooks.slice(renderIndex, renderIndex + count);
+  renderBooks(nextBooks);
+  renderIndex += nextBooks.length;
+  if (renderIndex >= allBooks.length) {
+    btnLoadMore.style.display = 'none';
+  } else {
+    btnLoadMore.style.display = 'block';
+  }
 }
 
 /* ===== RENDER ===== */
@@ -53,20 +64,69 @@ function renderBooks(books) {
 }
 
 /* ===== SEARCH FUNCTION ===== */
+
 const searchInput = document.getElementById('searchInput');
 const btnSearch = document.getElementById('btnSearch');
+const trangThaiInput = document.getElementById('trangThaiBanSaoSachInput');
+
+// Dynamically update filter options based on all unique trangThaiBanSaoSach from all bansaosach in all books
+async function updateTrangThaiFilterOptions() {
+  try {
+    // Fetch all books (with a large enough size)
+    const res = await fetch(`${apiBase}/api/sach/all?page=0&size=1000`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) return;
+    const data = await res.json();
+    const books = data.content || [];
+    // Collect all sachIds
+    const sachIds = books.map(b => b.sachId);
+    // Fetch all bansaosach for all books
+    let allTrangThai = new Set();
+    for (const sachId of sachIds) {
+      try {
+        const resp = await fetch(`${apiBase}/api/bansaosach/danhsach?sachId=${sachId}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!resp.ok) continue;
+        const bssData = await resp.json();
+        const list = bssData.content || [];
+        list.forEach(item => {
+          if (item.trangThaiBanSaoSach) allTrangThai.add(item.trangThaiBanSaoSach);
+        });
+      } catch {}
+    }
+    // Build options
+    const options = [
+      { value: '', label: 'Tất cả trạng thái' },
+      ...Array.from(allTrangThai).map(val => ({ value: val, label: getTrangThaiLabel(val) }))
+    ];
+    // Clear and repopulate the filter dropdown
+    if (trangThaiInput) {
+      trangThaiInput.innerHTML = '';
+      options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.label;
+        trangThaiInput.appendChild(option);
+      });
+    }
+  } catch (err) {
+    // ignore
+  }
+}
+
+function getTrangThaiLabel(val) {
+  switch (val) {
+    case 'CON': return 'Còn';
+    case 'DANG_MUON': return 'Đang mượn';
+    case 'DA_MUON': return 'Đã mượn';
+    case 'MAT': return 'Mất';
+    case 'HU_HONG': return 'Hư hỏng';
+    default: return val;
+  }
+}
+
+
+
 
 async function searchBooks(keyword) {
-  // If search box is empty, reload all books
-  if (!keyword.trim()) {
-    bookGrid.innerHTML = '';
-    page = 0;
-    btnLoadMore.style.display = 'block';
-    loadBooks();
-    return;
-  }
-
-  // Get trangThaiBanSaoSach from a filter input if available
   let trangThaiBanSaoSach = '';
   const trangThaiInput = document.getElementById('trangThaiBanSaoSachInput');
   if (trangThaiInput && trangThaiInput.value) {
@@ -74,8 +134,7 @@ async function searchBooks(keyword) {
   }
 
   try {
-    const url = `${apiBase}/api/sach/admin/search?keyword=${encodeURIComponent(keyword)}&page=0&size=100` +
-      (trangThaiBanSaoSach ? `&trangThaiBanSaoSach=${encodeURIComponent(trangThaiBanSaoSach)}` : '');
+    const url = `${apiBase}/api/sach/admin/search?keyword=${encodeURIComponent(keyword || '')}&page=0&size=1000`;
     const res = await fetch(
       url,
       { headers: { Authorization: `Bearer ${token}` } }
@@ -87,15 +146,35 @@ async function searchBooks(keyword) {
     }
 
     const data = await res.json();
+    let books = data.content || data;
+
+    // If filter is set, only show books that have at least one bansaosach with matching trạng thái
+    if (trangThaiBanSaoSach) {
+      const filteredBooks = [];
+      for (const book of books) {
+        try {
+          const resp = await fetch(`${apiBase}/api/bansaosach/danhsach?sachId=${book.sachId}`, { headers: { Authorization: `Bearer ${token}` } });
+          if (!resp.ok) continue;
+          const bssData = await resp.json();
+          const list = bssData.content || [];
+          if (list.some(item => item.trangThaiBanSaoSach === trangThaiBanSaoSach)) {
+            filteredBooks.push(book);
+          }
+        } catch {}
+      }
+      books = filteredBooks;
+    }
+
+    allBooks = books;
+    renderIndex = 0;
     bookGrid.innerHTML = '';
-    page = 0;
-    renderBooks(data.content || data);
-    btnLoadMore.style.display = data.last ? 'none' : 'block';
+    renderMoreBooks(PAGE_SIZE);
   } catch (err) {
     console.error('Search error:', err);
     alert('Lỗi khi tìm kiếm');
   }
 }
+
 
 btnSearch.addEventListener('click', () => {
   const keyword = searchInput.value.trim();
@@ -108,27 +187,44 @@ searchInput.addEventListener('keydown', (e) => {
   }
 });
 
+if (trangThaiInput) {
+  trangThaiInput.addEventListener('change', () => {
+    // Always trigger searchBooks, even if search input is empty
+    searchBooks(searchInput.value);
+  });
+}
+
 /* ===== SCROLL TOP ===== */
 btnScrollTop.addEventListener('click', () => {
   main.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 /* ===== EVENTS ===== */
-btnLoadMore.addEventListener('click', () => loadBooks(true));
+btnLoadMore.addEventListener('click', () => {
+  renderMoreBooks(MORE_SIZE);
+});
+
 
 /* ===== INIT ===== */
+
 loadBooks();
+updateTrangThaiFilterOptions();
 
 /* ===== ADD BOOK MODAL ===== */
 document.getElementById('btnAddBook').addEventListener('click', () => {
   showAddBookModal();
 });
 
+
 /* ===== REPORT BUTTON ===== */
-document.getElementById('btnReport').addEventListener('click', () => {
-  alert('Chức năng báo cáo đang được phát triển');
-  // TODO: Implement report generation (PDF export, etc.)
-});
+const btnReport = document.getElementById('btnReport');
+if (btnReport) {
+  // Placeholder for future API integration
+  btnReport.addEventListener('click', () => {
+    // No action yet
+    // alert('Báo cáo API chưa sẵn sàng');
+  });
+}
 
 function showAddBookModal() {
   const modal = document.createElement('div');

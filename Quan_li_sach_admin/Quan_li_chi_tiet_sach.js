@@ -99,7 +99,34 @@ async function loadBanSaoSach(sachId) {
         });
         if (!resp.ok) throw new Error("Không thể tải danh sách bản sao");
         const data = await resp.json();
-        renderBanSaoSach(data.content || []);
+        // --- Show More for Copy List (use same button as HTML) ---
+let _banSaoAll = [];
+let _banSaoRenderIndex = 4;
+
+function showMoreBanSaoSachInit(list) {
+    _banSaoAll = list || [];
+    _banSaoRenderIndex = 4;
+    renderBanSaoSach(_banSaoAll.slice(0, _banSaoRenderIndex));
+    showMoreBanSaoSachButton();
+}
+
+function showMoreBanSaoSachButton() {
+    // Use the same button as in HTML: #btnLoadMore
+    let btn = document.getElementById('btnLoadMore');
+    if (!btn) return;
+    btn.style.display = (_banSaoAll && _banSaoAll.length > _banSaoRenderIndex) ? '' : 'none';
+    btn.onclick = function() {
+        _banSaoRenderIndex += 4;
+        renderBanSaoSach(_banSaoAll.slice(0, _banSaoRenderIndex));
+        // Hide button if all are shown
+        if (_banSaoRenderIndex >= _banSaoAll.length) {
+            btn.style.display = 'none';
+        }
+    };
+}
+// In loadBanSaoSach, call showMoreBanSaoSachInit(data.content || []);
+
+        showMoreBanSaoSachInit(data.content || []);
     } catch (err) {
         alert("Không thể tải danh sách bản sao");
     }

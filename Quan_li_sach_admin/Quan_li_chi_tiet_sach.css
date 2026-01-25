@@ -1,3 +1,38 @@
+/* ===== SHOW MORE BUTTON FOR COPY SECTION ===== */
+/* ===== LOAD MORE BUTTON FOR COPY SECTION (MATCH BOOK LIST) ===== */
+#btnLoadMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  cursor: pointer;
+}
+#btnLoadMore {
+  /* Remove margin so parent controls centering */
+}
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+#btnLoadMore i {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+#btnLoadMore:disabled {
+  color: #9ca3af;
+  cursor: default;
+  text-decoration: none;
+}
+#btnLoadMore:hover {
+  color: #2563eb;
+}
 /* ================= RESET ================= */
 * {
   margin: 0;
@@ -534,6 +569,35 @@ body {
 .action-bar {
   padding: 20px 40px;
   display: flex;
+
+/* ===== SHOW MORE BUTTON FOR COPY SECTION (MATCH BOOK LIST) ===== */
+.btn-show-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 6px 10px;
+  margin: 12px auto 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  cursor: pointer;
+  margin: 12px auto 0;
+}
+.btn-show-more i {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+.btn-show-more:disabled {
+  color: #9ca3af;
+  cursor: default;
+  text-decoration: none;
+}
+.btn-show-more:hover {
+  color: #2563eb;
+}
   justify-content: space-between;
   align-items: center;
 }
