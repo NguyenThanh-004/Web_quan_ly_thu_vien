@@ -762,9 +762,6 @@ function renderBanSaoSach(list) {
                     <button class="btn-copy-update" data-id="${item.banSaoSachId}" title="Cập nhật">
                         <i class="fa-solid fa-pen"></i>
                     </button>
-                    <button class="btn-copy-delete" data-id="${item.banSaoSachId}" title="Xóa">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
                 </div>
             </div>
         `;

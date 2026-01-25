@@ -85,7 +85,24 @@ function setStatus(msg) {
 }
 
 /* =====================================================
-   MODAL (ĐÚNG CSS CŨ)
+   FETCH BOOKS BY PUBLISHER
+===================================================== */
+async function fetchBooksByPublisher(nhaXuatBanId) {
+  try {
+    const resp = await fetch(`${apiBase}/sach/nhaxuatban?nhaXuatBanId=${nhaXuatBanId}`, {
+      headers: buildHeaders()
+    });
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    return data.content || [];
+  } catch (err) {
+    console.error('Error fetching books:', err);
+    return [];
+  }
+}
+
+/* =====================================================
+   MODAL
 ===================================================== */
 function createModal() {
   if (document.getElementById('publisher-modal')) return;
@@ -96,7 +113,7 @@ function createModal() {
 
   modal.innerHTML = `
     <div class="modal-overlay">
-      <div class="modal-box">
+      <div class="modal-box" id="modal-box-content">
         <div class="modal-header">
           <h3 id="modal-title">Thêm NXB</h3>
           <button class="modal-close">&times;</button>
@@ -111,8 +128,8 @@ function createModal() {
         </div>
 
         <div class="modal-footer">
-          <button id="modal-cancel">Hủy</button>
-          <button id="modal-save">Lưu</button>
+          <button id="modal-cancel" class="btn-cancel">Hủy</button>
+          <button id="modal-save" class="btn-save">Cập nhật</button>
         </div>
       </div>
     </div>
@@ -129,6 +146,8 @@ function createModal() {
 
 function openModal({ title, data = {}, onSave }) {
   createModal();
+  
+  const isEditing = !!data.nhaXuatBanId;
 
   document.getElementById('modal-title').textContent = title;
   const nameInput = document.getElementById('modal-name');
@@ -136,6 +155,108 @@ function openModal({ title, data = {}, onSave }) {
 
   nameInput.value = data.tenNhaXuatBan || '';
   addrInput.value = data.diaChi || '';
+
+  // If editing, restructure modal with two columns
+  if (isEditing) {
+    const modalBox = document.getElementById('modal-box-content');
+    modalBox.classList.add('modal-with-books');
+    
+    // Get current body and footer
+    const modalBody = modalBox.querySelector('.modal-body');
+    const modalFooter = modalBox.querySelector('.modal-footer');
+    
+    // Create wrapper for content
+    const contentWrapper = document.createElement('div');
+    contentWrapper.className = 'modal-content-wrapper';
+    
+    // Move body to left container
+    const formContainer = document.createElement('div');
+    formContainer.className = 'modal-form-container';
+    formContainer.appendChild(modalBody);
+    
+    // Create right container for books
+    const booksContainer = document.createElement('div');
+    booksContainer.className = 'modal-books-container';
+    booksContainer.innerHTML = `
+      <div class="books-carousel-section">
+        <h3>Sách của nhà xuất bản</h3>
+        <div class="books-carousel">
+          <button class="carousel-arrow left" id="carousel-prev">&lt;</button>
+          <div class="books-display" id="books-display">
+            <div class="book-card">
+              <img src="" alt="Book" class="book-cover">
+              <p class="book-title">Đang tải...</p>
+            </div>
+          </div>
+          <button class="carousel-arrow right" id="carousel-next">&gt;</button>
+        </div>
+        <p class="book-counter" id="book-counter"></p>
+      </div>
+    `;
+    
+    // Add form footer buttons to form container
+    const formFooter = document.createElement('div');
+    formFooter.className = 'modal-footer';
+    formFooter.innerHTML = `
+      <button id="modal-cancel" class="btn-cancel">Hủy</button>
+      <button id="modal-save" class="btn-save">Cập nhật</button>
+    `;
+    formContainer.appendChild(formFooter);
+    
+    // Build layout
+    contentWrapper.appendChild(formContainer);
+    contentWrapper.appendChild(booksContainer);
+    
+    // Insert content wrapper and remove old footer
+    modalBox.insertBefore(contentWrapper, modalFooter);
+    modalFooter.remove();
+    
+    // Setup carousel
+    let books = [];
+    let currentBookIndex = 0;
+
+    async function loadBooks() {
+      books = await fetchBooksByPublisher(data.nhaXuatBanId);
+      if (books.length > 0) {
+        displayBook(0);
+      } else {
+        document.getElementById('books-display').innerHTML = '<p style="color: #999;">Không có sách nào</p>';
+      }
+    }
+
+    function displayBook(index) {
+      if (books.length === 0) return;
+      currentBookIndex = index;
+      const book = books[index];
+      const display = document.getElementById('books-display');
+      display.innerHTML = `
+        <div class="book-card">
+          <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x260?text=No+Image'">
+          <p class="book-title">${book.tenSach}</p>
+        </div>
+      `;
+      document.getElementById('book-counter').textContent = `${index + 1} / ${books.length}`;
+      document.getElementById('carousel-prev').disabled = index === 0;
+      document.getElementById('carousel-next').disabled = index === books.length - 1;
+    }
+
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+
+    if (prevBtn) {
+      prevBtn.onclick = () => {
+        if (currentBookIndex > 0) displayBook(currentBookIndex - 1);
+      };
+    }
+
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        if (currentBookIndex < books.length - 1) displayBook(currentBookIndex + 1);
+      };
+    }
+
+    loadBooks();
+  }
 
   document.getElementById('modal-save').onclick = () => {
     if (!nameInput.value.trim()) {

@@ -109,6 +109,21 @@ function setStatus(msg) {
   if (status) status.textContent = msg || '';
 }
 
+// ================= FETCH READER INFO =================
+async function fetchReaderInfo(theThuVienId) {
+  try {
+    const resp = await fetch(`${apiBase}/docgia/admin/thethuvien?theThuVienId=${theThuVienId}`, {
+      headers: buildHeaders()
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data;
+  } catch (err) {
+    console.error('Error fetching reader info:', err);
+    return null;
+  }
+}
+
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -192,33 +207,109 @@ function bindUpdateButtons() {
 function showUpdateModal(theThuVienId, ngayHetHan, trangThai) {
   const old = document.getElementById('update-modal');
   if (old) old.remove();
+  
   const modal = document.createElement('div');
   modal.id = 'update-modal';
   modal.className = 'modal';
   modal.innerHTML = `
-    <div class="modal-content">
+    <div class="modal-content modal-content-two-col">
       <span class="close" id="close-update-modal">&times;</span>
       <h2>Cập nhật thẻ thư viện</h2>
-      <form id="update-form">
-        <input type="hidden" name="theThuVienId" value="${theThuVienId}">
-        <div>
-          <label>Ngày hết hạn</label>
-          <input type="date" name="ngayHetHan" value="${ngayHetHan ? new Date(ngayHetHan).toISOString().slice(0,10) : ''}" required>
+      
+      <div class="modal-content-wrapper-two-col">
+        <!-- LEFT: UPDATE FORM -->
+        <div class="modal-form-section">
+          <form id="update-form">
+            <input type="hidden" name="theThuVienId" value="${theThuVienId}">
+            <div>
+              <label>Ngày hết hạn</label>
+              <input type="date" name="ngayHetHan" value="${ngayHetHan ? new Date(ngayHetHan).toISOString().slice(0,10) : ''}" required>
+            </div>
+            <div>
+              <label>Trạng thái</label>
+              <select name="trangThai">
+                <option value="HOAT_DONG" ${trangThai === 'HOAT_DONG' ? 'selected' : ''}>Hoạt động</option>
+                <option value="VO_HIEU_HOA" ${trangThai === 'VO_HIEU_HOA' ? 'selected' : ''}>Vô hiệu hoá</option>
+              </select>
+            </div>
+            <button type="submit">Cập nhật</button>
+          </form>
         </div>
-        <div>
-          <label>Trạng thái</label>
-          <select name="trangThai">
-            <option value="HOAT_DONG" ${trangThai === 'HOAT_DONG' ? 'selected' : ''}>Hoạt động</option>
-            <option value="VO_HIEU_HOA" ${trangThai === 'VO_HIEU_HOA' ? 'selected' : ''}>Vô hiệu hoá</option>
-          </select>
+        
+        <!-- RIGHT: READER INFO -->
+        <div class="modal-reader-info">
+          <h3>Thông tin độc giả</h3>
+          <div id="reader-info">
+            <p style="text-align: center; color: #999;">Đang tải...</p>
+          </div>
         </div>
-        <button type="submit">Lưu</button>
-      </form>
+      </div>
     </div>
   `;
+  
   document.body.appendChild(modal);
   document.getElementById('close-update-modal').onclick = () => modal.remove();
   modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  
+  // Load reader info
+  fetchReaderInfo(theThuVienId).then(data => {
+    const infoDiv = document.getElementById('reader-info');
+    if (!data) {
+      infoDiv.innerHTML = '<p style="color: #e74c3c;">Không thể tải thông tin độc giả</p>';
+      return;
+    }
+    
+    const docGia = data.docGia || {};
+    const overdue = data.overdueCount || 0;
+    
+    const statusClass = docGia.trangThaiDocGia === 'HOAT_DONG' ? 'status-active' : 'status-inactive';
+    const statusText = docGia.trangThaiDocGia === 'HOAT_DONG' ? 'Hoạt động' : 'Vô hiệu hoá';
+    
+    infoDiv.innerHTML = `
+      <div class="reader-info-group">
+        <span class="reader-info-label">Tên độc giả</span>
+        <div class="reader-info-value">${docGia.tenDocGia || 'N/A'}</div>
+      </div>
+      
+      <div class="reader-info-group">
+        <span class="reader-info-label">Email</span>
+        <div class="reader-info-value">${docGia.email || 'N/A'}</div>
+      </div>
+      
+      <div class="reader-info-group">
+        <span class="reader-info-label">Điện thoại</span>
+        <div class="reader-info-value">${docGia.soDienThoai || 'N/A'}</div>
+      </div>
+      
+      <div class="reader-info-group">
+        <span class="reader-info-label">Địa chỉ</span>
+        <div class="reader-info-value">${docGia.diaChi || 'N/A'}</div>
+      </div>
+      
+      <div class="reader-info-group">
+        <span class="reader-info-label">Ngày sinh</span>
+        <div class="reader-info-value">${docGia.ngaySinh ? formatDate(docGia.ngaySinh) : 'N/A'}</div>
+      </div>
+      
+      <div class="reader-info-divider"></div>
+      
+      <div class="reader-info-group">
+        <span class="reader-info-label">Trạng thái</span>
+        <div class="reader-info-value ${statusClass}">${statusText}</div>
+      </div>
+      
+      <div class="reader-info-group">
+        <span class="reader-info-label">Tiền kỳ quỹ</span>
+        <div class="reader-info-value">${docGia.tienKyQuy ? docGia.tienKyQuy.toLocaleString('vi-VN') + ' đ' : 'N/A'}</div>
+      </div>
+      
+      <div class="reader-info-group">
+        <span class="reader-info-label">Sách quá hạn</span>
+        <div class="reader-info-value">${overdue > 0 ? `<strong style="color: #e74c3c;">${overdue} cuốn</strong>` : `<strong style="color: #4CAF50;">${overdue} cuốn</strong>`}</div>
+      </div>
+    `;
+  });
+  
   document.getElementById('update-form').onsubmit = async function(e) {
     e.preventDefault();
     const form = e.target;
