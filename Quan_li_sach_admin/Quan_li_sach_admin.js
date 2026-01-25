@@ -66,9 +66,18 @@ async function searchBooks(keyword) {
     return;
   }
 
+  // Get trangThaiBanSaoSach from a filter input if available
+  let trangThaiBanSaoSach = '';
+  const trangThaiInput = document.getElementById('trangThaiBanSaoSachInput');
+  if (trangThaiInput && trangThaiInput.value) {
+    trangThaiBanSaoSach = trangThaiInput.value;
+  }
+
   try {
+    const url = `${apiBase}/api/sach/admin/search?keyword=${encodeURIComponent(keyword)}&page=0&size=100` +
+      (trangThaiBanSaoSach ? `&trangThaiBanSaoSach=${encodeURIComponent(trangThaiBanSaoSach)}` : '');
     const res = await fetch(
-      `${apiBase}/api/sach/search?keyword=${encodeURIComponent(keyword)}&page=0&size=100`,
+      url,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -538,18 +547,33 @@ async function handleAddBook(modal, imageFile) {
   const selLv = modal.querySelector('#select-linhvuc');
   const selTl = modal.querySelector('#select-theloai');
 
+  let giaTienRaw = formData.get('giaTien');
+  if (giaTienRaw === null || giaTienRaw === undefined || giaTienRaw === '') {
+    alert('Giá tiền không được để trống');
+    return;
+  }
+  let giaTien = Number(giaTienRaw);
+  if (isNaN(giaTien)) {
+    alert('Giá tiền không hợp lệ');
+    return;
+  }
+  if (giaTien < 0) {
+    alert('Giá tiền không được âm');
+    return;
+  }
   const payload = {
     tenSach: formData.get('tenSach'),
     soTrang: Number(formData.get('soTrang')) || 0,
     khoSach: formData.get('khoSach'),
     anhBia: anhBia,
-    giaTien: Number(formData.get('giaTien')) || 0,
+    giaTien: giaTien,
     namXuatBan: formData.get('namXuatBan') ? new Date(formData.get('namXuatBan')).toISOString().split('T')[0] : null,
     nhaXuatBanId: selNxb ? Number(selNxb.value) : Number(formData.get('nhaXuatBanId')),
     linhVucId: selLv ? Number(selLv.value) : Number(formData.get('linhVucId')),
     theLoaiId: selTl ? Number(selTl.value) : Number(formData.get('theLoaiId')),
     tacGiaIds: tacGiaIds
   };
+  console.log('[ADD BOOK] Payload:', payload);
 
   try {
     const resp = await fetch(`${apiBase}/api/sach/admin/create`, {

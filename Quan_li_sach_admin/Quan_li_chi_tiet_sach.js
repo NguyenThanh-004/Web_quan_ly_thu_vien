@@ -128,6 +128,45 @@ async function loadBanSaoSach(sachId) {
     function openUpdateModal(data) {
         const modal = document.getElementById("update-modal");
         if (!modal) return;
+        // Ensure giaTien is always a string and not null/undefined
+        let giaTienValue = '';
+        if (data.giaTien !== undefined && data.giaTien !== null && data.giaTien !== '') {
+            // If giaTien is an object (BigDecimal), try to extract value
+            if (typeof data.giaTien === 'object' && data.giaTien.toString) {
+                giaTienValue = data.giaTien.toString();
+            } else {
+                giaTienValue = String(data.giaTien);
+            }
+        } else {
+            // fallback: try to fetch again from API
+            console.warn('[UPDATE FORM] giaTien is missing from data, attempting to fetch from API...');
+            giaTienValue = '';
+            // Try to fetch book detail again and update the input if found
+            (async () => {
+                try {
+                    const token = sessionStorage.getItem("token");
+                    const resp = await fetch(`${apiBase}/api/sach/chitietsach?sachId=${data.sachId}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (resp.ok) {
+                        const detail = await resp.json();
+                        if (detail && detail.giaTien !== undefined && detail.giaTien !== null && detail.giaTien !== '') {
+                            let value = '';
+                            if (typeof detail.giaTien === 'object' && detail.giaTien.toString) {
+                                value = detail.giaTien.toString();
+                            } else {
+                                value = String(detail.giaTien);
+                            }
+                            const giaTienInput = document.getElementById('update-giaTien');
+                            if (giaTienInput) giaTienInput.value = value;
+                            console.log('[UPDATE FORM] (async) Set giaTien to:', value);
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[UPDATE FORM] Could not fetch giaTien from API:', err);
+                }
+            })();
+        }
         modal.innerHTML = `
             <div class="modal-box large">
                 <div class="modal-header">
@@ -178,7 +217,7 @@ async function loadBanSaoSach(sachId) {
                                 <div class="row">
                                     <label>
                                         Giá tiền
-                                        <input type="number" id="update-giaTien" min="0" step="0.01" placeholder="Giá tiền" value="${data.giaTien || ''}" />
+                                        <input type="number" id="update-giaTien" min="0" step="0.01" placeholder="Giá tiền" value="${giaTienValue}" />
                                     </label>
 
                                     <label>
@@ -560,7 +599,8 @@ async function loadBanSaoSach(sachId) {
 
             // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
-                if (!modal.querySelector('.tacgia-dropdown-wrapper').contains(e.target)) {
+                const wrapper = modal.querySelector('.tacgia-dropdown-wrapper');
+                if (wrapper && !wrapper.contains(e.target)) {
                     tacgiaDropdown.style.display = 'none';
                 }
             }, { once: false });
@@ -580,13 +620,29 @@ async function loadBanSaoSach(sachId) {
         const namXuatBanValue = document.getElementById("update-namXuatBan").value;
         const namXuatBan = namXuatBanValue ? new Date(namXuatBanValue).toISOString().split('T')[0] : null;
         
+        // Validate giaTien
+        let giaTienRaw = document.getElementById("update-giaTien").value;
+        if (giaTienRaw === null || giaTienRaw === undefined || giaTienRaw === "") {
+            alert('Giá tiền không được để trống');
+            return;
+        }
+        let giaTien = Number(giaTienRaw);
+        if (isNaN(giaTien)) {
+            alert('Giá tiền không hợp lệ');
+            return;
+        }
+        if (giaTien < 0) {
+            alert('Giá tiền không được âm');
+            return;
+        }
+
         const payload = {
             sachId,
             tenSach: document.getElementById("update-title").value.trim(),
             soTrang: Number(document.getElementById("update-pages").value),
             khoSach: document.getElementById("update-khoSach").value.trim(),
             anhBia: document.getElementById("update-anhBia").value.trim(),
-            giaTien: Number(document.getElementById("update-giaTien").value),
+            giaTien: giaTien,
             namXuatBan: namXuatBan,
             nhaXuatBanId: Number(document.getElementById("update-nhaXuatBanId").value),
             linhVucId: Number(document.getElementById("update-linhVucId").value),
