@@ -264,7 +264,9 @@ function openModal({ title, data = {}, onSave }) {
       const display = document.getElementById('books-display');
       display.innerHTML = `
         <div class="book-card">
-          <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x260?text=No+Image'">
+          <a href="/Quan_li_sach_admin/Quan_li_chi_tiet_sach.html?sachId=${book.sachId}" style="cursor: pointer; text-decoration: none;">
+            <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x260?text=No+Image'" style="cursor: pointer;">
+          </a>
           <p class="book-title">${book.tenSach}</p>
         </div>
       `;
