@@ -70,10 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.setItem('username', data.username);
       sessionStorage.setItem('role', data.role);
       sessionStorage.setItem('token', data.token);
-      if(data.role !== 'ADMIN') {
-        const status = await getChitietDocGia(data.accountId, data.token);
-        sessionStorage.setItem('trangThaiDocGia', status);
-      }
       // nối đến trang chủ
       if (data.role === 'ADMIN') {
         window.location.href = '/Trang_chu_admin/Trang_chu_admin.html';
@@ -99,22 +95,4 @@ guestBtn.addEventListener('click', () => {
     window.location.href = '/Trang_chu/Trang_chu.html';
 });
 
-async function getChitietDocGia(accountId, token) {
-  const response = await fetch(
-    `${API_CONFIG.BASE_URL}/docgia/chitietdocgia?accountId=${accountId}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    }
-  );
 
-  if (!response.ok) {
-    throw new Error('Không lấy được dữ liệu độc giả');
-  }
-
-  const data = await response.json();
-  return data.trangThaiDocGia;
-}

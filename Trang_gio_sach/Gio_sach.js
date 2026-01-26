@@ -186,12 +186,6 @@ document.querySelector('.btn-borrow')
         alert('Bạn chưa chọn bản sao nào để mượn');
         return;
     }
-    const statusDocGia = sessionStorage.getItem('trangThaiDocGia');
-    // ❌ Độc giả bị khóa
-    if (statusDocGia === 'VO_HIEU_HOA') {
-        alert('Tài khoản của bạn đã bị vô hiệu hóa. Không thể mượn sách.');
-        return;
-    }
 
     const token = sessionStorage.getItem('token');
 
