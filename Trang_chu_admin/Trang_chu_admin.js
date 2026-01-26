@@ -17,7 +17,7 @@ async function fetchStat({ url, key, selector }) {
     const res = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + token,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       credentials: 'include',
@@ -30,7 +30,14 @@ async function fetchStat({ url, key, selector }) {
     }
     const data = await res.json();
     console.log(`[BUGLOG] Data for ${url}:`, data);
-    if (el) el.textContent = data[key] !== undefined ? data[key] : '0';
+    
+    // Handle different response formats
+    let value = data[key];
+    if (value === undefined) {
+      // If key not found, try to get the first numeric value
+      value = Object.values(data).find(v => typeof v === 'number');
+    }
+    if (el) el.textContent = value !== undefined ? value : '0';
   } catch (err) {
     if (el) el.textContent = `Lỗi: ${err.message}`;
     console.error(`[BUGLOG] API ${url} error:`, err);
@@ -40,9 +47,9 @@ async function fetchStat({ url, key, selector }) {
 // Show real-time stats on page load
 document.addEventListener('DOMContentLoaded', () => {
   fetchStat({
-    url: 'http://localhost:8080/api/bansaosach/count',
-    key: 'totalBanSaoSach',
-    selector: '#stat-totalBanSaoSach',
+    url: 'http://localhost:8080/api/sach/admin/count',
+    key: 'totalDauSach',
+    selector: '#stat-totalDauSach',
   });
   fetchStat({
     url: 'http://localhost:8080/api/phieumuon/admin/count',

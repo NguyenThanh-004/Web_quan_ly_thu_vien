@@ -97,27 +97,30 @@
 }
 
 .book-info .book-title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     margin: 0 0 5px 0;
 }
 
 .book-info .book-copy-id {
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
+    font-weight: bold;
     margin: 0;
 }
 
 .book-info .book-borrow-detail-id {
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
+    font-weight: bold;
     margin: 5px 0 0 0;
 }
 
 .book-extra-info {
     margin-top: 6px;
-    font-size: 13px;
+    font-size: 14px;
     color: #555;
+    font-weight: bold;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -130,6 +133,14 @@
 .book-extra-info .fine {
     color: #b00020;
     font-weight: bold;
+}
+
+.book-extra-info .dropdown-tinhtrang{
+    padding: 3px 5px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    font-style: bold;
 }
 
 @media (max-width: 768px) {

@@ -232,7 +232,10 @@ function showUpdateModal(theThuVienId, ngayHetHan, trangThai) {
                 <option value="VO_HIEU_HOA" ${trangThai === 'VO_HIEU_HOA' ? 'selected' : ''}>Vô hiệu hoá</option>
               </select>
             </div>
-            <button type="submit">Cập nhật</button>
+            <div class="form-buttons">
+              <button type="submit" class="btn-submit">Lưu</button>
+              <button type="button" class="btn-cancel">Hủy</button>
+            </div>
           </form>
         </div>
         
@@ -335,6 +338,8 @@ function showUpdateModal(theThuVienId, ngayHetHan, trangThai) {
       alert('Lỗi khi cập nhật');
     }
   };
+
+  document.getElementById('btn-cancel-update').onclick = () => modal.remove();
 }
 
   updatePagination();

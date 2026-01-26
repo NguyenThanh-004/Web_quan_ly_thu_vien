@@ -148,6 +148,40 @@ function openModal({ title, data = {}, onSave }) {
   createModal();
   
   const isEditing = !!data.nhaXuatBanId;
+  const modalBox = document.getElementById('modal-box-content');
+  
+  // Always reset and rebuild structure from scratch
+  const contentWrapper = modalBox.querySelector('.modal-content-wrapper');
+  if (contentWrapper) {
+    contentWrapper.remove();
+  }
+  modalBox.classList.remove('modal-with-books');
+  
+  // Clear existing body and footer
+  const existingBody = modalBox.querySelector('.modal-body');
+  const existingFooter = modalBox.querySelector('.modal-footer');
+  if (existingBody) existingBody.remove();
+  if (existingFooter) existingFooter.remove();
+  
+  // Recreate fresh body and footer
+  const freshBody = document.createElement('div');
+  freshBody.className = 'modal-body';
+  freshBody.innerHTML = `
+    <label>Tên nhà xuất bản</label>
+    <input id="modal-name" type="text">
+
+    <label>Địa chỉ</label>
+    <input id="modal-address" type="text">
+  `;
+  modalBox.appendChild(freshBody);
+  
+  const freshFooter = document.createElement('div');
+  freshFooter.className = 'modal-footer';
+  freshFooter.innerHTML = `
+    <button id="modal-cancel" class="btn-cancel">Hủy</button>
+    <button id="modal-save" class="btn-save">Cập nhật</button>
+  `;
+  modalBox.appendChild(freshFooter);
 
   document.getElementById('modal-title').textContent = title;
   const nameInput = document.getElementById('modal-name');
@@ -158,7 +192,6 @@ function openModal({ title, data = {}, onSave }) {
 
   // If editing, restructure modal with two columns
   if (isEditing) {
-    const modalBox = document.getElementById('modal-box-content');
     modalBox.classList.add('modal-with-books');
     
     // Get current body and footer
@@ -208,7 +241,7 @@ function openModal({ title, data = {}, onSave }) {
     contentWrapper.appendChild(booksContainer);
     
     // Insert content wrapper and remove old footer
-    modalBox.insertBefore(contentWrapper, modalFooter);
+    modalBox.appendChild(contentWrapper);
     modalFooter.remove();
     
     // Setup carousel
@@ -275,7 +308,19 @@ function openModal({ title, data = {}, onSave }) {
 
 function closeModal() {
   const modal = document.getElementById('publisher-modal');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    // Reset modal structure when closing
+    const modalBox = document.getElementById('modal-box-content');
+    if (modalBox && modalBox.classList.contains('modal-with-books')) {
+      const contentWrapper = modalBox.querySelector('.modal-content-wrapper');
+      if (contentWrapper) {
+        contentWrapper.remove();
+      }
+      modalBox.classList.remove('modal-with-books');
+    }
+    
+    modal.style.display = 'none';
+  }
 }
 
 /* =====================================================
