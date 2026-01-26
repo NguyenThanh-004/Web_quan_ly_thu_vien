@@ -151,7 +151,7 @@ body {
 }
 
 .add-button:hover {
-    background: #237245;
+    background: #d3d3d3;
 }
 
 /* ===== TABLE ===== */
@@ -361,7 +361,7 @@ tbody tr {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
+}   
 
 .modal-close {
   font-size: 24px;
@@ -374,6 +374,11 @@ tbody tr {
   width: 100%;
   padding: 10px;
   margin-top: 8px;
+  border-radius: 5px;
+}
+
+.modal-body{
+    margin-top: 5px;
 }
 
 .modal-footer {

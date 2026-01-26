@@ -689,7 +689,7 @@ async function handleAddBook(modal, imageFile) {
 
     alert(text || 'Thêm sách thành công');
     modal.remove();
-    page = 0;
+    renderIndex = 0;
     bookGrid.innerHTML = '';
     loadBooks();
   } catch (err) {

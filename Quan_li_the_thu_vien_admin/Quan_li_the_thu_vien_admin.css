@@ -512,7 +512,7 @@ tbody tr {
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  max-width: 280px;
+  max-width: 350px;
 }
 
 .modal-form-section form div {
@@ -562,6 +562,48 @@ tbody tr {
 
 .modal-form-section button[type="submit"]:hover {
   background: #27ae60;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.btn-submit,
+.btn-cancel {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  flex: 1;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-submit {
+  background: #2ecc71;
+  color: white;
+}
+
+.btn-submit:hover {
+  background: #27ae60;
+}
+
+.btn-cancel {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #c0392b;
 }
 
 /* ===== READER INFO SECTION ===== */
