@@ -65,13 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('LOGIN RESPONSE:', data);
       console.log('ROLE TYPE:', typeof data.role);
       console.log('ROLE VALUE:', `"${data.role}"`);
-      const status = await getChitietDocGia(data.accountId, data.token);
       // lưu session
       sessionStorage.setItem('accountId', data.accountId);
       sessionStorage.setItem('username', data.username);
       sessionStorage.setItem('role', data.role);
       sessionStorage.setItem('token', data.token);
-      sessionStorage.setItem('trangThaiDocGia', status);
+      if(data.role !== 'ADMIN') {
+        const status = await getChitietDocGia(data.accountId, data.token);
+        sessionStorage.setItem('trangThaiDocGia', status);
+      }
       // nối đến trang chủ
       if (data.role === 'ADMIN') {
         window.location.href = '/Trang_chu_admin/Trang_chu_admin.html';
