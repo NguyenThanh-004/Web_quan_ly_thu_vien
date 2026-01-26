@@ -459,7 +459,28 @@ function openModal(data = null) {
 
 /* ================= FORM HELPERS ================= */
 function buildPayload() {
-  // Format date as ISO 8601 (yyyy-MM-dd) for backend Date parsing
+  // Format date as dd/MM/yyyy for CREATE
+  const rawDate = document.getElementById('ngaySinh').value;
+  let ngayThangNamSinh = '';
+  if (rawDate) {
+    const d = new Date(rawDate);
+    if (!isNaN(d.getTime())) {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      ngayThangNamSinh = `${day}/${month}/${year}`;
+    }
+  }
+  return {
+    tenTacGia: document.getElementById('tenTacGia').value.trim(),
+    noiLamViec: document.getElementById('noiLam').value.trim(),
+    diaChi: document.getElementById('diaChi').value.trim(),
+    ngayThangNamSinh
+  };
+}
+
+function buildUpdatePayload() {
+  // Format date as ISO 8601 (yyyy-MM-dd) for UPDATE
   const rawDate = document.getElementById('ngaySinh').value;
   let ngayThangNamSinh = '';
   if (rawDate) {
@@ -514,7 +535,7 @@ async function createTacGia() {
 
 /* ================= UPDATE ================= */
 async function updateTacGia() {
-  const payload = buildPayload();
+  const payload = buildUpdatePayload();
   if (!validatePayload(payload)) return;
 
   payload.tacGiaId = editingId;
