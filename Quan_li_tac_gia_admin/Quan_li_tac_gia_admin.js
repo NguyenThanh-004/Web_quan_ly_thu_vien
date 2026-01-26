@@ -459,17 +459,11 @@ function openModal(data = null) {
 
 /* ================= FORM HELPERS ================= */
 function buildPayload() {
-  // Format date as dd/MM/yyyy and validate
+  // Format date as ISO 8601 (yyyy-MM-dd) for backend Date parsing
   const rawDate = document.getElementById('ngaySinh').value;
   let ngayThangNamSinh = '';
   if (rawDate) {
-    const d = new Date(rawDate);
-    if (!isNaN(d.getTime())) {
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      ngayThangNamSinh = `${day}/${month}/${year}`;
-    }
+    ngayThangNamSinh = rawDate; // rawDate from input type="date" is already yyyy-MM-dd
   }
   return {
     tenTacGia: document.getElementById('tenTacGia').value.trim(),
