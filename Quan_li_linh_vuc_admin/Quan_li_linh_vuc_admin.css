@@ -364,3 +364,21 @@ tbody tr {
   border-radius: 6px;
   cursor: pointer;
 }
+
+.modal-footer .btn-save {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.modal-footer .btn-save:hover {
+  background-color: #45a049;
+}
+
+.modal-footer .btn-cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal-footer .btn-cancel:hover {
+  background-color: #da190b;
+}

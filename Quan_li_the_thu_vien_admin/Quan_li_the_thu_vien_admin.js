@@ -307,8 +307,8 @@ function showUpdateModal(theThuVienId, ngayHetHan, trangThai) {
       </div>
       
       <div class="reader-info-group">
-        <span class="reader-info-label">Sách quá hạn</span>
-        <div class="reader-info-value">${overdue > 0 ? `<strong style="color: #e74c3c;">${overdue} cuốn</strong>` : `<strong style="color: #4CAF50;">${overdue} cuốn</strong>`}</div>
+        <span class="reader-info-label">Phiếu quá hạn</span>
+        <div class="reader-info-value">${overdue > 0 ? `<strong style="color: #e74c3c;">${overdue} phiếu</strong>` : `<strong style="color: #4CAF50;">${overdue} phiếu</strong>`}</div>
       </div>
     `;
   });

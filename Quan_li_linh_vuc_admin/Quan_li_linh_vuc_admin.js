@@ -33,8 +33,8 @@ function createModal() {
         </div>
 
         <div class="modal-footer">
-          <button id="modal-cancel">Hủy</button>
-          <button id="modal-save">Lưu</button>
+          <button id="modal-cancel" class="btn-cancel">Hủy</button>
+          <button id="modal-save" class="btn-save">Lưu</button>
         </div>
       </div>
     </div>
