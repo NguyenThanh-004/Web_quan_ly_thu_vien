@@ -192,9 +192,9 @@ document.querySelector('.btn-borrow')
         alert('Tài khoản của bạn đã bị vô hiệu hóa. Không thể mượn sách.');
         return;
     }
-    
+
     const token = sessionStorage.getItem('token');
-    
+
     try {
         const res = await fetch(
             "http://localhost:8080/api/phieumuon/create",
