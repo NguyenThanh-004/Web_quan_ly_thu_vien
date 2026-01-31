@@ -202,47 +202,46 @@ function openModal({ title, data = {}, onSave }) {
     const contentWrapper = document.createElement('div');
     contentWrapper.className = 'modal-content-wrapper';
     
-    // Move body to left container
+    // Move body to form container
     const formContainer = document.createElement('div');
     formContainer.className = 'modal-form-container';
     formContainer.appendChild(modalBody);
     
-    // Create right container for books
+    // Create books container
     const booksContainer = document.createElement('div');
     booksContainer.className = 'modal-books-container';
     booksContainer.innerHTML = `
       <div class="books-carousel-section">
         <h3>Sách của nhà xuất bản</h3>
         <div class="books-carousel">
-          <button class="carousel-arrow left" id="carousel-prev">&lt;</button>
           <div class="books-display" id="books-display">
-            <div class="book-card">
-              <img src="" alt="Book" class="book-cover">
-              <p class="book-title">Đang tải...</p>
-            </div>
+            <div class="book-list-item" style="display:none;">Danh sách sách</div>
           </div>
-          <button class="carousel-arrow right" id="carousel-next">&gt;</button>
+          <div class="book-card">
+            <img src="" alt="Book" class="book-cover">
+            <p class="book-title">Đang tải...</p>
+          </div>
         </div>
         <p class="book-counter" id="book-counter"></p>
       </div>
     `;
     
-    // Add form footer buttons to form container
-    const formFooter = document.createElement('div');
-    formFooter.className = 'modal-footer';
-    formFooter.innerHTML = `
-      <button id="modal-cancel" class="btn-cancel">Hủy</button>
-      <button id="modal-save" class="btn-save">Cập nhật</button>
-    `;
-    formContainer.appendChild(formFooter);
-    
-    // Build layout
+    // Build layout: form on top, books section below
     contentWrapper.appendChild(formContainer);
     contentWrapper.appendChild(booksContainer);
     
-    // Insert content wrapper and remove old footer
+    // Insert content wrapper
     modalBox.appendChild(contentWrapper);
+    
+    // Move footer outside to modal level
     modalFooter.remove();
+    const newFooter = document.createElement('div');
+    newFooter.className = 'modal-footer';
+    newFooter.innerHTML = `
+      <button id="modal-cancel" class="btn-cancel">Hủy</button>
+      <button id="modal-save" class="btn-save">Cập nhật</button>
+    `;
+    modalBox.appendChild(newFooter);
     
     // Setup carousel
     let books = [];
@@ -251,43 +250,41 @@ function openModal({ title, data = {}, onSave }) {
     async function loadBooks() {
       books = await fetchBooksByPublisher(data.nhaXuatBanId);
       if (books.length > 0) {
+        renderBooksList();
         displayBook(0);
       } else {
         document.getElementById('books-display').innerHTML = '<p style="color: #999;">Không có sách nào</p>';
       }
     }
 
+    function renderBooksList() {
+      const booksList = document.getElementById('books-display');
+      booksList.innerHTML = '';
+      books.forEach((book, index) => {
+        const item = document.createElement('div');
+        item.className = 'book-list-item' + (index === 0 ? ' active' : '');
+        item.textContent = book.tenSach;
+        item.onclick = () => {
+          displayBook(index);
+          document.querySelectorAll('.book-list-item').forEach(el => el.classList.remove('active'));
+          item.classList.add('active');
+        };
+        booksList.appendChild(item);
+      });
+    }
+
     function displayBook(index) {
       if (books.length === 0) return;
       currentBookIndex = index;
       const book = books[index];
-      const display = document.getElementById('books-display');
-      display.innerHTML = `
-        <div class="book-card">
-          <a href="/Quan_li_sach_admin/Quan_li_chi_tiet_sach.html?sachId=${book.sachId}" style="cursor: pointer; text-decoration: none;">
-            <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x260?text=No+Image'" style="cursor: pointer;">
-          </a>
-          <p class="book-title">${book.tenSach}</p>
-        </div>
+      const bookCard = booksContainer.querySelector('.book-card');
+      bookCard.innerHTML = `
+        <a href="/Quan_li_sach_admin/Quan_li_chi_tiet_sach.html?sachId=${book.sachId}" style="cursor: pointer; text-decoration: none;">
+          <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'" style="cursor: pointer;">
+        </a>
+        <p class="book-title">${book.tenSach}</p>
       `;
       document.getElementById('book-counter').textContent = `${index + 1} / ${books.length}`;
-      document.getElementById('carousel-prev').disabled = index === 0;
-      document.getElementById('carousel-next').disabled = index === books.length - 1;
-    }
-
-    const prevBtn = document.getElementById('carousel-prev');
-    const nextBtn = document.getElementById('carousel-next');
-
-    if (prevBtn) {
-      prevBtn.onclick = () => {
-        if (currentBookIndex > 0) displayBook(currentBookIndex - 1);
-      };
-    }
-
-    if (nextBtn) {
-      nextBtn.onclick = () => {
-        if (currentBookIndex < books.length - 1) displayBook(currentBookIndex + 1);
-      };
     }
 
     loadBooks();
