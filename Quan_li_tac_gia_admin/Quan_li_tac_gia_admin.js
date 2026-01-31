@@ -91,7 +91,7 @@ function renderTable(pageData) {
         </div>
       </td>
     `;
-    tr.querySelector('.btn-edit').onclick = () => openModal(item);
+    tr.querySelector('.btn-edit').onclick = () => openUpdateModal(item);
     tr.querySelector('.btn-delete').onclick = () => deleteTacGia(item.tacGiaId);
     tbody.appendChild(tr);
   });
@@ -122,278 +122,55 @@ async function fetchBooksByAuthor(tacGiaId) {
   }
 }
 
-/* ================= MODAL ================= */
-function openModal(data = null) {
-  editingId = data?.tacGiaId || null;
+/* ================= MODAL - ADD ================= */
+function openAddModal() {
+  editingId = null;
 
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
   modal.innerHTML = `
-    <div class="modal-box modal-with-books">
+    <div class="modal-box">
       <div class="modal-header">
-        <h3>${editingId ? 'Sửa tác giả' : 'Thêm tác giả'}</h3>
+        <h3>Thêm tác giả</h3>
         <button class="modal-close">&times;</button>
       </div>
 
       <div class="modal-content-wrapper">
-        <!-- LEFT CONTAINER: FORM -->
         <div class="modal-form-container">
-          <div class="modal-body">
-            <input id="tenTacGia" placeholder="Tên tác giả"
-                   value="${data?.tenTacGia || ''}">
-            <input id="noiLam" placeholder="Nơi làm"
-                   value="${data?.noiLamViec || ''}">
-            <input id="diaChi" placeholder="Địa chỉ"
-                   value="${data?.diaChi || ''}">
-            <input id="ngaySinh" type="date"
-                   value="${data?.ngayThangNamSinh ? new Date(data.ngayThangNamSinh).toISOString().slice(0,10) : ''}" required>
-          </div>
-
-          <div class="modal-footer">
-            <button class="btn-cancel">Hủy</button>
-            <button class="btn-save">
-              ${editingId ? 'Cập nhật' : 'Thêm'}
-            </button>
-          </div>
-        </div>
-        
-        <!-- RIGHT CONTAINER: BOOKS CAROUSEL -->
-        ${editingId ? `
-        <div class="modal-books-container">
-          <div class="books-carousel-section">
-            <h3>Sách của tác giả</h3>
-            <div class="books-carousel">
-              <button class="carousel-arrow left" id="carousel-prev">&lt;</button>
-              <div class="books-display" id="books-display">
-                <div class="book-card">
-                  <img src="" alt="Book" class="book-cover">
-                  <p class="book-title">Đang tải...</p>
-                </div>
-              </div>
-              <button class="carousel-arrow right" id="carousel-next">&gt;</button>
+          <h2 class="form-title">Thông tin tác giả</h2>
+          <div class="modal-body modal-body-single-row">
+            <div class="input-group">
+              <label>Tên tác giả</label>
+              <input id="tenTacGia" placeholder="Tên tác giả">
             </div>
-            <p class="book-counter" id="book-counter"></p>
+            <div class="input-group">
+              <label>Nơi làm</label>
+              <input id="noiLam" placeholder="Nơi làm">
+            </div>
+            <div class="input-group">
+              <label>Địa chỉ</label>
+              <input id="diaChi" placeholder="Địa chỉ">
+            </div>
+            <div class="input-group">
+              <label>Ngày sinh</label>
+              <input id="ngaySinh" type="date" required>
+            </div>
           </div>
         </div>
-        ` : ''}
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel">Hủy</button>
+        <button class="btn-save">Thêm</button>
       </div>
     </div>
   `;
-
-  // Add styles
-  const style = document.createElement('style');
-  style.textContent = `
-    .modal-with-books .modal-box {
-      max-width: 1000px;
-      max-height: 650px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-content-wrapper {
-      display: flex;
-      gap: 40px;
-      padding: 25px;
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    /* LEFT CONTAINER: FORM */
-    .modal-form-container {
-      flex: 1;
-      min-width: 350px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .modal-body {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .modal-body input {
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    .modal-body input:focus {
-      outline: none;
-      border-color: #4CAF50;
-      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-
-    .modal-footer button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .btn-save {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .btn-save:hover {
-      background-color: #45a049;
-    }
-
-    .btn-cancel {
-      background-color: #f44336;
-      color: white;
-    }
-
-    .btn-cancel:hover {
-      background-color: #da190b;
-    }
-
-    /* RIGHT CONTAINER: BOOKS */
-    .modal-books-container {
-      flex: 1;
-      min-width: 350px;
-      display: flex;
-      flex-direction: column;
-      border-left: 2px solid #e0e0e0;
-      padding-left: 40px;
-    }
-
-    .books-carousel-section {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      height: 100%;
-    }
-
-    .books-carousel-section h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
-      text-align: center;
-      color: #333;
-    }
-
-    .books-carousel {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      justify-content: center;
-      flex: 1;
-      min-height: 280px;
-    }
-
-    .carousel-arrow {
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      padding: 12px 15px;
-      font-size: 20px;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-      flex-shrink: 0;
-    }
-
-    .carousel-arrow:hover:not(:disabled) {
-      background-color: #0b7dda;
-    }
-
-    .carousel-arrow:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    .books-display {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-width: 200px;
-    }
-
-    .book-card {
-      text-align: center;
-      max-width: 220px;
-      animation: fadeIn 0.3s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    .book-cover {
-      max-width: 180px;
-      max-height: 260px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      margin-bottom: 12px;
-      object-fit: cover;
-    }
-
-    .book-title {
-      font-weight: bold;
-      font-size: 14px;
-      color: #333;
-      word-wrap: break-word;
-      margin: 0;
-      line-height: 1.4;
-      max-height: 60px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .book-counter {
-      text-align: center;
-      font-size: 12px;
-      color: #666;
-      margin: 10px 0 0 0;
-      font-weight: 500;
-    }
-
-    @media (max-width: 1024px) {
-      .modal-content-wrapper {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-      }
-
-      .modal-books-container {
-        border-left: none;
-        border-top: 2px solid #e0e0e0;
-        padding-left: 0;
-        padding-top: 20px;
-      }
-
-      .modal-with-books .modal-box {
-        max-width: 90vw;
-      }
-    }
-  `;
-  document.head.appendChild(style);
 
   document.body.appendChild(modal);
 
   modal.querySelector('.modal-close').onclick =
   modal.querySelector('.btn-cancel').onclick = () => {
     modal.remove();
-    style.remove();
   };
 
   modal.querySelector('.btn-save').onclick = () => {
@@ -401,60 +178,152 @@ function openModal(data = null) {
     if (!dateVal) {
       alert('Ngày tháng năm sinh không được để trống');
       return;
-    } 
+    }
+    submitForm();
+  };
+}
+
+/* ================= MODAL - UPDATE ================= */
+function openUpdateModal(data) {
+  editingId = data?.tacGiaId || null;
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-box modal-with-books">
+      <div class="modal-header">
+        <h3>Sửa tác giả</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+
+      <div class="modal-content-wrapper">
+        <div class="modal-right-section">
+          <!-- TOP: FORM INPUTS IN 2 COLUMNS -->
+          <div class="modal-form-container">
+            <h2 class="form-title">Thông tin tác giả</h2>
+            <div class="modal-body">
+              <div class="input-row">
+                <div class="input-group">
+                  <label>Tên tác giả</label>
+                  <input id="tenTacGia" placeholder="Tên tác giả"
+                         value="${data?.tenTacGia || ''}">
+                </div>
+                <div class="input-group">
+                  <label>Nơi làm</label>
+                  <input id="noiLam" placeholder="Nơi làm"
+                         value="${data?.noiLamViec || ''}">
+                </div>
+              </div>
+              <div class="input-row">
+                <div class="input-group">
+                  <label>Địa chỉ</label>
+                  <input id="diaChi" placeholder="Địa chỉ"
+                         value="${data?.diaChi || ''}">
+                </div>
+                <div class="input-group">
+                  <label>Ngày sinh</label>
+                  <input id="ngaySinh" type="date"
+                         value="${data?.ngayThangNamSinh ? new Date(data.ngayThangNamSinh).toISOString().slice(0,10) : ''}" required>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTTOM: BOOKS LIST + BOOK DISPLAY TOGETHER -->
+          <div class="modal-book-display-section">
+            <!-- LEFT: BOOKS LIST -->
+            <div class="modal-books-list-container">
+              <h3>Danh sách sách</h3>
+              <div class="books-list" id="books-list">
+                <p style="color: #999;">Đang tải...</p>
+              </div>
+            </div>
+
+            <!-- RIGHT: BOOK DISPLAY -->
+            <div class="book-display-large" id="books-display">
+              <div class="book-card-large">
+                <img src="" alt="Book" class="book-cover-large">
+                <p class="book-title-large">Đang tải...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER: BUTTONS - OUTSIDE MODAL-RIGHT-SECTION -->
+      <div class="modal-footer">
+        <button class="btn-cancel">Hủy</button>
+        <button class="btn-save">Cập nhật</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('.modal-close').onclick =
+  modal.querySelector('.btn-cancel').onclick = () => {
+    modal.remove();
+  };
+
+  modal.querySelector('.btn-save').onclick = () => {
+    const dateVal = document.getElementById('ngaySinh').value;
+    if (!dateVal) {
+      alert('Ngày tháng năm sinh không được để trống');
+      return;
+    }
     submitForm();
   };
 
-  // Setup carousel if editing
-  if (editingId) {
-    let books = [];
-    let currentBookIndex = 0;
+  // Setup book display
+  let books = [];
+  let currentBookIndex = 0;
 
-    async function loadBooks() {
-      books = await fetchBooksByAuthor(editingId);
-      if (books.length > 0) {
-        displayBook(0);
-      } else {
-        document.getElementById('books-display').innerHTML = '<p style="color: #999;">Không có sách nào</p>';
-      }
+  async function loadBooks() {
+    books = await fetchBooksByAuthor(editingId);
+    if (books.length > 0) {
+      renderBooksList();
+      displayBook(0);
+    } else {
+      document.getElementById('books-display').innerHTML = '<p style="color: #999;">Không có sách nào</p>';
+      document.getElementById('books-list').innerHTML = '<p style="color: #999;">Không có sách</p>';
     }
-
-    function displayBook(index) {
-      if (books.length === 0) return;
-      currentBookIndex = index;
-      const book = books[index];
-      
-      const display = document.getElementById('books-display');
-      display.innerHTML = `
-        <div class="book-card">
-          <a href="/Quan_li_sach_admin/Quan_li_chi_tiet_sach.html?sachId=${book.sachId}" style="cursor: pointer; text-decoration: none;">
-            <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/180x260?text=No+Image'" style="cursor: pointer;">
-          </a>
-          <p class="book-title">${book.tenSach}</p>
-        </div>
-      `;
-      document.getElementById('book-counter').textContent = `${index + 1} / ${books.length}`;
-      document.getElementById('carousel-prev').disabled = index === 0;
-      document.getElementById('carousel-next').disabled = index === books.length - 1;
-    }
-
-    const prevBtn = document.getElementById('carousel-prev');
-    const nextBtn = document.getElementById('carousel-next');
-
-    if (prevBtn) {
-      prevBtn.onclick = () => {
-        if (currentBookIndex > 0) displayBook(currentBookIndex - 1);
-      };
-    }
-
-    if (nextBtn) {
-      nextBtn.onclick = () => {
-        if (currentBookIndex < books.length - 1) displayBook(currentBookIndex + 1);
-      };
-    }
-
-    loadBooks();
   }
+
+  function renderBooksList() {
+    const booksList = document.getElementById('books-list');
+    booksList.innerHTML = '';
+    
+    books.forEach((book, index) => {
+      const item = document.createElement('div');
+      item.className = 'book-list-item' + (index === 0 ? ' active' : '');
+      item.textContent = book.tenSach;
+      item.onclick = () => {
+        displayBook(index);
+        // Update active state
+        document.querySelectorAll('.book-list-item').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+      };
+      booksList.appendChild(item);
+    });
+  }
+
+  function displayBook(index) {
+    if (books.length === 0) return;
+    currentBookIndex = index;
+    const book = books[index];
+    
+    const display = document.getElementById('books-display');
+    display.innerHTML = `
+      <div class="book-card-large">
+        <a href="/Quan_li_sach_admin/Quan_li_chi_tiet_sach.html?sachId=${book.sachId}" style="cursor: pointer; text-decoration: none;">
+          <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover-large" onerror="this.src='https://via.placeholder.com/160x240?text=No+Image'" style="cursor: pointer;">
+        </a>
+        <p class="book-title-large">${book.tenSach}</p>
+      </div>
+    `;
+  }
+
+  loadBooks();
 }
 
 /* ================= FORM HELPERS ================= */
@@ -621,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
     () => fetchTacGia(Math.min(totalPages - 1, currentPage + 1), pageSize);
 
   const addBtn = document.querySelector('.add-button');
-  if (addBtn) addBtn.onclick = () => openModal();
+  if (addBtn) addBtn.onclick = () => openAddModal();
 
   fetchTacGia(0, pageSize);
 });
