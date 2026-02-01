@@ -138,7 +138,7 @@ function createModal() {
   document.body.appendChild(modal);
 
   modal.querySelector('.modal-close').onclick = closeModal;
-  modal.querySelector(' #modal-cancel').onclick = closeModal;
+  modal.querySelector('#modal-cancel').onclick = closeModal;
   modal.querySelector('.modal-overlay').onclick = e => {
     if (e.target.classList.contains('modal-overlay')) closeModal();
   };
@@ -192,7 +192,7 @@ function openModal({ title, data = {}, onSave }) {
 
   // Attach cancel button handler
   document.getElementById('modal-cancel').onclick = () => {
-    window.location.reload();
+    closeModal();
   };
 
   // If editing, restructure modal with two columns
@@ -250,7 +250,7 @@ function openModal({ title, data = {}, onSave }) {
      
     // Attach cancel button handler for editing modal
     document.getElementById('modal-cancel').onclick = () => {
-      window.location.reload();
+      closeModal();
     };
 
     // Setup carousel
