@@ -235,7 +235,7 @@ function openUpdateModal(data) {
             <div class="modal-books-list-container">
               <h3>Danh sách sách</h3>
               <div class="books-list" id="books-list">
-                <p style="color: #999;">Đang tải...</p>
+                <p style="color: #999;"></p>
               </div>
             </div>
 
@@ -243,7 +243,7 @@ function openUpdateModal(data) {
             <div class="book-display-large" id="books-display">
               <div class="book-card-large">
                 <img src="" alt="Book" class="book-cover-large">
-                <p class="book-title-large">Đang tải...</p>
+                <p class="book-title-large"></p>
               </div>
             </div>
           </div>

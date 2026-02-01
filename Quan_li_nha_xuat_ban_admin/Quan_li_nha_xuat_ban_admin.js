@@ -129,7 +129,7 @@ function createModal() {
 
         <div class="modal-footer">
           <button id="modal-cancel" class="btn-cancel">Hủy</button>
-          <button id="modal-save" class="btn-save">Cập nhật</button>
+          <button id="modal-save" class="btn-save">Thêm</button>
         </div>
       </div>
     </div>
@@ -138,7 +138,7 @@ function createModal() {
   document.body.appendChild(modal);
 
   modal.querySelector('.modal-close').onclick = closeModal;
-  modal.querySelector('#modal-cancel').onclick = closeModal;
+  modal.querySelector(' #modal-cancel').onclick = closeModal;
   modal.querySelector('.modal-overlay').onclick = e => {
     if (e.target.classList.contains('modal-overlay')) closeModal();
   };
@@ -179,7 +179,7 @@ function openModal({ title, data = {}, onSave }) {
   freshFooter.className = 'modal-footer';
   freshFooter.innerHTML = `
     <button id="modal-cancel" class="btn-cancel">Hủy</button>
-    <button id="modal-save" class="btn-save">Cập nhật</button>
+    <button id="modal-save" class="btn-save">thêm</button>
   `;
   modalBox.appendChild(freshFooter);
 
@@ -189,6 +189,11 @@ function openModal({ title, data = {}, onSave }) {
 
   nameInput.value = data.tenNhaXuatBan || '';
   addrInput.value = data.diaChi || '';
+
+  // Attach cancel button handler
+  document.getElementById('modal-cancel').onclick = () => {
+    window.location.reload();
+  };
 
   // If editing, restructure modal with two columns
   if (isEditing) {
@@ -219,7 +224,7 @@ function openModal({ title, data = {}, onSave }) {
           </div>
           <div class="book-card">
             <img src="" alt="Book" class="book-cover">
-            <p class="book-title">Đang tải...</p>
+            <p class="book-title"></p>
           </div>
         </div>
         <p class="book-counter" id="book-counter"></p>
@@ -242,7 +247,12 @@ function openModal({ title, data = {}, onSave }) {
       <button id="modal-save" class="btn-save">Cập nhật</button>
     `;
     modalBox.appendChild(newFooter);
-    
+     
+    // Attach cancel button handler for editing modal
+    document.getElementById('modal-cancel').onclick = () => {
+      window.location.reload();
+    };
+
     // Setup carousel
     let books = [];
     let currentBookIndex = 0;
@@ -254,6 +264,7 @@ function openModal({ title, data = {}, onSave }) {
         displayBook(0);
       } else {
         document.getElementById('books-display').innerHTML = '<p style="color: #999;">Không có sách nào</p>';
+        displayBook(0);
       }
     }
 
@@ -274,10 +285,13 @@ function openModal({ title, data = {}, onSave }) {
     }
 
     function displayBook(index) {
-      if (books.length === 0) return;
+      const bookCard = booksContainer.querySelector('.book-card');
+      if (books.length === 0) {
+        bookCard.innerHTML = '<p style="color: #999;">Không có sách nào</p>';
+        return;
+      }
       currentBookIndex = index;
       const book = books[index];
-      const bookCard = booksContainer.querySelector('.book-card');
       bookCard.innerHTML = `
         <a href="/Quan_li_sach_admin/Quan_li_chi_tiet_sach.html?sachId=${book.sachId}" style="cursor: pointer; text-decoration: none;">
           <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'" style="cursor: pointer;">
