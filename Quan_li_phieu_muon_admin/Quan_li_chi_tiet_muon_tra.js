@@ -10,6 +10,8 @@ function formatDate(dateStr) {
 }
 import { API_CONFIG } from '../Assets/JS/Config/api.config.js';
 
+console.log('[Script Loaded] Quan_li_chi_tiet_muon_tra.js loaded');
+
 
 async function loadChiTietMuonTraAdmin() {
     const phieuMuonId = getPhieuMuonIdFromUrl();
@@ -39,6 +41,11 @@ async function loadChiTietMuonTraAdmin() {
         }
         const data = await resp.json();
         displayLoanDetailsAdmin(phieuMuonId, data);
+        // Load reader information
+        if (data && data.length > 0) {
+            const chiTietId = data[0].chiTietMuonTraId;
+            loadReaderInfo(chiTietId, token, apiBase);
+        }
     } catch (err) {
         console.error('[Quan_li_chi_tiet_muon_tra.js] Exception in loadChiTietMuonTraAdmin:', err);
         alert('Không thể tải chi tiết mượn trả');
@@ -47,6 +54,49 @@ async function loadChiTietMuonTraAdmin() {
 function getPhieuMuonIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get('phieuMuonId');
+}
+
+async function loadReaderInfo(chiTietId, token, apiBase) {
+    try {
+        console.log(`[Reader Info] Loading reader info for chiTietId=${chiTietId}`);
+        const resp = await fetch(`${apiBase}/phieumuon/admin/chitietphieumuon/doc-gia?chiTietId=${chiTietId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!resp.ok) {
+            console.error('[Quan_li_chi_tiet_muon_tra.js] Error loading reader info:', resp.status, await resp.text());
+            return;
+        }
+        const readerData = await resp.json();
+        console.log('[Reader Info] Received data:', readerData);
+        displayReaderInfo(readerData);
+    } catch (err) {
+        console.error('[Quan_li_chi_tiet_muon_tra.js] Exception in loadReaderInfo:', err);
+    }
+}
+
+function displayReaderInfo(reader) {
+    if (!reader) {
+        console.warn('[Reader Info] No reader data to display');
+        return;
+    }
+    
+    console.log('[Reader Info] Displaying reader info:', reader);
+    
+    const nameEl = document.getElementById('api-reader-name');
+    const emailEl = document.getElementById('api-reader-email');
+    const phoneEl = document.getElementById('api-reader-phone');
+    const addressEl = document.getElementById('api-reader-address');
+    const dobEl = document.getElementById('api-reader-dob');
+    const depositEl = document.getElementById('api-reader-deposit');
+    
+    if (nameEl) nameEl.innerText = reader.tenDocGia || '';
+    if (emailEl) emailEl.innerText = reader.email || '';
+    if (phoneEl) phoneEl.innerText = reader.soDienThoai || '';
+    if (addressEl) addressEl.innerText = reader.diaChi || '';
+    if (dobEl) dobEl.innerText = formatDate(reader.ngaySinh);
+    if (depositEl) depositEl.innerText = reader.tienKyQuy ? formatMoney(reader.tienKyQuy) : '0đ';
 }
 
 function mapTinhTrang(status) {
@@ -148,11 +198,35 @@ async function loadChiTietMuonTra() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('[PAGE LOADED] DOMContentLoaded event fired');
+    console.log('[PAGE LOADED] API_CONFIG:', API_CONFIG);
+    
+    // Check token info
+    const token = sessionStorage.getItem('token');
+    const username = sessionStorage.getItem('username');
+    console.log('[PAGE LOADED] Token present:', !!token);
+    console.log('[PAGE LOADED] Username:', username);
+    
+    // Decode and log token info if present
+    if (token) {
+        try {
+            const parts = token.split('.');
+            if (parts.length === 3) {
+                const decoded = JSON.parse(atob(parts[1]));
+                console.log('[PAGE LOADED] Token decoded:', decoded);
+            }
+        } catch (e) {
+            console.warn('[PAGE LOADED] Could not decode token:', e);
+        }
+    }
+    
     // Hiển thị tên người dùng nếu có
     const usernameEl = document.querySelector('.username-text');
     if (usernameEl) {
-        usernameEl.textContent = sessionStorage.getItem('username') || 'Khách';
+        usernameEl.textContent = username || 'Khách';
     }
+    
+    console.log('[PAGE LOADED] About to call loadChiTietMuonTraAdmin()');
     loadChiTietMuonTraAdmin();
 
     // ...existing code...
@@ -162,14 +236,27 @@ document.addEventListener('DOMContentLoaded', () => {
 async function updateChiTietStatus(chiTietPhieuMuonId, tinhTrang) {
     const token = sessionStorage.getItem('token');
     const apiBase = API_CONFIG && (API_CONFIG.baseUrl || API_CONFIG.BASE_URL);
+    
+    console.log('[UPDATE] Starting update with:', { chiTietPhieuMuonId, tinhTrang, token: token ? 'present' : 'missing', apiBase });
+    
     if (!token) {
         console.error('[UpdateButtonError] Không tìm thấy token khi cập nhật chi tiết!');
         alert('Bạn chưa đăng nhập');
         return;
     }
+    
+    if (!apiBase) {
+        console.error('[UpdateButtonError] API base URL is not configured!');
+        alert('Lỗi cấu hình API');
+        return;
+    }
+    
     try {
-        console.log(`[UPDATE] Updating chiTietPhieuMuonId=${chiTietPhieuMuonId} to tinhTrang=${tinhTrang}`);
-        const resp = await fetch(`${apiBase}/phieumuon/admin/update-chitiet-status?chiTietPhieuMuonId=${chiTietPhieuMuonId}`, {
+        const url = `${apiBase}/phieumuon/admin/update-chitiet-status?chiTietPhieuMuonId=${chiTietPhieuMuonId}`;
+        console.log(`[UPDATE] Request URL: ${url}`);
+        console.log(`[UPDATE] Request body:`, { tinhTrang });
+        
+        const resp = await fetch(url, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -177,21 +264,27 @@ async function updateChiTietStatus(chiTietPhieuMuonId, tinhTrang) {
             },
             body: JSON.stringify({ tinhTrang })
         });
+        
+        const responseText = await resp.text();
+        console.log(`[UPDATE] Response status: ${resp.status}, body:`, responseText);
+        
         if (resp.status === 403) {
             console.warn(`[UPDATE] 403 Forbidden for chiTietPhieuMuonId=${chiTietPhieuMuonId}, tinhTrang=${tinhTrang}`);
             alert('Bạn không có quyền thực hiện thao tác này. Vui lòng đăng nhập lại hoặc liên hệ quản trị viên.');
             return;
         }
+        
         if (!resp.ok) {
-            console.error(`[UPDATE] Failed for chiTietPhieuMuonId=${chiTietPhieuMuonId}, tinhTrang=${tinhTrang}`);
-            alert('Cập nhật chi tiết thất bại');
+            console.error(`[UPDATE] Failed with status ${resp.status}: ${responseText}`);
+            alert(`Cập nhật chi tiết thất bại: ${responseText || 'Lỗi không xác định'}`);
             return;
         }
+        
         console.log(`[UPDATE] Success for chiTietPhieuMuonId=${chiTietPhieuMuonId}, tinhTrang=${tinhTrang}`);
-        // No alert for success, just reload
+        // Reload the data without alert
         loadChiTietMuonTraAdmin();
     } catch (err) {
         console.error(`[UPDATE] Exception for chiTietPhieuMuonId=${chiTietPhieuMuonId}, tinhTrang=${tinhTrang}:`, err);
-        alert('Không thể cập nhật chi tiết');
+        alert(`Không thể cập nhật chi tiết: ${err.message}`);
     }
 }
