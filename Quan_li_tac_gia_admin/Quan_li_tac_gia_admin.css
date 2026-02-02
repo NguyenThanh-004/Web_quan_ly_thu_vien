@@ -499,15 +499,6 @@ tbody tr {
   overflow: hidden;
 }
 
-.modal-with-books .books-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  padding-right: 6px; /* tránh che scrollbar */
-}
 
 
 .modal-with-books .book-list-item {
@@ -633,13 +624,6 @@ tbody tr {
   order: 2;
 }
 
-.modal-with-books .modal-books-list-container {
-  flex: 0.6;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #e0e0e0;
-  padding-right: 12px;
-}
 
 .modal-with-books .modal-books-list-container h3 {
   margin: 0 0 12px 0;
@@ -813,58 +797,34 @@ tbody tr {
 .modal-box .btn-cancel:hover {
   background-color: #da190b;
 }
-/* CONTAINER DANH SÁCH SÁCH */
-.modal-with-books .modal-books-list-container {
-  flex: 0.6;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #e0e0e0;
-  padding-right: 12px;
 
-  /* QUAN TRỌNG */
-  height: 100%;
-  overflow: hidden;
-}
 /* =========================
    FIX SCROLL DANH SÁCH SÁCH – SỬA TÁC GIẢ
-   (KHÔNG PHÁ LAYOUT, KHÔNG TO FOOTER)
+   KHÔNG PHÁ FOOTER – KHÔNG CO ẢNH
 ========================= */
 
-/* Không ép chiều cao container cha */
-.modal-with-books .modal-books-list-container {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #e0e0e0;
-  padding-right: 12px;
-}
-
-/* CHỖ DUY NHẤT CÓ SCROLL */
-.modal-with-books .books-list {
-  max-height: 360px;     /* ⬅ chỉnh cao / thấp tại đây */
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-right: 6px;   /* tránh che scrollbar */
-}
-/* =========================
-   TINH CHỈNH CUỐI – SỬA TÁC GIẢ
-   (SCROLL ĐẸP – KHÔNG PHÁ FOOTER)
-========================= */
-
-/* Đảm bảo khu hiển thị sách không đẩy footer */
 .modal-with-books .modal-book-display-section {
-  min-height: 0;
+  min-height: 0; /* bắt buộc cho flex */
 }
 
-/* CHỐT: danh sách sách có scroll ổn định */
+.modal-with-books .modal-books-list-container {
+  flex: 1;                /* ⬅ rộng như cũ */
+  max-width: 320px; 
+}
+
 .modal-with-books .books-list {
-  max-height: 400px;      /* ⬅ tăng nhẹ cho thoáng hơn */
+  height: 260px;        /* ⬅ chỉnh chiều cao tại đây */
   overflow-y: auto;
   padding-right: 8px;
+  gap: 15px; 
 }
 
-/* (tuỳ chọn) scrollbar gọn hơn – không bắt buộc */
+.modal-with-books .book-list-item {
+  width: 100%;            /* item chiếm trọn chiều ngang */
+  margin-bottom: 7px;
+}
+
+/* Scrollbar gọn đẹp */
 .modal-with-books .books-list::-webkit-scrollbar {
   width: 6px;
 }
