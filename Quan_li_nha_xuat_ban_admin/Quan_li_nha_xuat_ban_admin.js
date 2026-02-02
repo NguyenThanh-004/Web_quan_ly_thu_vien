@@ -136,9 +136,13 @@ function createModal() {
   `;
 
   document.body.appendChild(modal);
+  // Prevent body scrolling while modal is open; restore on close
+  const _prevBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  const _cleanupModal = () => { document.body.style.overflow = _prevBodyOverflow || ''; };
 
-  modal.querySelector('.modal-close').onclick = closeModal;
-  modal.querySelector('#modal-cancel').onclick = closeModal;
+  modal.querySelector('.modal-close').onclick = () => { _cleanupModal(); closeModal(); };
+  modal.querySelector('#modal-cancel').onclick = () => { _cleanupModal(); closeModal(); };
   modal.querySelector('.modal-overlay').onclick = e => {
     if (e.target.classList.contains('modal-overlay')) closeModal();
   };
@@ -214,20 +218,19 @@ function openModal({ title, data = {}, onSave }) {
     
     // Create books container
     const booksContainer = document.createElement('div');
-    booksContainer.className = 'modal-books-container';
+    booksContainer.className = 'modal-books-section';
     booksContainer.innerHTML = `
-      <div class="books-carousel-section">
-        <h3>Sách của nhà xuất bản</h3>
-        <div class="books-carousel">
-          <div class="books-display" id="books-display">
-            <div class="book-list-item" style="display:none;">Danh sách sách</div>
-          </div>
-          <div class="book-card">
-            <img src="" alt="Book" class="book-cover">
-            <p class="book-title"></p>
+      <h3>Danh sách sách</h3>
+      <div class="books-container">
+        <div class="books-list-container" id="books-display">
+          <div class="books-list"></div>
+        </div>
+        <div class="books-display-container">
+          <div class="book-card-large">
+            <img src="" alt="Book" class="book-cover-large">
+            <p class="book-title-large"></p>
           </div>
         </div>
-        <p class="book-counter" id="book-counter"></p>
       </div>
     `;
     
@@ -253,7 +256,7 @@ function openModal({ title, data = {}, onSave }) {
       closeModal();
     };
 
-    // Setup carousel
+    // Setup books display
     let books = [];
     let currentBookIndex = 0;
 
@@ -263,13 +266,16 @@ function openModal({ title, data = {}, onSave }) {
         renderBooksList();
         displayBook(0);
       } else {
-        document.getElementById('books-display').innerHTML = '<p style="color: #999;">Không có sách nào</p>';
+        const box = document.getElementById('books-display')?.querySelector('.books-list');
+        if (box) box.innerHTML = '<p style="color: #999;">Không có sách nào</p>';
         displayBook(0);
       }
     }
 
     function renderBooksList() {
-      const booksList = document.getElementById('books-display');
+      const booksDisplay = document.getElementById('books-display');
+      const booksList = booksDisplay ? booksDisplay.querySelector('.books-list') : null;
+      if (!booksList) return;
       booksList.innerHTML = '';
       books.forEach((book, index) => {
         const item = document.createElement('div');
@@ -285,7 +291,7 @@ function openModal({ title, data = {}, onSave }) {
     }
 
     function displayBook(index) {
-      const bookCard = booksContainer.querySelector('.book-card');
+      const bookCard = booksContainer.querySelector('.book-card-large');
       if (books.length === 0) {
         bookCard.innerHTML = '<p style="color: #999;">Không có sách nào</p>';
         return;
@@ -294,11 +300,10 @@ function openModal({ title, data = {}, onSave }) {
       const book = books[index];
       bookCard.innerHTML = `
         <a href="/Quan_li_sach_admin/Quan_li_chi_tiet_sach.html?sachId=${book.sachId}" style="cursor: pointer; text-decoration: none;">
-          <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover" onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'" style="cursor: pointer;">
+          <img src="${book.anhBia}" alt="${book.tenSach}" class="book-cover-large" onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'" style="cursor: pointer;">
         </a>
-        <p class="book-title">${book.tenSach}</p>
+        <p class="book-title-large">${book.tenSach}</p>
       `;
-      document.getElementById('book-counter').textContent = `${index + 1} / ${books.length}`;
     }
 
     loadBooks();
@@ -332,6 +337,8 @@ function closeModal() {
       modalBox.classList.remove('modal-with-books');
     }
     
+    // restore body scroll in case it was disabled
+    try { document.body.style.overflow = ''; } catch (e) {}
     modal.style.display = 'none';
   }
 }
