@@ -678,3 +678,22 @@ tbody tr {
     padding: 0 20px;
   }
 }
+/* =========================
+   FIX SCROLL DANH SÁCH SÁCH – BẢN ỔN ĐỊNH
+========================= */
+
+.modal-with-books .modal-books-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.modal-with-books .books-carousel {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 🎯 CHỖ DUY NHẤT CÓ SCROLL */
+.modal-with-books .books-display {
+  max-height: 380px;      /* chỉnh số này nếu muốn */
+  overflow-y: auto;
+}
