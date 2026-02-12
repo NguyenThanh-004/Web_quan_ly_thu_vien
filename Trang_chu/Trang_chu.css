@@ -223,13 +223,11 @@ header {
 }
 
 .introduce{
-    margin: 70px 80px;
+    margin: 50px 80px;
     font-size: 50px;
     font-weight: bold;
     background-color: #F8F9FB;
 }
-
-
 
 /* ===== FOOTER ===== */
 .footer {
@@ -291,7 +289,7 @@ header {
 
 
 .book-section {
-    padding: 40px 80px;
+    padding: 10px 80px;
     background-color: #F8F9FB;
 }
 
@@ -361,6 +359,41 @@ header {
 .scroll-top:hover {
     transform: translateY(-3px);
     background-color: #256628;
+}
+
+/* ===== RECOMMEND ===== */
+.recommend-section {
+    padding: 40px 80px 0 80px;
+    background-color: #F8F9FB;
+}
+
+.recommend-title {
+    font-size: 50px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .recommend-section {
+        padding: 30px 40px 0 40px;
+    }
+
+    .recommend-title {
+        font-size: 26px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .recommend-section {
+        padding: 30px 20px 0 20px;
+    }
+
+    .recommend-title {
+        font-size: 22px;
+        text-align: center;
+    }
 }
 
 

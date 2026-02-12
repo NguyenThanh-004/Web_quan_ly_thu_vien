@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 🔹 ĐÃ ĐĂNG NHẬP → THAY NAV
+  loadRecommendations();
   loginLink.style.display = 'none';
   userMenu.style.display = 'block';
   libraryActions.style.display = 'block';
@@ -50,6 +51,9 @@ const pageSize = 10;
 
 const bookGrid = document.getElementById('bookGrid');
 const btnLoadMore = document.getElementById('btnLoadMore');
+const recommendSection = document.querySelector('.recommend-section');
+const recommendGrid = document.getElementById('recommendGrid');
+
 
 async function loadBooks() {
   try {
@@ -149,3 +153,57 @@ searchInput.addEventListener('keydown', (e) => {
   }
 });
 
+
+async function loadRecommendations() {
+  try {
+    const token = sessionStorage.getItem('token');
+
+    const response = await fetch(
+      `http://localhost:8080/api/recommendation?limit=10`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Không thể tải gợi ý");
+    }
+
+    const books = await response.json();
+
+    renderRecommendBooks(books);
+
+    // Hiện section
+    recommendSection.style.display = 'block';
+
+  } catch (error) {
+    console.error("Lỗi khi tải gợi ý:", error);
+  }
+}
+
+function renderRecommendBooks(books) {
+  recommendGrid.innerHTML = '';
+
+  books.forEach(book => {
+    const authors = book.tacGiaList
+      .map(tg => tg.tenTacGia)
+      .join(', ');
+
+    const bookCard = document.createElement('div');
+    bookCard.classList.add('book-card');
+
+    bookCard.innerHTML = `
+      <img src="${book.anhBia}" alt="${book.tenSach}">
+      <h4>${book.tenSach}</h4>
+      <p>${authors}</p>
+    `;
+
+    bookCard.addEventListener('click', () => {
+      goToDetail(book.sachId);
+    });
+
+    recommendGrid.appendChild(bookCard);
+  });
+}
