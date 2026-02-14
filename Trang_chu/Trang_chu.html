@@ -59,13 +59,26 @@
         </div>
 
         <!-- ===== RECOMMEND SECTION (Chỉ hiện khi đăng nhập) ===== -->
-        <div class="recommend-section" style="display:none;">
+       <div class="recommend-section" style="display:none;">
             <p class="recommend-title">Gợi ý dành cho bạn</p>
 
-            <div class="book-grid" id="recommendGrid">
-                <!-- JS render gợi ý ở đây -->
+            <div class="recommend-wrapper">
+                <button class="recommend-btn left" id="recommendLeft">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="recommend-slider">
+                    <div class="recommend-slider-inner" id="recommendGrid">
+                        <!-- JS render -->
+                    </div>
+                </div>
+
+                <button class="recommend-btn right" id="recommendRight">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
+
         <div class = "content-area">
             <p class = "introduce">Xem thư viện có gì</p>
         </div>

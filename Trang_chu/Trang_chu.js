@@ -54,7 +54,6 @@ const btnLoadMore = document.getElementById('btnLoadMore');
 const recommendSection = document.querySelector('.recommend-section');
 const recommendGrid = document.getElementById('recommendGrid');
 
-
 async function loadBooks() {
   try {
     const response = await fetch(
@@ -183,27 +182,74 @@ async function loadRecommendations() {
   }
 }
 
+const recommendPageSize = 5;
+let currentRecommendPage = 0;
+let totalRecommendPages = 0;
+
 function renderRecommendBooks(books) {
   recommendGrid.innerHTML = '';
 
-  books.forEach(book => {
-    const authors = book.tacGiaList
-      .map(tg => tg.tenTacGia)
-      .join(', ');
+  totalRecommendPages = Math.ceil(books.length / recommendPageSize);
 
-    const bookCard = document.createElement('div');
-    bookCard.classList.add('book-card');
+  for (let i = 0; i < totalRecommendPages; i++) {
+    const page = document.createElement('div');
+    page.classList.add('recommend-page');
 
-    bookCard.innerHTML = `
-      <img src="${book.anhBia}" alt="${book.tenSach}">
-      <h4>${book.tenSach}</h4>
-      <p>${authors}</p>
-    `;
+    books
+      .slice(i * recommendPageSize, (i + 1) * recommendPageSize)
+      .forEach(book => {
+        const authors = book.tacGiaList
+          .map(tg => tg.tenTacGia)
+          .join(', ');
 
-    bookCard.addEventListener('click', () => {
-      goToDetail(book.sachId);
-    });
+        const bookCard = document.createElement('div');
+        bookCard.classList.add('book-card');
 
-    recommendGrid.appendChild(bookCard);
-  });
+        bookCard.innerHTML = `
+          <img src="${book.anhBia}" alt="${book.tenSach}">
+          <h4>${book.tenSach}</h4>
+          <p>${authors}</p>
+        `;
+
+        bookCard.addEventListener('click', () => {
+          goToDetail(book.sachId);
+        });
+
+        page.appendChild(bookCard);
+      });
+
+    recommendGrid.appendChild(page);
+  }
+
+  currentRecommendPage = 0;
+  updateRecommendSlider();
 }
+
+
+function updateRecommendSlider() {
+  recommendGrid.style.transform =
+    `translateX(-${currentRecommendPage * 100}%)`;
+
+  recommendLeft.disabled = currentRecommendPage === 0;
+  recommendRight.disabled = currentRecommendPage === totalRecommendPages - 1;
+}
+
+
+const recommendLeft = document.getElementById('recommendLeft');
+const recommendRight = document.getElementById('recommendRight');
+
+recommendRight.addEventListener('click', () => {
+  if (currentRecommendPage < totalRecommendPages - 1) {
+    currentRecommendPage++;
+    updateRecommendSlider();
+  }
+});
+
+recommendLeft.addEventListener('click', () => {
+  if (currentRecommendPage > 0) {
+    currentRecommendPage--;
+    updateRecommendSlider();
+  }
+});
+
+
