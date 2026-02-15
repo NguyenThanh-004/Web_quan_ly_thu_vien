@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   libraryActions.style.display = 'block';
   usernameText.textContent = username;
 
+  loadViolationWarning();
   // Toggle dropdown
   btnUser.addEventListener('click', () => {
     userMenu.classList.toggle('show');
@@ -264,4 +265,113 @@ function reloadCartFromAPI(ids) {
     .then(data => {
         renderCartItems(data.content);
     });
+}
+
+
+async function loadViolationWarning() {
+    const token = sessionStorage.getItem("token");
+
+    let soQuaHan = 0;
+    let soMat = 0;
+    let soHong = 0;
+
+    try {
+        // 1️⃣ Load tất cả phiếu mượn
+        const res = await fetch(
+            "http://localhost:8080/api/phieumuon/load?trangThai=TAT_CA",
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        console.log("Phiếu mượn của user:", data.content);
+        const phieuList = data.content || [];
+
+        // 2️⃣ Duyệt từng phiếu
+        for (const phieu of phieuList) {
+            const detailRes = await fetch(
+                `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieu.phieuMuonId}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (!detailRes.ok) continue;
+
+            const chiTietList = await detailRes.json();
+
+            const result = countViolationsFromChiTiet(chiTietList);
+
+            soQuaHan += result.soQuaHan;
+            soMat += result.soMat;
+            soHong += result.soHong;
+        }
+
+        showWarning(soQuaHan, soMat, soHong);
+
+    } catch (err) {
+        console.error("Lỗi load cảnh báo:", err);
+    }
+}
+
+function countViolationsFromChiTiet(list) {
+    let soQuaHan = 0;
+    let soMat = 0;
+    let soHong = 0;
+
+    list.forEach(item => {
+        switch (item.tinhTrangKhiTra) {
+            case "QUA_HAN":
+                soQuaHan++;
+                break;
+            case "MAT":
+                soMat++;
+                break;
+            case "HU_HONG":
+                soHong++;
+                break;
+        }
+    });
+    return { soQuaHan, soMat, soHong };
+}
+
+function showWarning(soQuaHan, soMat, soHong) {
+    const warningBox = document.getElementById("cart-warning");
+    if (!warningBox) return;
+
+    const parts = [];
+
+    if (soQuaHan > 0) {
+        parts.push(`${soQuaHan} quyển sách quá hạn`);
+    }
+    if (soMat > 0) {
+        parts.push(`làm mất ${soMat} quyển`);
+    }
+    if (soHong > 0) {
+        parts.push(`làm hỏng ${soHong} quyển`);
+    }
+
+    if (parts.length === 0) {
+        warningBox.style.display = "none";
+        return;
+    }
+
+    const message =
+        soQuaHan === 0
+            ? "Bạn đã " + parts.join(" và ")
+            : "Bạn có " + parts.join(" và ");
+
+    warningBox.textContent = "⚠ " + message;
+    warningBox.style.display = "block";
+
+    if (soMat > 0 || soHong > 0) {
+        warningBox.classList.add("serious");
+    }
 }
