@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? keyword.substring(0, maxLength) + "..."
                 : keyword;
 
-        keywordSpan.textContent = `: "${displayKeyword}"`;
+        keywordSpan.textContent = ` "${displayKeyword}"`;
     }
     if (!keyword || keyword.trim() === "") {
         console.warn("Không có keyword");
