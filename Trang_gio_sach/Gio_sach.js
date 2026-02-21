@@ -276,7 +276,6 @@ async function loadViolationWarning() {
     let soHong = 0;
 
     try {
-        // 1️⃣ Load tất cả phiếu mượn
         const res = await fetch(
             "http://localhost:8080/api/phieumuon/load?trangThai=TAT_CA",
             {
@@ -289,31 +288,58 @@ async function loadViolationWarning() {
         if (!res.ok) return;
 
         const data = await res.json();
-        console.log("Phiếu mượn của user:", data.content);
         const phieuList = data.content || [];
-
-        // 2️⃣ Duyệt từng phiếu
+        console.log("PHIEU LIST:", phieuList);
         for (const phieu of phieuList) {
-            const detailRes = await fetch(
-                `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieu.phieuMuonId}`,
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
+
+            // ❌ BỎ QUA trạng thái không tính
+            if (
+                phieu.trangThaiPhieuMuon === "HUY" ||
+                phieu.trangThaiPhieuMuon === "HOAN_TAT" ||
+                phieu.trangThaiPhieuMuon === "DANG_CHO"
+            ) {
+                continue;
+            }
+
+            // ✅ Chỉ check các phiếu còn hiệu lực
+            if (
+                phieu.trangThaiPhieuMuon === "DANG_MUON" ||
+                phieu.trangThaiPhieuMuon === "QUA_HAN"
+            ) {
+
+                const detailRes = await fetch(
+                    `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieu.phieuMuonId}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
                     }
-                }
-            );
+                );
 
-            if (!detailRes.ok) continue;
+                if (!detailRes.ok) continue;
 
-            const chiTietList = await detailRes.json();
+                const detailData = await detailRes.json();
+                const chiTietList = detailData.content || detailData || [];
 
-            const result = countViolationsFromChiTiet(chiTietList);
-
-            soQuaHan += result.soQuaHan;
-            soMat += result.soMat;
-            soHong += result.soHong;
+                console.log("CHI TIET LIST:", chiTietList);
+                console.log(chiTietList);
+                // 🔥 Đếm trực tiếp từ chi tiết
+                chiTietList.forEach(item => {
+                    switch (item.tinhTrangKhiTra) {
+                        case "QUA_HAN":
+                            soQuaHan++;
+                            break;
+                        case "MAT":
+                            soMat++;
+                            break;
+                        case "HU_HONG":
+                            soHong++;
+                            break;
+                    }
+                });
+            }
         }
-
+        console.log("Tổng:", soQuaHan, soMat, soHong);
         showWarning(soQuaHan, soMat, soHong);
 
     } catch (err) {
@@ -344,7 +370,9 @@ function countViolationsFromChiTiet(list) {
 
 function showWarning(soQuaHan, soMat, soHong) {
     const warningBox = document.getElementById("cart-warning");
-    if (!warningBox) return;
+    const borrowBtn = document.querySelector(".btn-borrow");
+
+    if (!warningBox || !borrowBtn) return;
 
     const parts = [];
 
@@ -360,18 +388,28 @@ function showWarning(soQuaHan, soMat, soHong) {
 
     if (parts.length === 0) {
         warningBox.style.display = "none";
+        borrowBtn.disabled = false;
+        borrowBtn.classList.remove("disabled");
         return;
     }
 
-    const message =
-        soQuaHan === 0
-            ? "Bạn đã " + parts.join(" và ")
-            : "Bạn có " + parts.join(" và ");
+    let message = "";
+
+    if (soMat > 0 || soHong > 0) {
+        // 🚫 Trường hợp nghiêm trọng
+        message = "Bạn đã " + parts.join(" và ") +
+            ". Vui lòng xử lý vi phạm trước khi mượn sách.";
+
+        borrowBtn.disabled = true;
+        borrowBtn.classList.add("disabled");
+        warningBox.classList.add("serious");
+
+    } else {
+        // ⚠ Chỉ quá hạn
+        message = "Bạn có " + parts.join(" và ") + ".";
+        borrowBtn.disabled = false;
+    }
 
     warningBox.textContent = "⚠ " + message;
     warningBox.style.display = "block";
-
-    if (soMat > 0 || soHong > 0) {
-        warningBox.classList.add("serious");
-    }
 }
