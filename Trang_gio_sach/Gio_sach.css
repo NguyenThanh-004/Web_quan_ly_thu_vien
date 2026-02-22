@@ -383,19 +383,59 @@ header {
 }
 
 .cart-warning {
-    background: #fff4e5;
-    border-left: 5px solid #ff9800;
-    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    background: #fff8f0;
+    border: 1px solid #ffd8b5;
+    border-left: 6px solid #ff7a00;
+
+    padding: 16px 18px;
     margin-bottom: 20px;
-    border-radius: 6px;
+    border-radius: 10px;
+
     font-size: 14px;
-    color: #663c00;
+    color: #7a3e00;
 }
 
+/* Trạng thái nghiêm trọng */
 .cart-warning.serious {
-    background: #fdecea;
-    border-left: 5px solid #d32f2f;
+    background: #fff1f1;
+    border: 1px solid #f5c2c7;
+    border-left: 6px solid #d32f2f;
     color: #7f1d1d;
+}
+
+
+.warning-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.warning-text {
+    flex: 1;
+}
+
+/* Nút dùng chung cho mọi trường hợp */
+.btn-view-detail {
+    margin-left: auto;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    background: #404752;   /* màu trung tính */
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-view-detail:hover {
+    background: #1f2937;
 }
 
 .btn-borrow.disabled {

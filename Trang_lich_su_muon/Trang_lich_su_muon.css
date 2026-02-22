@@ -188,6 +188,22 @@
     background-color: #256628;
 } 
 
+/* 🟡 Quá hạn */
+.highlight-warning {
+    border: 2px solid #f4b400;
+}
+
+/* 🔴 Mất / Hỏng */
+.highlight-serious {
+    border: 2px solid #d32f2f;
+}
+
+@keyframes blinkHighlight {
+    0% { background-color: #fdecea; }
+    50% { background-color: #ffffff; }
+    100% { background-color: #fdecea; }
+}
+
 @media (max-width: 768px) {
     .loan-card-body {
         flex-direction: column;

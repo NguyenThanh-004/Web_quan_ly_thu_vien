@@ -170,7 +170,7 @@ function renderLoansFromAPI(list) {
     }
 
     container.innerHTML = list.map(item => `
-        <div class="loan-card">
+        <div class="loan-card" data-loan-id="${item.phieuMuonId}">
             <div class="loan-card-header">
                 <i class="far fa-file-alt"></i> PHIẾU MƯỢN
             </div>
@@ -204,6 +204,90 @@ function renderLoansFromAPI(list) {
             </div>
         </div>
     `).join("");
+    handleScrollFromCart(list);
+}
+
+async function handleScrollFromCart(list) {
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("from") !== "cart") return;
+
+    const token = sessionStorage.getItem("token");
+
+    let firstViolationCard = null;
+
+    for (const phieu of list) {
+
+        if (
+            phieu.trangThaiPhieuMuon === "HUY" ||
+            phieu.trangThaiPhieuMuon === "HOAN_TAT" ||
+            phieu.trangThaiPhieuMuon === "DANG_CHO"
+        ) {
+            continue;
+        }
+
+        try {
+            const res = await fetch(
+                `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieu.phieuMuonId}`,
+                {
+                    headers: { "Authorization": `Bearer ${token}` }
+                }
+            );
+
+            if (!res.ok) continue;
+
+            const detailData = await res.json();
+            const chiTietList = detailData.content || detailData || [];
+
+            let hasOverdue = false;
+            let hasSerious = false;
+
+            chiTietList.forEach(item => {
+                if (item.tinhTrangKhiTra === "QUA_HAN") {
+                    hasOverdue = true;
+                }
+                if (
+                    item.tinhTrangKhiTra === "MAT" ||
+                    item.tinhTrangKhiTra === "HU_HONG"
+                ) {
+                    hasSerious = true;
+                }
+            });
+
+            if (hasOverdue || hasSerious) {
+
+                const card = document.querySelector(
+                    `[data-loan-id="${phieu.phieuMuonId}"]`
+                );
+
+                if (!card) continue;
+
+                if (!firstViolationCard) {
+                    firstViolationCard = card;
+                }
+
+                // 🔴 Nếu có mất/hỏng → đỏ
+                if (hasSerious) {
+                    card.classList.add("highlight-serious");
+                }
+                // 🟡 Nếu chỉ quá hạn → vàng
+                else if (hasOverdue) {
+                    card.classList.add("highlight-warning");
+                }
+            }
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // 👉 Scroll tới phiếu vi phạm đầu tiên
+    if (firstViolationCard) {
+        firstViolationCard.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
 }
 
 function goToChiTiet(phieuMuonId) {

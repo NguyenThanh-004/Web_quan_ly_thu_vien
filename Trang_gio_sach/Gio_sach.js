@@ -417,7 +417,19 @@ function showWarning(soQuaHan, soMat, soHong) {
         borrowBtn.classList.add("disabled");
     }
 
-    warningBox.textContent = "⚠ " + message;
+    warningBox.innerHTML = `
+    <div class="warning-content">
+        <div class="warning-text">
+            ⚠ ${message}
+        </div>
+        <button class="btn-view-detail">Xem chi tiết</button>
+        </div>
+    `;
+    const detailBtn = warningBox.querySelector(".btn-view-detail");
+    detailBtn.addEventListener("click", () => {
+        window.location.href =
+            "/Trang_lich_su_muon/Trang_lich_su_muon.html?from=cart";
+    });
     warningBox.style.display = "block";
 }
 
