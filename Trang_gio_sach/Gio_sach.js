@@ -369,47 +369,56 @@ function countViolationsFromChiTiet(list) {
 }
 
 function showWarning(soQuaHan, soMat, soHong) {
+
     const warningBox = document.getElementById("cart-warning");
     const borrowBtn = document.querySelector(".btn-borrow");
 
     if (!warningBox || !borrowBtn) return;
 
+    // Không có vi phạm
+    if (soQuaHan === 0 && soMat === 0 && soHong === 0) {
+        warningBox.style.display = "none";
+        borrowBtn.disabled = false;
+        return;
+    }
+
+    let message = "";
     const parts = [];
 
     if (soQuaHan > 0) {
         parts.push(`${soQuaHan} quyển sách quá hạn`);
     }
-    if (soMat > 0) {
-        parts.push(`làm mất ${soMat} quyển`);
-    }
+
     if (soHong > 0) {
-        parts.push(`làm hỏng ${soHong} quyển`);
+        parts.push(`${soHong} quyển sách bị hỏng`);
     }
 
-    if (parts.length === 0) {
-        warningBox.style.display = "none";
-        borrowBtn.disabled = false;
-        borrowBtn.classList.remove("disabled");
-        return;
+    if (soMat > 0) {
+        parts.push(`${soMat} quyển sách bị mất`);
     }
 
-    let message = "";
-
-    if (soMat > 0 || soHong > 0) {
-        // 🚫 Trường hợp nghiêm trọng
-        message = "Bạn đã " + parts.join(" và ") +
-            ". Vui lòng xử lý vi phạm trước khi mượn sách.";
-
-        borrowBtn.disabled = true;
-        borrowBtn.classList.add("disabled");
+    // Chỉ quá hạn
+    if (soQuaHan > 0 && soMat === 0 && soHong === 0) {
+        message = `Bạn có ${soQuaHan} quyển sách quá hạn.`;
+        borrowBtn.disabled = false; // vẫn cho mượn
+    }
+    // Chỉ hỏng hoặc mất
+    else if (soQuaHan === 0) {
+        message = `Bạn có ${parts.join(" và ")}. Vui lòng xử lý các vi phạm trước khi tiếp tục mượn sách.`;
+        borrowBtn.disabled = true; // ❌ disable
         warningBox.classList.add("serious");
-
-    } else {
-        // ⚠ Chỉ quá hạn
-        message = "Bạn có " + parts.join(" và ") + ".";
-        borrowBtn.disabled = false;
+        borrowBtn.classList.add("disabled");
+    }
+    // Có cả quá hạn + vi phạm
+    else {
+        message = `Bạn có ${parts.join(", ").replace(/,([^,]*)$/, " và$1")}. Vui lòng xử lý các vi phạm trước khi tiếp tục mượn sách.`;
+        borrowBtn.disabled = true; // ❌ disable
+        warningBox.classList.add("serious");
+        borrowBtn.classList.add("disabled");
     }
 
     warningBox.textContent = "⚠ " + message;
     warningBox.style.display = "block";
 }
+
+

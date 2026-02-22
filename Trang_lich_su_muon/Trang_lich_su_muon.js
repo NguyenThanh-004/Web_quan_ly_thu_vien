@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
    
     loadPhieuMuon("TAT_CA");
-
+    loadViolationWarningForLoanPage();
 });
 
 const filterBtn = document.getElementById("filterBtn");
@@ -243,3 +243,129 @@ btnScrollTop.addEventListener('click', () => {
     behavior: 'smooth'
   });
 });
+
+async function loadViolationWarningForLoanPage() {
+    const token = sessionStorage.getItem("token");
+
+    let soQuaHan = 0;
+    let soMat = 0;
+    let soHong = 0;
+
+    try {
+        const res = await fetch(
+            "http://localhost:8080/api/phieumuon/load?trangThai=TAT_CA",
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const phieuList = data.content || [];
+
+        for (const phieu of phieuList) {
+
+            if (
+                phieu.trangThaiPhieuMuon === "HUY" ||
+                phieu.trangThaiPhieuMuon === "HOAN_TAT" ||
+                phieu.trangThaiPhieuMuon === "DANG_CHO"
+            ) {
+                continue;
+            }
+
+            if (
+                phieu.trangThaiPhieuMuon === "DANG_MUON" ||
+                phieu.trangThaiPhieuMuon === "QUA_HAN"
+            ) {
+
+                const detailRes = await fetch(
+                    `http://localhost:8080/api/phieumuon/chitietmuontra?phieuMuonId=${phieu.phieuMuonId}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    }
+                );
+
+                if (!detailRes.ok) continue;
+
+                const detailData = await detailRes.json();
+                const chiTietList = detailData.content || detailData || [];
+
+                chiTietList.forEach(item => {
+                    switch (item.tinhTrangKhiTra) {
+                        case "QUA_HAN":
+                            soQuaHan++;
+                            break;
+                        case "MAT":
+                            soMat++;
+                            break;
+                        case "HU_HONG":
+                            soHong++;
+                            break;
+                    }
+                });
+            }
+        }
+
+        showLoanWarning(soQuaHan, soMat, soHong);
+
+    } catch (err) {
+        console.error("Lỗi load cảnh báo:", err);
+    }
+}
+
+function showLoanWarning(soQuaHan, soMat, soHong) {
+    const warningBox = document.getElementById("loan-warning");
+    if (!warningBox) return;
+
+    // ❌ Không có vi phạm gì
+    if (soQuaHan === 0 && soMat === 0 && soHong === 0) {
+        warningBox.style.display = "none";
+        return;
+    }
+
+    let message = "";
+    const parts = [];
+
+    // 🔹 Phần quá hạn
+    if (soQuaHan > 0) {
+        parts.push(`${soQuaHan} quyển sách quá hạn`);
+    }
+
+    // 🔹 Phần hỏng
+    if (soHong > 0) {
+        parts.push(`${soHong} quyển sách bị hỏng`);
+    }
+
+    // 🔹 Phần mất
+    if (soMat > 0) {
+        parts.push(`${soMat} quyển sách bị mất`);
+    }
+
+    // =========================
+    // XỬ LÝ TỪNG NHÓM TRƯỜNG HỢP
+    // =========================
+
+    // 1️⃣ Chỉ quá hạn
+    if (soQuaHan > 0 && soMat === 0 && soHong === 0) {
+        message = `Bạn có ${soQuaHan} quyển sách quá hạn.`;
+        warningBox.classList.remove("serious");
+    }
+    // 2️⃣ Chỉ hỏng hoặc mất
+    else if (soQuaHan === 0 && (soMat > 0 || soHong > 0)) {
+        message = `Bạn có ${parts.join(" và ")}. Vui lòng xử lý vi phạm.`;
+        warningBox.classList.add("serious");
+    }
+    // 3️⃣ Có cả quá hạn và vi phạm
+    else {
+        message = `Bạn có ${parts.join(", ").replace(/,([^,]*)$/, " và$1")}. Vui lòng xử lý vi phạm.`;
+        warningBox.classList.add("serious");
+    }
+
+    warningBox.textContent = "⚠ " + message;
+    warningBox.style.display = "block";
+}
