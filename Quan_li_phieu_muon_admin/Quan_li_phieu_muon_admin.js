@@ -179,13 +179,13 @@ function renderPhieuMuon(pageData, append = false) {
 
         <div class="info">
           <span class="label">Trạng thái</span>
-          <span class="value">
+          <span>
             <select class="status-select" data-id="${item.phieuMuonId}">
-              <option value="DANG_CHO" ${item.trangThaiPhieuMuon === 'DANG_CHO' ? 'selected' : ''}>Đang chờ</option>
-              <option value="DANG_MUON" ${item.trangThaiPhieuMuon === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
-              <option value="HUY" ${item.trangThaiPhieuMuon === 'HUY' ? 'selected' : ''}>Huỷ</option>
-              <option value="QUA_HAN" ${item.trangThaiPhieuMuon === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
-              <option value="HOAN_TAT" ${item.trangThaiPhieuMuon === 'HOAN_TAT' ? 'selected' : ''}>Hoàn tất</option>
+              <option class="status-option-neutral" value="DANG_CHO" ${item.trangThaiPhieuMuon === 'DANG_CHO' ? 'selected' : ''}>Đang chờ</option>
+              <option class="status-option-good" value="DANG_MUON" ${item.trangThaiPhieuMuon === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
+              <option class="status-option-bad" value="HUY" ${item.trangThaiPhieuMuon === 'HUY' ? 'selected' : ''}>Huỷ</option>
+              <option class="status-option-bad" value="QUA_HAN" ${item.trangThaiPhieuMuon === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
+              <option class="status-option-good" value="HOAN_TAT" ${item.trangThaiPhieuMuon === 'HOAN_TAT' ? 'selected' : ''}>Hoàn tất</option>
             </select>
           </span>
         </div>
@@ -289,39 +289,40 @@ async function updateChiTietStatus(phieuMuonId) {
 // ================= BIND EVENTS =================
 function bindActions() {
   document.querySelectorAll('.status-select').forEach(select => {
+
+    // ✅ SET MÀU NGAY KHI RENDER
+    updateSelectColor(select);
+
+    // ✅ ĐỔI MÀU + UPDATE API KHI CHANGE
     select.addEventListener('change', e => {
-      updateTrangThaiPhieuMuon(e.target.dataset.id, e.target.value);
+      updateSelectColor(e.target); // đổi màu ngay
+      updateTrangThaiPhieuMuon(
+        e.target.dataset.id,
+        e.target.value
+      );
     });
   });
 
   document.querySelectorAll('.btn-detail').forEach(btn => {
     btn.addEventListener('click', () => {
-      // Always get the correct phieuMuonId from the card
       let phieuMuonId = btn.getAttribute('data-id');
       if (!phieuMuonId) {
-        // fallback: try to get from parent .phieu-muon-card
         const card = btn.closest('.phieu-muon-card');
         if (card) {
           const valueEl = card.querySelector('.info .value');
           if (valueEl) phieuMuonId = valueEl.textContent.trim();
         }
       }
-      console.log('[DEBUG] Navigating to chi tiết mượn trả, phieuMuonId:', phieuMuonId);
       if (phieuMuonId) {
-        window.location.href = `/Quan_li_phieu_muon_admin/Quan_li_chi_tiet_muon_tra.html?phieuMuonId=${encodeURIComponent(phieuMuonId)}`;
-      } else {
-        alert('Không tìm thấy mã phiếu mượn để xem chi tiết!');
+        window.location.href =
+          `/Quan_li_phieu_muon_admin/Quan_li_chi_tiet_muon_tra.html?phieuMuonId=${encodeURIComponent(phieuMuonId)}`;
       }
     });
   });
-  // Xóa modal chi tiết mượn trả nếu còn sót lại trong DOM
+
   const oldModal = document.getElementById('chitiet-muontra-modal');
   if (oldModal) oldModal.remove();
 }
-
-
-
-
 
 // ================= INIT =================
 document.addEventListener('DOMContentLoaded', () => {
@@ -615,4 +616,23 @@ async function searchPhieuMuon(keyword, trangThai) {
     console.error(err);
     setStatus('Không thể tìm kiếm.');
   }
+}
+
+// ================= UPDATE SELECT COLOR ================= // Cập nhật màu sắc của select dựa trên giá trị
+function updateSelectColor(select) {
+    select.classList.remove('neutral', 'good', 'bad');
+
+    switch (select.value) {
+        case 'DANG_CHO':
+            select.classList.add('neutral');
+            break;
+        case 'DANG_MUON':
+        case 'HOAN_TAT':
+            select.classList.add('good');
+            break;
+        case 'HUY':
+        case 'QUA_HAN':
+            select.classList.add('bad');
+            break;
+    }
 }

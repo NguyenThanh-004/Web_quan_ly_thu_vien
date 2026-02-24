@@ -363,6 +363,12 @@ tbody tr {
   align-items: center;
 }   
 
+.modal-title-wrapper {
+  display: flex;
+  align-items: center;
+
+}
+
 .modal-close {
   font-size: 24px;
   border: none;
@@ -785,15 +791,21 @@ tbody tr {
 /* ITEM */
 .modal-with-books .book-list-item {
   padding: 10px;
-  font-size: 13px;
+  font-size: 14px;
+  font-style: bold;
   border-radius: 4px;
   background: #f9f9f9;
   border: 1px solid #e0e0e0;
   cursor: pointer;
 }
 
+.modal-with-books .book-list-item:hover {
+  background: #f0f0f0;
+  border-color: #34c171;
+}
+
 .modal-with-books .book-list-item.active {
-  background: #2196F3;
+  background: #34c171;
   color: #fff;
   font-weight: 600;
 }
@@ -803,7 +815,7 @@ tbody tr {
   flex: 1;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
-  background: #fafafa;
+  background: rgba(153, 153, 153, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -833,4 +845,19 @@ tbody tr {
   color: #333;
   max-width: 180px;
   word-break: break-word;
+}
+
+.title .greenline {
+  width: 5px;
+  height: 16px;
+  background-color: #5ad75f;
+  border-radius: 2px;
+  margin-bottom: 1px; 
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }

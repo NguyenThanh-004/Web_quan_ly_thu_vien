@@ -134,10 +134,14 @@ function openAddModal() {
         <h3>Thêm tác giả</h3>
         <button class="modal-close">&times;</button>
       </div>
+      
+      <div class="title-section">
+        <div class ="greenline"></div>
+        <h2 class="form-title">Thông tin tác giả</h2>
+      </div>
 
       <div class="modal-content-wrapper">
         <div class="modal-form-container">
-          <h2 class="form-title">Thông tin tác giả</h2>
           <div class="modal-body modal-body-single-row">
             <div class="input-group">
               <label>Tên tác giả</label>
@@ -199,8 +203,11 @@ function openUpdateModal(data) {
       <div class="modal-content-wrapper">
         <div class="modal-right-section">
           <!-- TOP: FORM INPUTS IN 2 COLUMNS -->
-          <div class="modal-form-container">
+          <div class="title-section">
+            <div class="greenline"></div>
             <h2 class="form-title">Thông tin tác giả</h2>
+          </div>
+          <div class="modal-form-container">
             <div class="modal-body">
               <div class="input-row">
                 <div class="input-group">
@@ -231,15 +238,21 @@ function openUpdateModal(data) {
 
           <!-- BOTTOM: BOOKS LIST + BOOK DISPLAY TOGETHER -->
           <div class="modal-book-display-section">
+            
             <!-- LEFT: BOOKS LIST -->
+
             <div class="modal-books-list-container">
-              <h3>Danh sách sách</h3>
+            <div class="title-section-small">
+              <div class="greenline"></div>
+              <h2 class="form-title">Danh sách sách</h2>
+            </div>
               <div class="books-list" id="books-list">
                 <p style="color: #999;"></p>
               </div>
             </div>
 
             <!-- RIGHT: BOOK DISPLAY -->
+
             <div class="book-display-large" id="books-display">
               <div class="book-card-large">
                 <img src="" alt="Book" class="book-cover-large">

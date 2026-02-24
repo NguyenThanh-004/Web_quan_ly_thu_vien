@@ -146,6 +146,23 @@
     font-style: bold;
 }
 
+/* màu theo trạng thái */
+
+.book-extra-info .dropdown-tinhtrang.good    { color: #2ecc71; }
+
+.book-extra-info .dropdown-tinhtrang.bad     { color: #e74c3c; }
+
+.book-extra-info .dropdown-tinhtrang .tinhtrang-option-good{
+    background: #f0f2f1;
+    color: #2ecc71;
+}
+
+.book-extra-info .dropdown-tinhtrang .tinhtrang-option-bad{
+    background: #f0f2f1;
+    color: #e74c3c;
+}
+
+
 @media (max-width: 1024px) {
     .loan-summary-grid {
         grid-template-columns: repeat(4, 1fr);

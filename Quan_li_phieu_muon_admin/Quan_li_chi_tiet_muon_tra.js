@@ -143,11 +143,11 @@ function displayLoanDetailsAdmin(phieuMuonId, list) {
                         <span>Ngày trả: ${ngayTraText}</span>
                         <span>Tình trạng: 
                             <select class="dropdown-tinhtrang" data-chitietid="${item.chiTietMuonTraId}" style="margin-left:4px;">
-                                <option value="DANG_MUON" ${tinhTrang === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
-                                <option value="DA_TRA" ${tinhTrang === 'DA_TRA' ? 'selected' : ''}>Đã trả</option>
-                                <option value="HU_HONG" ${tinhTrang === 'HU_HONG' ? 'selected' : ''}>Hư hỏng</option>
-                                <option value="MAT" ${tinhTrang === 'MAT' ? 'selected' : ''}>Mất</option>
-                                <option value="QUA_HAN" ${tinhTrang === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
+                                <option class="tinhtrang-option-good" value="DANG_MUON" ${tinhTrang === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
+                                <option class="tinhtrang-option-good" value="DA_TRA" ${tinhTrang === 'DA_TRA' ? 'selected' : ''}>Đã trả</option>
+                                <option class="tinhtrang-option-bad" value="HU_HONG" ${tinhTrang === 'HU_HONG' ? 'selected' : ''}>Hư hỏng</option>
+                                <option class="tinhtrang-option-bad" value="MAT" ${tinhTrang === 'MAT' ? 'selected' : ''}>Mất</option>
+                                <option class="tinhtrang-option-bad" value="QUA_HAN" ${tinhTrang === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
                             </select>
                         </span>
                         <span class="fine">Tiền phạt: ${tienPhatText}</span>
@@ -160,11 +160,18 @@ function displayLoanDetailsAdmin(phieuMuonId, list) {
 
     // Add event listeners for each dropdown
     listContainer.querySelectorAll('.dropdown-tinhtrang').forEach(dropdown => {
-        dropdown.addEventListener('change', async function (e) {
+        
+        // ✅ SET MÀU NGAY KHI RENDER (GIỐNG bindActions)
+        updateSelectColor(dropdown);
+
+    // ✅ ĐỔI MÀU + GỌI API KHI CHANGE
+        dropdown.addEventListener('change', async function () {
+            updateSelectColor(dropdown); // đổi màu ngay
+
             const chiTietId = dropdown.getAttribute('data-chitietid');
             const tinhTrang = dropdown.value;
             await updateChiTietStatus(chiTietId, tinhTrang);
-        });
+    });
     });
 }
 
@@ -288,3 +295,19 @@ async function updateChiTietStatus(chiTietPhieuMuonId, tinhTrang) {
         alert(`Không thể cập nhật chi tiết: ${err.message}`);
     }
 }
+// ================= UPDATE SELECT COLOR ================= // Cập nhật màu sắc của select dựa trên giá trị
+function updateSelectColor(select) {
+    select.classList.remove('neutral', 'good', 'bad');
+
+    switch (select.value) {
+        case 'DANG_MUON':
+        case 'DA_TRA':
+            select.classList.add('good');
+            break;
+        case 'HU_HONG':
+        case 'QUA_HAN':
+        case 'MAT':
+            select.classList.add('bad');
+            break;
+    }
+}   

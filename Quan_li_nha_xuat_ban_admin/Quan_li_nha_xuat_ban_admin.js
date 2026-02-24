@@ -220,7 +220,10 @@ function openModal({ title, data = {}, onSave }) {
     const booksContainer = document.createElement('div');
     booksContainer.className = 'modal-books-section';
     booksContainer.innerHTML = `
+      <div class="title">
+      <div class="greenline"></div>
       <h3>Danh sách sách</h3>
+      </div>
       <div class="books-container">
         <div class="books-list-container" id="books-display">
           <div class="books-list"></div>

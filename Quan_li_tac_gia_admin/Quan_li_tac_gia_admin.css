@@ -387,7 +387,7 @@ tbody tr {
 
 .modal-box {
   background: #fff;
-  width: 520px;
+  width: 600px;
   padding: 20px;
 }
 
@@ -405,7 +405,21 @@ tbody tr {
   gap: 4px;
 }
 
-.modal-box .form-title {
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.greenline {
+  width: 5px;
+  height: 20px;
+  background-color: #5ad75f;
+  border-radius: 2px;
+  margin-bottom: 12px; 
+}
+
+.form-title {
   margin: 0 0 8px 0;
   font-size: 16px;
   font-weight: bold;
@@ -423,6 +437,7 @@ tbody tr {
   flex-direction: column;
   gap: 6px;
   width: 100%;
+  margin-bottom: 12px;
 }
 
 .modal-box .modal-body-single-row .input-group label {
@@ -520,13 +535,13 @@ tbody tr {
 
 .modal-with-books .book-list-item:hover {
   background: #f0f0f0;
-  border-color: #2196F3;
+  border-color: #34c171;
 }
 
 .modal-with-books .book-list-item.active {
-  background: #2196F3;
+  background: #34c171;
   color: white;
-  border-color: #2196F3;
+  border-color: #34c171;
   font-weight: bold;
 }
 
@@ -546,6 +561,7 @@ tbody tr {
   flex-direction: column;
   gap: 4px;
   order: 1;
+  height: auto ;
 }
 
 .modal-with-books .form-title {
@@ -559,11 +575,13 @@ tbody tr {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  height: 130px;
 }
 
 .modal-with-books .input-row {
   display: flex;
   gap: 4px;
+  margin-bottom: 8px;
 }
 
 .modal-with-books .input-group {
@@ -624,11 +642,11 @@ tbody tr {
   order: 2;
 }
 
+.modal-with-books .modal-books-list-container .title-section-small {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-.modal-with-books .modal-books-list-container h3 {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  color: #333;
 }
 
 .modal-with-books .book-display-large {
@@ -636,6 +654,7 @@ tbody tr {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: rgba(153, 153, 153, 0.15);
 }
 
 .modal-with-books .book-card-large {

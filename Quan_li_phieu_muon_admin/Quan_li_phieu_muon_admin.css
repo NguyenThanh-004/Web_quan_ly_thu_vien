@@ -550,16 +550,37 @@ tbody tr {
 .status-select {
     padding: 8px 10px;
     border-radius: 8px;
-    border: none;
-    background: #f0f2f1;
+    border: 1px solid #ddd;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     outline: none;
 }
 
+/* màu theo trạng thái */
+.status-select.neutral { color: #FFAC1C; }
+
+.status-select.good    { color: #2ecc71; }
+
+.status-select.bad     { color: #e74c3c; }
+
 .status-select:focus {
     box-shadow: 0 0 0 3px rgba(46,204,113,0.35);
+}
+
+.status-select .status-option-neutral{
+    background: #f0f2f1;
+    color: #FFAC1C;
+}
+
+.status-select .status-option-good{
+    background: #f0f2f1;
+    color: #2ecc71;
+}
+
+.status-select .status-option-bad{
+    background: #f0f2f1;
+    color: #e74c3c;
 }
 
 /* ===== FOOTER ===== */
