@@ -1,3 +1,4 @@
+let isBorrowBlocked = false;
 document.addEventListener('DOMContentLoaded', () => {
   // === CHECK LOGIN NGAY KHI LOAD ===
   const username = sessionStorage.getItem('username');
@@ -179,7 +180,10 @@ function getSelectedBanSaoIds() {
 
 document.querySelector('.btn-borrow')
     .addEventListener('click', async () => {
-
+     if (isBorrowBlocked) {
+        alert("Bạn cần xử lý vi phạm (mất hoặc hỏng sách) trước khi tiếp tục mượn.");
+        return;
+    }
     const selectedBanSaoSachIds = getSelectedBanSaoIds();
     console.log('length selected:', selectedBanSaoSachIds.length); 
     // ❌ Không chọn gì
@@ -378,7 +382,7 @@ function showWarning(soQuaHan, soMat, soHong) {
     // Không có vi phạm
     if (soQuaHan === 0 && soMat === 0 && soHong === 0) {
         warningBox.style.display = "none";
-        borrowBtn.disabled = false;
+        //borrowBtn.disabled = false;
         return;
     }
 
@@ -400,19 +404,22 @@ function showWarning(soQuaHan, soMat, soHong) {
     // Chỉ quá hạn
     if (soQuaHan > 0 && soMat === 0 && soHong === 0) {
         message = `Bạn có ${soQuaHan} quyển sách quá hạn.`;
-        borrowBtn.disabled = false; // vẫn cho mượn
+        //borrowBtn.disabled = false; // vẫn cho mượn
+        isBorrowBlocked = false;
     }
     // Chỉ hỏng hoặc mất
     else if (soQuaHan === 0) {
         message = `Bạn có ${parts.join(" và ")}. Vui lòng xử lý các vi phạm trước khi tiếp tục mượn sách.`;
-        borrowBtn.disabled = true; // ❌ disable
+        //borrowBtn.disabled = true; // ❌ disable
+        isBorrowBlocked = true;
         warningBox.classList.add("serious");
         borrowBtn.classList.add("disabled");
     }
     // Có cả quá hạn + vi phạm
     else {
         message = `Bạn có ${parts.join(", ").replace(/,([^,]*)$/, " và$1")}. Vui lòng xử lý các vi phạm trước khi tiếp tục mượn sách.`;
-        borrowBtn.disabled = true; // ❌ disable
+        //borrowBtn.disabled = true; // ❌ disable
+        isBorrowBlocked = true;
         warningBox.classList.add("serious");
         borrowBtn.classList.add("disabled");
     }
