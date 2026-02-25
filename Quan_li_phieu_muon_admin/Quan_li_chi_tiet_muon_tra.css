@@ -148,9 +148,18 @@
 
 /* màu theo trạng thái */
 
+.book-extra-info .dropdown-tinhtrang.wait { color: #0c1fae; }
+
 .book-extra-info .dropdown-tinhtrang.good    { color: #2ecc71; }
 
-.book-extra-info .dropdown-tinhtrang.bad     { color: #e74c3c; }
+.book-extra-info .dropdown-tinhtrang.bad     { color: #ff6700; }
+
+.book-extra-info .dropdown-tinhtrang.very-bad   { color: #e74c3c; }
+
+.book-extra-info .dropdown-tinhtrang .tinhtrang-option-wait{
+    background: #f0f2f1;
+    color: #0c1fae;
+}
 
 .book-extra-info .dropdown-tinhtrang .tinhtrang-option-good{
     background: #f0f2f1;
@@ -158,6 +167,11 @@
 }
 
 .book-extra-info .dropdown-tinhtrang .tinhtrang-option-bad{
+    background: #f0f2f1;
+    color: #ff6700;
+}
+
+.book-extra-info .dropdown-tinhtrang .tinhtrang-option-very-bad{
     background: #f0f2f1;
     color: #e74c3c;
 }

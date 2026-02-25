@@ -558,19 +558,28 @@ tbody tr {
 }
 
 /* màu theo trạng thái */
-.status-select.neutral { color: #FFAC1C; }
+.status-select.neutral { color: #d9b207; }
+
+.status-select.wait    { color: #0c1fae; }
 
 .status-select.good    { color: #2ecc71; }
 
-.status-select.bad     { color: #e74c3c; }
+.status-select.bad { color: #ff6700; }
+
+.status-select.very-bad     { color: #e74c3c; }
 
 .status-select:focus {
     box-shadow: 0 0 0 3px rgba(46,204,113,0.35);
 }
 
-.status-select .status-option-neutral{
+.status-option-neutral{
     background: #f0f2f1;
-    color: #FFAC1C;
+    color: #d9b207;
+}
+
+.status-option-wait{
+    background: #f0f2f1;
+    color: #0c1fae;
 }
 
 .status-select .status-option-good{
@@ -579,6 +588,11 @@ tbody tr {
 }
 
 .status-select .status-option-bad{
+    background: #f0f2f1;
+    color: #ff6700;
+}
+
+.status-select .status-option-very-bad{
     background: #f0f2f1;
     color: #e74c3c;
 }

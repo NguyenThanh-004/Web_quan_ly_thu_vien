@@ -143,11 +143,11 @@ function displayLoanDetailsAdmin(phieuMuonId, list) {
                         <span>Ngày trả: ${ngayTraText}</span>
                         <span>Tình trạng: 
                             <select class="dropdown-tinhtrang" data-chitietid="${item.chiTietMuonTraId}" style="margin-left:4px;">
-                                <option class="tinhtrang-option-good" value="DANG_MUON" ${tinhTrang === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
+                                <option class="tinhtrang-option-wait" value="DANG_MUON" ${tinhTrang === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
                                 <option class="tinhtrang-option-good" value="DA_TRA" ${tinhTrang === 'DA_TRA' ? 'selected' : ''}>Đã trả</option>
-                                <option class="tinhtrang-option-bad" value="HU_HONG" ${tinhTrang === 'HU_HONG' ? 'selected' : ''}>Hư hỏng</option>
-                                <option class="tinhtrang-option-bad" value="MAT" ${tinhTrang === 'MAT' ? 'selected' : ''}>Mất</option>
                                 <option class="tinhtrang-option-bad" value="QUA_HAN" ${tinhTrang === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
+                                <option class="tinhtrang-option-very-bad" value="HU_HONG" ${tinhTrang === 'HU_HONG' ? 'selected' : ''}>Hư hỏng</option>
+                                <option class="tinhtrang-option-very-bad" value="MAT" ${tinhTrang === 'MAT' ? 'selected' : ''}>Mất</option>                               
                             </select>
                         </span>
                         <span class="fine">Tiền phạt: ${tienPhatText}</span>
@@ -297,17 +297,23 @@ async function updateChiTietStatus(chiTietPhieuMuonId, tinhTrang) {
 }
 // ================= UPDATE SELECT COLOR ================= // Cập nhật màu sắc của select dựa trên giá trị
 function updateSelectColor(select) {
-    select.classList.remove('neutral', 'good', 'bad');
+    select.classList.remove('wait', 'good', 'bad', 'very-bad');
 
     switch (select.value) {
         case 'DANG_MUON':
+            select.classList.add('wait');
+            break;
         case 'DA_TRA':
             select.classList.add('good');
             break;
-        case 'HU_HONG':
         case 'QUA_HAN':
-        case 'MAT':
             select.classList.add('bad');
+            break;
+        case 'HU_HONG':
+            select.classList.add('very-bad');
+            break;
+        case 'MAT':
+            select.classList.add('very-bad');
             break;
     }
 }   

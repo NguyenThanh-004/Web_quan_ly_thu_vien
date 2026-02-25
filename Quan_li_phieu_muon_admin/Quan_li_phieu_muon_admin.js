@@ -182,10 +182,10 @@ function renderPhieuMuon(pageData, append = false) {
           <span>
             <select class="status-select" data-id="${item.phieuMuonId}">
               <option class="status-option-neutral" value="DANG_CHO" ${item.trangThaiPhieuMuon === 'DANG_CHO' ? 'selected' : ''}>Đang chờ</option>
-              <option class="status-option-good" value="DANG_MUON" ${item.trangThaiPhieuMuon === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
-              <option class="status-option-bad" value="HUY" ${item.trangThaiPhieuMuon === 'HUY' ? 'selected' : ''}>Huỷ</option>
-              <option class="status-option-bad" value="QUA_HAN" ${item.trangThaiPhieuMuon === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
+              <option class="status-option-wait" value="DANG_MUON" ${item.trangThaiPhieuMuon === 'DANG_MUON' ? 'selected' : ''}>Đang mượn</option>
               <option class="status-option-good" value="HOAN_TAT" ${item.trangThaiPhieuMuon === 'HOAN_TAT' ? 'selected' : ''}>Hoàn tất</option>
+              <option class="status-option-bad" value="HUY" ${item.trangThaiPhieuMuon === 'HUY' ? 'selected' : ''}>Huỷ</option>
+              <option class="status-option-very-bad" value="QUA_HAN" ${item.trangThaiPhieuMuon === 'QUA_HAN' ? 'selected' : ''}>Quá hạn</option>
             </select>
           </span>
         </div>
@@ -620,19 +620,23 @@ async function searchPhieuMuon(keyword, trangThai) {
 
 // ================= UPDATE SELECT COLOR ================= // Cập nhật màu sắc của select dựa trên giá trị
 function updateSelectColor(select) {
-    select.classList.remove('neutral', 'good', 'bad');
+    select.classList.remove('neutral', 'wait', 'good', 'bad', 'very-bad');
 
     switch (select.value) {
         case 'DANG_CHO':
             select.classList.add('neutral');
             break;
         case 'DANG_MUON':
+          select.classList.add('wait');
+            break;
         case 'HOAN_TAT':
             select.classList.add('good');
             break;
         case 'HUY':
+          select.classList.add('bad');
+            break;
         case 'QUA_HAN':
-            select.classList.add('bad');
+            select.classList.add('very-bad');
             break;
     }
 }
